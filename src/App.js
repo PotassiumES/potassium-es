@@ -270,7 +270,7 @@ const App = class extends EventHandler {
 	_makeHand(color) {
 		/** @todo make this a portable resource, perhaps by embedding it in an ES module */
 		return graph.obj(
-			"./js/potassium/input/models/Controller.obj",
+			"/static/potassium-es/models/Controller.obj",
 			(group, obj) => {
 				const body = group.getObjectByName("Body_Cylinder") // Magic string for temp OBJ
 				if (!body) {

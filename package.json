@@ -50,9 +50,11 @@
       "prefer-const": "error",
       "no-var": "error"
     }
-  },  
+  },
+  "dependencies": {
+    "action-input": "git+https://github.com/TrevorFSmith/action-input.git"
+  },
   "devDependencies": {
-    "action-input": "git+https://github.com/TrevorFSmith/action-input.git",
     "cross-env": "^5.2.0",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",

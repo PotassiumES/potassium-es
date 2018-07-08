@@ -16,8 +16,8 @@ export default class VirtualKeyboardInputSource extends InputSource {
 		this._command = null
 
 		// TODO make this a portable asset, perhaps by embedding it in an ES module
-		this.keyboardGroup = graph.obj("./js/potassium/input/Kayboard.obj", null, (...params) => {
-			console.err("Could not load virtual keyboard OBJ", ...params)
+		this.keyboardGroup = graph.obj("/static/potassium-es/models/Keyboard.obj", null, (...params) => {
+			console.error("Could not load virtual keyboard OBJ", ...params)
 		})
 		this.keyboardGroup.name = "virtual-keyboard"
 	}
