@@ -1,7 +1,6 @@
 /*
 A handy, chain oriented API for creating Three.js scenes
 */
-import el from "./El.js"
 import Engine from "./Engine.js"
 
 const graph = {}
@@ -169,7 +168,7 @@ graph.GRAPH_CLASSES = [
 	{ class: "AmbientLight", name: "ambientLight" }
 ]
 
-// This loop generates the element generating functions like el.div(...)
+// This loop generates the element generating functions like graph.group(...)
 for (let graphClassInfo of graph.GRAPH_CLASSES) {
 	const innerClazz = graphClassInfo.class
 	graph[graphClassInfo.name] = function(...params) {

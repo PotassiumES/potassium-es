@@ -1,0 +1,30 @@
+{
+  "comment": "Main",
+  "filters": [
+    {
+      "filter": "/filter/click",
+      "filterParameters": {},
+      "actionParameters": {},
+      "source": "/input/mouse/*/button/primary",
+      "destination": "/action/activate"
+    },
+    {
+      "filter": "/filter/click",
+      "filterParameters": {},
+      "actionParameters": {},
+      "source": "/input/touch/count",
+      "destination": "/action/activate"
+    },
+    {
+      "filter": "/filter/active-pick",
+      "filterParameters": {
+        "pickPath" : "/input/picking/touch"
+      },
+      "actionParameters": {},
+      "source": "/input/touch/count",
+      "destination": "/action/activate"
+    }
+  ],
+  "inputs": [],
+  "aliases": []
+}

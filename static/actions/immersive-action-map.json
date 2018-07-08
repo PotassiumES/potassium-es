@@ -1,0 +1,23 @@
+{
+  "comment": "Immersive",
+  "filters": [
+    {
+      "filter": "/filter/text-input",
+      "filterParameters": {},
+      "actionParameters": {},
+      "source": "/input/virtual-keyboard/command",
+      "destination": "/action/text-input"
+    },
+    {
+      "filter": "/filter/active-pick",
+      "filterParameters": {
+        "pickPath": "/input/picking/left"
+      },
+      "actionParameters": { "pointer": "left" },
+      "source": "/input/gamepad/left/button/0/pressed",
+      "destination": "/action/activate"
+    }
+  ],
+  "inputs": [],
+  "aliases": []
+}
