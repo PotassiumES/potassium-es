@@ -3,6 +3,7 @@ import graph from "./Graph.js"
 import Engine from "./Engine.js"
 import Router from "./Router.js"
 import Component from "./Component.js"
+import AssetLoader from './AssetLoader.js'
 import EventHandler from "./EventHandler.js"
 import { throttledConsoleLog } from "./throttle.js"
 
@@ -32,6 +33,7 @@ const App = class extends EventHandler {
 		this._handleImmersiveTick = this._handleImmersiveTick.bind(this)
 
 		this._router = new Router()
+		this._assetLoader = new AssetLoader()
 
 		this._displayMode = App.FLAT
 
@@ -159,6 +161,10 @@ const App = class extends EventHandler {
 	/** @return {Router} */
 	get router() {
 		return this._router
+	}
+	/** @return {AssetLoader} */
+	get assetLoader(){
+		return this._assetLoader
 	}
 	/** @return {HTMLElement} */
 	get el() {
