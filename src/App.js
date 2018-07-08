@@ -57,15 +57,15 @@ const App = class extends EventHandler {
 		/** @todo figure out how action map files should be bundled */
 		this._actionManager.addActionMap(
 			"flat",
-			new ActionMap([...this._actionManager.filters], "/input/flat-action-map.json")
+			new ActionMap([...this._actionManager.filters], "/static/potassium-es/actions/flat-action-map.json")
 		)
 		this._actionManager.addActionMap(
 			"portal",
-			new ActionMap([...this._actionManager.filters], "/input/portal-action-map.json")
+			new ActionMap([...this._actionManager.filters], "/static/potassium-es/actions/portal-action-map.json")
 		)
 		this._actionManager.addActionMap(
 			"immersive",
-			new ActionMap([...this._actionManager.filters], "/input/immersive-action-map.json")
+			new ActionMap([...this._actionManager.filters], "/static/potassium-es/actions/immersive-action-map.json")
 		)
 		this._actionManager.switchToActionMaps("flat")
 
