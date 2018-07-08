@@ -78,7 +78,7 @@ function loadText(resultGroup, text, material, font, options) {
 }
 
 graph.text = (text = "", material = null, fontPath = null, options = {}) => {
-	const font = fontPath || "./js/potassium/fonts/helvetiker_regular.typeface.json"
+	const font = fontPath || "/static/potassium-es/fonts/helvetiker_regular.typeface.json"
 	options = Object.assign(
 		{
 			size: 0.25,
