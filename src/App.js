@@ -33,7 +33,7 @@ const App = class extends EventHandler {
 		this._handleImmersiveTick = this._handleImmersiveTick.bind(this)
 
 		this._router = new Router()
-		this._assetLoader = new AssetLoader()
+		this._assetLoader = AssetLoader.Singleton
 
 		this._displayMode = App.FLAT
 

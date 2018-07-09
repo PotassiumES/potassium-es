@@ -2,9 +2,15 @@
 A handy, chain oriented API for creating Three.js scenes
 */
 import Engine from "./Engine.js"
+import AssetLoader from './AssetLoader.js'
 
 const graph = {}
 export default graph
+
+const assetLoader = AssetLoader.Singleton
+const fontLoader = new THREE.FontLoader()
+const mtlLoader = new THREE.MTLLoader()
+const objLoader = new THREE.OBJLoader()
 
 /*
 	if the first elements in `params` is an array, the values of the array will be passed as separate parameters into the constructor of the instance
@@ -61,19 +67,29 @@ function loadText(resultGroup, text, material, font, options) {
 		const textGeometry = new THREE.TextGeometry(text, Object.assign({ font: graph.fonts.get(font) }, options))
 		resultGroup.add(new THREE.Mesh(textGeometry, material))
 	} else {
-		const fontLoader = new THREE.FontLoader()
-		fontLoader.load(
-			font,
-			loadedFont => {
-				graph.fonts.set(font, loadedFont)
-				const textGeometry = new THREE.TextGeometry(text, Object.assign({ font: loadedFont }, options))
-				resultGroup.add(new THREE.Mesh(textGeometry, material))
-			},
-			() => {},
-			err => {
-				console.error("Could not load font", font, err)
+		assetLoader.get(font).then(blob => {
+			if(!blob){
+				console.error('Failed to fetch the font', font)
+				return
 			}
-		)
+			const blobURL = URL.createObjectURL(blob)
+			fontLoader.load(
+				blobURL,
+				loadedFont => {
+					graph.fonts.set(font, loadedFont)
+					const textGeometry = new THREE.TextGeometry(text, Object.assign({ font: loadedFont }, options))
+					resultGroup.add(new THREE.Mesh(textGeometry, material))
+					URL.revokeObjectURL(blobURL)
+				},
+				() => {},
+				err => {
+					console.error("Could not load font", font, err)
+					URL.revokeObjectURL(blobURL)
+				}
+			)
+
+
+		})
 	}
 }
 
@@ -110,11 +126,9 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 	return resultGroup
 }
 
-graph.obj = (path, successCallback = null, failureCallback = null) => {
-	const geometry = path.split("/")[path.split("/").length - 1]
-	const baseURL = path.substring(0, path.length - geometry.length)
+graph.obj = (objPath, successCallback = null, failureCallback = null) => {
 	const group = graph.group()
-	loadObj(baseURL, geometry)
+	loadObj(objPath)
 		.then(obj => {
 			group.add(obj)
 			if (successCallback !== null) successCallback(group, obj)
@@ -228,35 +242,57 @@ function loadGLTF(url) {
 	})
 }
 
-function loadObj(baseURL, geometry) {
-	return new Promise(function(resolve, reject) {
-		const mtlLoader = new THREE.MTLLoader()
-		mtlLoader.setPath(baseURL)
-		const mtlName = geometry.split(".")[geometry.split(":").length - 1] + ".mtl"
-		mtlLoader.load(
-			mtlName,
-			materials => {
-				materials.preload()
-				const objLoader = new THREE.OBJLoader()
-				objLoader.setMaterials(materials)
-				objLoader.setPath(baseURL)
-				objLoader.load(
-					geometry,
-					obj => {
-						resolve(obj)
+function loadObj(objPath) {
+	const objName = objPath.split("/")[objPath.split("/").length - 1]
+	const baseURL = objPath.substring(0, objPath.length - objName.length)
+	const mtlName = objName.split(".")[objName.split(":").length - 1] + ".mtl"
+	const mtlPath = baseURL + mtlName
+
+	return new Promise((resolve, reject) => {
+		assetLoader.get(mtlPath).then(mtlBlob => {
+			if(mtlBlob === null){
+				reject(`Could not load ${mtlPath}`)
+				return
+			}
+
+			assetLoader.get(objPath).then(objBlob => {
+				if(objBlob === null) {
+					reject(`Could not load ${objPath}`)
+					return
+				}
+
+				const objURL = URL.createObjectURL(objBlob)
+				const mtlURL = URL.createObjectURL(mtlBlob)
+
+				mtlLoader.setTexturePath(baseURL)
+				mtlLoader.load(
+					mtlURL,
+					materials => {
+						materials.preload()
+						objLoader.setMaterials(materials)
+						objLoader.load(
+							objURL,
+							obj => {
+								URL.revokeObjectURL(objURL)
+								resolve(obj)
+							},
+							() => {},
+							(...params) => {
+								console.error("Failed to load obj", ...params)
+								reject(...params)
+								URL.revokeObjectURL(objURL)
+							}
+						)
+						URL.revokeObjectURL(mtlURL)
 					},
 					() => {},
 					(...params) => {
-						console.error("Failed to load obj", ...params)
+						console.error("Failed to load mtl", ...params)
 						reject(...params)
+						URL.revokeObjectURL(mtlURL)
 					}
 				)
-			},
-			() => {},
-			(...params) => {
-				console.error("Failed to load mtl", ...params)
-				reject(...params)
-			}
-		)
+			})
+		})
 	})
 }

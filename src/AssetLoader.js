@@ -150,7 +150,16 @@ const AssetLoader = class extends EventHandler {
 		}
 		return null
 	}
+
+	static get Singleton(){
+		if(singleton === null){
+			singleton = new AssetLoader()
+		}
+		return singleton
+	}
 }
+
+let singleton = null
 
 // States for AssetInfo.state
 AssetLoader.LOADING = Symbol('loading')
