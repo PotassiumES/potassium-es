@@ -37,11 +37,12 @@ const Component = class extends EventHandler {
 	/**
 	* @param {DataObject} dataObject
 	* @param {Object} options
+	* @todo Add a description of options: flatEl, portalEl, portalGraph, immersiveGraph, and activationAnchor
 	*/
 	constructor(dataObject = null, options = {}) {
 		super()
 		this.dataObject = dataObject // a DataModel or DataCollection
-		this.options = options
+		this.options = options || {}
 		this.cleanedUp = false
 
 		this.focus = this.focus.bind(this)
@@ -68,8 +69,13 @@ const Component = class extends EventHandler {
 		this._immersiveGraph = this.options.immersiveGraph || graph.group()
 		this._immersiveGraph.component = this
 
+		// All Components are selectable by the 'component' class
+		this.addClass('component')
+
 		this.boundCallbacks = [] // { callback, dataObject } to be unbound during cleanup
 		this.domEventCallbacks = [] // { callback, eventName, targetEl } to be unregistered during cleanup
+
+		this._updateClasses()
 
 		this.listenToEl("focus", this._flatEl, this.focus)
 		this.listenToEl("blur", this._flatEl, this.blur)
@@ -94,11 +100,22 @@ const Component = class extends EventHandler {
 	*/
 	handleDisplayModeChange(mode) {}
 
+	get activationAnchor(){
+		return this.options.activationAnchor || null
+	}
+	set activationAnchor(value){
+		this.options.activationAnchor = value
+		this._updateClasses()
+	}
+
 	/*
 	Called when an action is targeted at a Component
 	*/
 	handleAction(actionName, value, actionParameters) {
 		if (actionName === "/action/activate" && value === true) {
+			if(typeof this.options.activationAnchor === 'string'){
+				document.location.href = this.options.activationAnchor
+			}
 			this.focus()
 		}
 		this.trigger(Component.ActionEvent, actionName, value, actionParameters)
@@ -137,11 +154,17 @@ const Component = class extends EventHandler {
 	focus() {
 		if (this._acceptsTextInputFocus === false) return false
 		Component.TextInputFocus = this
+		this._updateClasses()
 	}
 
 	blur() {
 		if (Component.TextInputFocus !== this) return
 		Component.TextInputFocus = null
+		this._updateClasses()
+	}
+
+	get hasFocus(){
+		return this === Component._TextInputFocus
 	}
 
 	/*
@@ -161,6 +184,15 @@ const Component = class extends EventHandler {
 		this._portalEl.removeChild(childComponent.portalEl)
 		this._portalGraph.remove(childComponent.portalGraph)
 		this._immersiveGraph.remove(childComponent.immersiveGraph)
+	}
+
+	/**
+	A handy method for quick creation and setting of a parent:
+	this._fooComponent = new FooComponent().appendTo(parentComponent)
+	*/
+	appendTo(parentComponent){
+		parentComponent.appendComponent(this)
+		return this
 	}
 
 	// Helper functions to add and remove class attributes to both flat and portal DOM elements
@@ -236,6 +268,22 @@ const Component = class extends EventHandler {
 			callback: callback,
 			dataObject: dataObject
 		})
+	}
+
+	/**
+	Updates classes based on activationAnchor and focus 
+	*/
+	_updateClasses(){
+		if(this.hasFocus){
+			this.addClass('focus')
+		} else {
+			this.removeClass('focus')
+		}
+		if(this.activationAnchor){
+			this.addClass('anchored')
+		} else {
+			this.removeClass('anchored')
+		}
 	}
 
 	static get TextInputFocus() {

@@ -1,3 +1,12 @@
+/** PotassiumES Styles **/
+
+/** Reset **/
+body, html, div, p, input, button, form, a, section,
+h1, h2, h3, h4, h5,
+.xr-canvas, .arkit-device-wrapper, .arkit-device-wrapper canvas {
+	padding: 0;
+	margin: 0;
+}
 
 body,
 html,
@@ -6,14 +15,18 @@ html,
 .arkit-device-wrapper canvas {
 	width: 100%;
 	height: 100%;
-	padding: 0;
-	margin: 0;
 	background: inherit;
 }
 
-body, html {
-	z-index: 1;
-}
+/** Set up z indices */
+.xr-canvas				{ z-index: -2; }
+.arkit-device-wrapper	{ z-index: -1; }
+html					{ z-index: 1; }
+body					{ z-index: 2; }
+.app					{ z-index: 3; }
+.flat-root,
+.portal-root,
+.immersive-root			{ z-index: 4; }
 
 .arkit-device-wrapper, .xr-canvas {
 	position: absolute;
@@ -21,14 +34,6 @@ body, html {
 	left: 0;
 	bottom: 0;
 	right: 0;
-}
-
-.arkit-device-wrapper {
-	z-index: -1;
-}
-
-.xr-canvas {
-	z-index: -2;
 }
 
 .webxr-sessions, .portal-root {
@@ -40,12 +45,6 @@ body, html {
 .webxr-sessions canvas {
 	width: 100%;
 	height: 100%;
-}
-
-.flat-root,
-.portal-root,
-.immersive-root {
-	z-index: 5;
 }
 
 /* Hide the *-root elements for the non-active display mode */
@@ -63,5 +62,4 @@ body, html {
 	top: 0; left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 4;
 }
