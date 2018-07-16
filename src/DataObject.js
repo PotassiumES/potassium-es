@@ -6,6 +6,7 @@ import EventHandler from "./EventHandler.js"
 */
 const DataObject = class extends EventHandler {
 	constructor(options = {}) {
+		super()
 		this.options = options
 		this._new = true // True until the first fetch returns, regardless of http status
 		this.cleanedUp = false

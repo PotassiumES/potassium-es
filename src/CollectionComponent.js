@@ -1,5 +1,7 @@
 import el from "./El.js"
+import graph from "./Graph.js"
 import Component from "./Component.js"
+import DataObject from "./DataObject.js"
 import DataCollection from "./DataCollection.js"
 
 /*
@@ -8,10 +10,12 @@ DefaultItemComponent is used by CollectionComponent if no itemComponent option i
 const DefaultItemComponent = class extends Component {
 	constructor(dataObject = null, options = {}) {
 		super(dataObject, Object.assign({ flatEl: el.li() }, options))
-		if (dataObject === null) throw "DefaultItemComponent requires a dataObject"
+		if(dataObject instanceof DataObject === false) throw "DefaultItemComponent requires a dataObject"
+		this.addClass('default-item-component')
 		this.flatEl.appendChild(el.span("Item: " + dataObject))
-		this.portalGraph.appendChild(graph.text("Item: " + dataObject))
-		this.immersiveGraph.appendChild(graph.text("Item: " + dataObject))
+		this.portalEl.appendChild(el.span("Item: " + dataObject))
+		this.portalGraph.add(graph.text("Item: " + dataObject))
+		this.immersiveGraph.add(graph.text("Item: " + dataObject))
 	}
 }
 
@@ -26,19 +30,16 @@ const CollectionComponent = class extends Component {
 	constructor(dataObject = null, options = {}) {
 		super(
 			dataObject,
-			Object.assign(
-				{
-					itemGraphHeight: 0.3
-				},
-				options
-			)
+			Object.assign({
+				flatEl: el.ul(),
+				portalEl: el.ul(),
+				itemGraphHeight: 0.3
+			}, options)
 		)
-		this.flatEl.addClass("collection-component")
+		this.addClass("collection-component")
 		if (dataObject instanceof DataCollection === false) throw "CollectionComponent requires a DataCollection dataObject"
 		this._inGroupChange = false // True while resetting or other group change
 		this._dataObjectComponents = new Map() // dataObject.id -> Component
-
-		this._ul = el.ul().appendTo(this.flatEl)
 
 		this.dataObject.addListener((...params) => {
 			this._handleCollectionReset(...params)
@@ -53,8 +54,8 @@ const CollectionComponent = class extends Component {
 	at(index) {
 		// Returns the Component at index, or null if index is out of bounds
 		if (index < 0) return null
-		if (index >= this._ul.children.length) return null
-		return this._ul.children.item(index).component
+		if (index >= this.flatEl.children.length) return null
+		return this.flatEl.children.item(index).component
 	}
 	componentForDataObject(dataObject) {
 		return this._dataObjectComponents.get(dataObject.get("id"))
@@ -68,6 +69,7 @@ const CollectionComponent = class extends Component {
 				var display = true
 			}
 			itemComponent.flatEl.style.display = display ? "" : "none"
+			itemComponent.portalEl.style.display = display ? "" : "none"
 			itemComponent.portalGraph.visible = display
 			itemComponent.immersiveGraph.visible = display
 		}
@@ -119,7 +121,7 @@ const CollectionComponent = class extends Component {
 		}
 		this._dataObjectComponents.set(itemComponent.dataObject.get("id"), itemComponent)
 
-		this._ul.appendChild(itemComponent.flatEl)
+		this.appendComponent(itemComponent)
 		// TODO switch to action-input
 		if (this.options.onClick) {
 			itemComponent.flatEl.addEventListener("click", ev => {
@@ -127,19 +129,15 @@ const CollectionComponent = class extends Component {
 			})
 		}
 
-		this.portalGraph.add(itemComponent.portalGraph)
-		this.immersiveGraph.add(itemComponent.immersiveGraph)
-
 		if (this._inGroupChange === false) this._layoutGraph()
 
 		itemComponent.dataObject.addListener(this._handleDeleted.bind(this), "deleted", true)
 	}
 	_remove(itemComponent) {
 		this._dataObjectComponents.delete(itemComponent.dataObject.get("id"))
-		this._ul.removeChild(itemComponent.flatEl)
-		this.portalGraph.remove(itemComponent.portalGraph)
-		this.immersiveGraph.remove(itemComponent.immersiveGraph)
+		this.removeComponent(itemComponent)
 		itemComponent.flatEl.removeEventListener("click", null)
+		itemComponent.portalEl.removeEventListener("click", null)
 		itemComponent.cleanup()
 
 		if (this._inGroupChange === false) this._layoutGraph()
@@ -162,7 +160,8 @@ const CollectionComponent = class extends Component {
 		} else {
 			var itemComponent = new DefaultItemComponent(itemDataObject, options)
 		}
-		itemComponent.flatEl.addClass("collection-item")
+		itemComponent.addClass("collection-item")
+		itemComponent.addClass("collection-item")
 		return itemComponent
 	}
 }
