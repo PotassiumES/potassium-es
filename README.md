@@ -1,25 +1,39 @@
-# PotassiumES: a browser-side framework for the wider web
+# PotassiumES
 
-*NOTE* We're still laying the foundation, so don't use this quite yet
+*NOTE* We're just now breaking ground on this project and there's a lot to do. Go look at the [Projects Section](https://github.com/orgs/PotassiumES/projects) to see what's happening and how you can help!
 
-A wider web application responsively supports:
-- three display modes: flat, portal, and immersive
-- three control types: page, overlay, and spatial
-- varied input types: tracked wands, hand gestures, speech
+## Project goals
 
-In other words, use PotassiumES to build web applications that are as lovely and accessible on mobile and desktop as they are in AR/VR headsets.
+*Goal 1:* Enable the wider web
 
-Read [Designing the Wider Web](https://trevor.smith.name/publish/exformation/10080/) for more information about wider web display modes and control types.
+The "wider web" is an extension of the existing responsive, flat web into augmented and virtual reality. It incorporates the essential harassment management tools required for healthy social systems.
 
-## Example sites
+See [What Is The Wider Web](https://github.com/PotassiumES/potassium-es/blob/master/WHAT+IS+THE+WIDER+WEB.md) for more details.
 
-TBD
+*Goal 2*: Explore new design, art, and social capabilities.
 
-## Installation
+The wider web provides fresh ground to explore new user experience designs, flat graphics, 3D graphics, art forms, and social situations.
 
-TBD
+This project supports and encourages exploration of these new directions.
 
-## Code examples
+## Audience
 
-TBD
+PotassiumES supports teams who create wider web applications:
+
+- Product and project managers
+- Designers
+- Artists
+- Writers
+- Coders
+
+## Products
+
+A delightful technical framework for building wider web applications.
+
+A library of beautiful user interface controls that work nicely on major web browsers and on accessibility-oriented browsers like screen readers.
+
+Educational resources for teams who want to co-create the wider web.
+
+A solid social framework for organizing and realizing progressive projects.
+
 
