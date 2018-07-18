@@ -84,6 +84,6 @@ members of the project's leadership.
 
 ## Attribution
 
-The latest version of this document is available at: https://github.com/PotassiumES/potassium-es/blob/master/CODE%20OF%20CONDUCT.md
+The latest version of this document is available at the [potassium-es repo](https://github.com/PotassiumES/potassium-es/)
 
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html).
