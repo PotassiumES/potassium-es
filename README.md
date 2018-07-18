@@ -40,6 +40,6 @@ A solid social framework for organizing and realizing progressive projects.
 
 ## Contributors
 
-This project has a somewhat unique Code of Conduct](https://github.com/PotassiumES/potassium-es/blob/master/CODE%20OF%20CONDUCT.md) that holds contributors to a higher standard that most other collective action.
+This project has a somewhat unique [Code of Conduct](https://github.com/PotassiumES/potassium-es/blob/master/CODE%20OF%20CONDUCT.md) that holds contributors to a higher standard that most other collective action.
 
 
