@@ -1,6 +1,6 @@
 # PotassiumES
 
-*NOTE* We're just now breaking ground on this project and there's a lot to do. Go look at the [Projects Section](https://github.com/orgs/PotassiumES/projects) to see what's happening and how you can help!
+**NOTE** We're just breaking ground on this project and there's a lot to do. Go look at the [Projects Section](https://github.com/orgs/PotassiumES/projects) to see what's happening and how you can help!
 
 ## Project goals
 
@@ -37,5 +37,9 @@ A library of beautiful user interface controls that work nicely on major web bro
 Educational resources for teams who want to co-create the wider web.
 
 A solid social framework for organizing and realizing progressive projects.
+
+## Contributors
+
+This project has a somewhat unique Code of Conduct](https://github.com/PotassiumES/potassium-es/blob/master/CODE%20OF%20CONDUCT.md) that holds contributors to a higher standard that most other collective action.
 
 
