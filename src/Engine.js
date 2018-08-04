@@ -108,17 +108,14 @@ const Engine = class {
 									resolve(this._mode)
 								})
 								.catch(err => {
-									console.error("Error finding frame of reference", err)
 									reject(err)
 								})
 						})
 						.catch(err => {
-							console.error("Error requesting session", err)
 							reject(err)
 						})
 				})
 				.catch(err => {
-					console.error("err", err)
 					reject("Error getting XR displays", err)
 					return
 				})

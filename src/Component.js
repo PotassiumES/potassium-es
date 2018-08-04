@@ -1,6 +1,7 @@
 import el from "./El.js"
 import graph from "./Graph.js"
 import EventHandler from "./EventHandler.js"
+import AudioManager from "./AudioManager.js"
 
 /**
 	Component contains the reactive logic for a responsive UI element.
@@ -301,10 +302,18 @@ const Component = class extends EventHandler {
 			component.trigger(Component.FocusEvent, component)
 		}
 	}
+
+	static get AudioManager(){
+		return Component._AudioManager
+	}
 }
 
 /** The Component that should receive text input because it is in focus */
 Component._TextInputFocus = null
+
+/** Components all share one {@link AudioManager}, retrieved by Component.AudioManager */
+Component._AudioManager = new AudioManager()
+
 
 /* Events */
 Component.ActionEvent = "component-action-event"

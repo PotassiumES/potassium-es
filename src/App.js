@@ -248,7 +248,7 @@ const App = class extends EventHandler {
 						resolve(App.PORTAL)
 					})
 					.catch(err => {
-						console.error("Error starting portal engine", err)
+						this.trigger(App.DisplayModeFailedEvent, App.PORTAL)
 						reject(err)
 					})
 			})
@@ -265,7 +265,7 @@ const App = class extends EventHandler {
 						resolve(App.IMMERSIVE)
 					})
 					.catch(err => {
-						console.error("Error starting immersive engine", err)
+						this.trigger(App.DisplayModeFailedEvent, App.IMMERSIVE)
 						reject(err)
 					})
 			})
@@ -389,5 +389,6 @@ App.IMMERSIVE = "immersive"
 App.DISPLAY_MODES = [App.FLAT, App.PORTAL, App.IMMERSIVE]
 
 App.DisplayModeChangedEvent = "display-mode-changed"
+App.DisplayModeFailedEvent = "display-mode-failed"
 
 export default App
