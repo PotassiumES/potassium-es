@@ -1,7 +1,7 @@
 {
   "name": "potassium-es",
   "version": "0.1.0",
-  "description": "a browser-side framework for wider web applications",
+  "description": "A browser-side framework for wider web applications",
   "main": "src/App.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,7 +23,7 @@
     "javascript-framework",
     "responsive-web"
   ],
-  "author": "Trevor F. Smith <trevor@trevors.smith.name>",
+  "author": "Trevor F. Smith <trevor@transmutable.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PotassiumES/potassium-es/issues"

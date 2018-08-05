@@ -31,8 +31,10 @@ This project is indirectly for people who use the wider web, but they'll probabl
 ## Products
 
 A delightful technical framework for building wider web applications.
+- [API Documentation](https://doc.esdoc.org/github.com/PotassiumES/potassium-es/)
 
 A library of beautiful user interface controls that work nicely on major web browsers and on accessibility-oriented browsers like screen readers.
+- [potassium-components repo](https://github.com/PotassiumES/potassium-components)
 
 Educational resources for teams who want to co-create the wider web.
 
@@ -42,4 +44,4 @@ A solid social framework for organizing and realizing progressive projects.
 
 This project has a somewhat unique [Code of Conduct](https://github.com/PotassiumES/potassium-es/blob/master/CODE%20OF%20CONDUCT.md) that holds contributors to a higher standard that most other collective action.
 
-
+If all else fails, ask [Trevor Flowers](http://trevor.smith.name/) &lt;trevor@trevor.smith.name&gt;

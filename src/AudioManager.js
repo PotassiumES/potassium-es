@@ -1,5 +1,3 @@
-import el from "./El.js"
-
 /**
 AudioManager manages audio for all {@link Component}s.
 */

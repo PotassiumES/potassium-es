@@ -314,7 +314,6 @@ Component._TextInputFocus = null
 /** Components all share one {@link AudioManager}, retrieved by Component.AudioManager */
 Component._AudioManager = new AudioManager()
 
-
 /* Events */
 Component.ActionEvent = "component-action-event"
 Component.TextInputEvent = "component-text-input-event"
