@@ -6,7 +6,7 @@
 
 **Goal 1:** Enable the wider web
 
-The "wider web" is an extension of the existing responsive, flat web into augmented and virtual reality. It incorporates the essential harassment management tools required for healthy social systems.
+The "wider web" adds augmented and virtual reality to the existing flat web. It incorporates the essential harassment management tools required for healthy social systems.
 
 See [What Is The Wider Web](https://github.com/PotassiumES/potassium-es/blob/master/WHAT%20IS%20THE%20WIDER%20WEB.md) for more details.
 
@@ -42,6 +42,6 @@ A solid social framework for organizing and realizing progressive projects.
 
 ## Contributors
 
-This project has a somewhat unique [Code of Conduct](https://github.com/PotassiumES/potassium-es/blob/master/CODE%20OF%20CONDUCT.md) that holds contributors to a higher standard that most other collective action.
+This project has a somewhat unique [Code of Conduct](https://github.com/PotassiumES/potassium-es/blob/master/CODE%20OF%20CONDUCT.md) that holds contributors to a higher standard than most other collective action.
 
 If all else fails, ask [Trevor Flowers](http://trevor.smith.name/) &lt;trevor@trevor.smith.name&gt;
