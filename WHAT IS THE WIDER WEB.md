@@ -8,7 +8,8 @@ The "wider web" is an extension of the current responsive web that has:
 - Portal: a window into a real or virtual space
 - Immersive: AR glasses and VR headsets
 
-<a href="https://potassiumes.org/images/Three-Display-Modes.jpg"><img src="https://potassiumes.org/images/Three-Display-Modes.jpg" alt="three display modes infographic" style="max-width: 100px" /></a>
+<a href="https://potassiumes.org/images/Three-Display-Modes.jpg"><img src="https://potassiumes.org/images/Three-Display-Modes-Thumbnail.jpg" alt="three display modes infographic" /></a>
+[full size](https://potassiumes.org/images/Three-Display-Modes.jpg)
 
 ## 3 control types
 
