@@ -52,7 +52,7 @@
     }
   },
   "dependencies": {
-    "action-input": "git+https://github.com/TrevorFSmith/action-input.git"
+    "action-input": "git+https@github.com:mozilla/action-input.git"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
