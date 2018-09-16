@@ -1,7 +1,6 @@
 /*
 A handy, chain oriented API for creating Three.js scenes
 */
-import Engine from "./Engine.js"
 import AssetLoader from './AssetLoader.js'
 
 const graph = {}
@@ -54,10 +53,6 @@ graph.nodeFunction = function(clazz, ...params) {
 		instance.append(params[i])
 	}
 	return instance
-}
-
-graph.engine = (scene, camera, mode, tickCallback) => {
-	return new Engine(scene, camera, mode, tickCallback)
 }
 
 graph.fonts = new Map() // url => THREE.Font

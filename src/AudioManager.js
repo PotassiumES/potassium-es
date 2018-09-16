@@ -3,7 +3,7 @@ AudioManager manages audio for all {@link Component}s.
 */
 const AudioManager = class {
 	constructor(){
-		this._audioContext = new AudioContext()
+		this._audioContext = new (window.AudioContext || window.webkitAudioContext)
 		this._sounds = new Map() // name {string} => 
 	}
 
@@ -19,6 +19,7 @@ const AudioManager = class {
 			console.error('No such sound', name)
 			return
 		}
+		// TODO spatially mix sounds based on Component pose
 		this._sounds.get(name).play()
 	}
 }

@@ -50,9 +50,9 @@ export default class VirtualKeyboardInputSource extends InputSource {
 	}
 
 	/**
-  @param partialPath {string} the relative semantic path for an input
-  @return the value of the the input, or null if the path does not exist
-  */
+	@param partialPath {string} the relative semantic path for an input
+	@return the value of the the input, or null if the path does not exist
+	*/
 	queryInputPath(partialPath) {
 		const tokens = partialPath.substring(1).split("/")
 		if (tokens.length !== 1) return null

@@ -6,6 +6,7 @@ import Component from "./Component.js"
 import AssetLoader from './AssetLoader.js'
 import EventHandler from "./EventHandler.js"
 import { throttledConsoleLog } from "./throttle.js"
+import DisplayModeTracker from './DisplayModeTracker.js'
 
 import ActionMap from "action-input/src/action/ActionMap"
 import ClickFilter from "action-input/src/filter/ClickFilter"
@@ -22,9 +23,18 @@ import PickingInputSource from "./input/PickingInputSource.js"
 import VirtualKeyboardInputSource from "./input/VirtualKeyboardInputSource.js"
 
 /**
-* App contains the orchestration logic for the entirety of what is being displayed for a given app, including the app chrome like navigation as well as 2D and 3D content.
-* It manages mode changes for mixed reality using [WebXR](https://immersive-web.github.io/webxr/).
-* It communicates these changes to {@link Component}s via events so that they may react. 
+* App contains the orchestration logic for the entirety of what is being displayed for a given app, including the app chrome like navigation.
+*
+* It contains the root data structures for each display mode:
+*
+* - For flat mode it holds a DOM element.
+* - For portal mode it holds a DOM element for overlay controls and a 3D scene for spatial controls and virtual environments.
+* - For immersive mode it holds a 3D scene for spatial controls as well as virtual environments.
+*
+* It manages WebXR sessions for portal and immersive modes. 
+* It also toggles the visibility of the flat and portal DOM fragments as display modes change.
+*
+* App communicates these changes to {@link Component}s via events so that they may react. 
 */
 const App = class extends EventHandler {
 	constructor() {
@@ -34,6 +44,7 @@ const App = class extends EventHandler {
 
 		this._router = new Router()
 		this._assetLoader = AssetLoader.Singleton
+		this._displayModeTracker = DisplayModeTracker.Singleton
 
 		this._displayMode = App.FLAT
 
@@ -112,19 +123,33 @@ const App = class extends EventHandler {
 		/** Portal display mode overlay DOM and 3D scene */
 		this._portalEl = el.div({ class: "portal-root" }).appendTo(this._el)
 		this._portalScene = graph.scene()
-		this._portalCamera = graph.perspectiveCamera([45, 1, 0.5, 10000])
-		this._portalEngine = graph.engine(this._portalScene, this._portalCamera, Engine.PORTAL, this._handlePortalTick)
+		this._portalEngine = new Engine(this._portalScene, Engine.PORTAL, this._handlePortalTick)
+		this._portalEngine.addListener(Engine.STOPPED, (eventName, engine) => {
+			if(this._displayMode === App.PORTAL){
+				this.setDisplayMode(App.FLAT)
+			}
+		})
 
 		/** Immersive display mode 3D scene */
 		this._immersiveEl = el.div({ class: "immersive-root" }).appendTo(this._el)
 		this._immersiveScene = graph.scene()
-		this._immersiveCamera = graph.perspectiveCamera([45, 1, 0.5, 10000])
-		this._immersiveEngine = graph.engine(
+		this._immersiveEngine = new Engine(
 			this._immersiveScene,
-			this._immersiveCamera,
 			Engine.IMMERSIVE,
 			this._handleImmersiveTick
 		)
+		this._immersiveEngine.addListener((eventName, engine) => {
+			if(this._displayMode === App.IMMERSIVE){
+				this.setDisplayMode(App.FLAT)
+			}
+		}, Engine.STOPPED)
+
+		/* Set up WebXR, WebVR, or fallback based displays for the portal and immersive engines */
+		Engine.chooseDisplays(this._portalEngine, this._immersiveEngine).then(() => {
+			this._displayModeTracker.setModes(true, this._portalEngine.hasDisplay, this._immersiveEngine.hasDisplay)
+		}).catch(err => {
+			console.error('Error setting engine displays', err)
+		})
 
 		/* Set up hands and pointers */
 		this._leftHand = graph.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
@@ -227,9 +252,9 @@ const App = class extends EventHandler {
 			})
 		if (value === App.FLAT) {
 			return new Promise((resolve, reject) => {
+				this._displayMode = App.FLAT
 				this._portalEngine.stop()
 				this._immersiveEngine.stop()
-				this._displayMode = App.FLAT
 				this._updateClasses()
 				this.trigger(App.DisplayModeChangedEvent, App.FLAT)
 				window.requestAnimationFrame(this._handleWindowAnimationFrame)
