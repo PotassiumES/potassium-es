@@ -38,12 +38,18 @@ const Component = class extends EventHandler {
 	/**
 	* @param {DataObject} dataObject
 	* @param {Object} options
-	* @todo Add a description of options: flatEl, portalEl, portalGraph, immersiveGraph, and activationAnchor
+	* @todo Add a description of options
+		flatEl, portalEl, portalGraph, immersiveGraph
+		portalOverlay, portalSpatial
+		activationAnchor
 	*/
 	constructor(dataObject = null, options = {}) {
 		super()
 		this.dataObject = dataObject // a DataModel or DataCollection
-		this.options = options || {}
+		this.options = Object.assign({
+			portalOverlay: true,
+			portalSpatial: true
+		}, options)
 		this.cleanedUp = false
 
 		this.focus = this.focus.bind(this)
@@ -65,6 +71,13 @@ const Component = class extends EventHandler {
 		// Portal display mode elements for overlay controls
 		this._portalEl = this.options.portalEl || el.div()
 		this._portalEl.component = this
+
+		if(this.options.portalOverlay === false){
+			this._portalEl.addClass('hidden')
+		}
+		if(this.options.portalSpatial === false){
+			this._portalGraph.visible = false
+		}
 
 		// Immersive display mode 3D graph for spatial controls
 		this._immersiveGraph = this.options.immersiveGraph || graph.group()
@@ -204,6 +217,20 @@ const Component = class extends EventHandler {
 	removeClass(className) {
 		this._flatEl.removeClass(className)
 		this._portalEl.removeClass(className)
+	}
+
+	hide(){
+		this.flatEl.addClass('hidden')
+		if(this.options.portalOverlay) this.portalEl.addClass('hidden')
+		if(this.options.portalSpatial) this.portalGraph.visible = false
+		this.immersiveGraph.visible = false
+	}
+
+	show(){
+		this.flatEl.removeClass('hidden')
+		if(this.options.portalOverlay) this.portalEl.removeClass('hidden')
+		if(this.options.portalSpatial) this.portalGraph.visible = true
+		this.immersiveGraph.visible = true
 	}
 
 	/*

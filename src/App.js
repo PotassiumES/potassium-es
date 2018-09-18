@@ -49,7 +49,6 @@ const App = class extends EventHandler {
 		this._displayMode = App.FLAT
 
 		this._virtualKeyboardInputSource = new VirtualKeyboardInputSource()
-		this._virtualKeyboardInputSource.keyboardGroup.scale.set(0.5, 0.5, 0.5)
 		this._virtualKeyboardInputSource.keyboardGroup.quaternion.setFromEuler(graph.euler(0, -45, 0))
 		this._virtualKeyboardInputSource.keyboardGroup.position.set(0.8, 0, -0.8)
 		this._virtualKeyboardInputSource.keyboardGroup.visible = false
