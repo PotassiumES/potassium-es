@@ -183,35 +183,35 @@ const App = class extends EventHandler {
 		window.requestAnimationFrame(this._handleWindowAnimationFrame)
 	}
 
-	/** @return {Router} */
+	/** @value {Router} */
 	get router() {
 		return this._router
 	}
-	/** @return {AssetLoader} */
+	/** @value {AssetLoader} */
 	get assetLoader(){
 		return this._assetLoader
 	}
-	/** @return {HTMLElement} */
+	/** @value {HTMLElement} */
 	get el() {
 		return this._el
 	}
-	/** @return {HTMLElement} */
+	/** @value {HTMLElement} */
 	get flatEl() {
 		return this._flatEl
 	}
-	/** @return {HTMLElement} */
+	/** @value {HTMLElement} */
 	get portalEl() {
 		return this._portalEl
 	}
-	/** @return {THREE.Group} */
+	/** @value {THREE.Group} */
 	get portalScene() {
 		return this._portalScene
 	}
-	/** @return {THREE.Group} */
+	/** @value {THREE.Group} */
 	get immersiveScene() {
 		return this._immersiveScene
 	}
-	/** @return {ActionManager} */
+	/** @value {ActionManager} */
 	get actionManager() {
 		return this._actionManager
 	}
@@ -237,7 +237,7 @@ const App = class extends EventHandler {
 		this._immersiveScene.remove(childComponent.immersiveGraph)
 	}
 
-	/** @return {string} flat|portal|immersive */
+	/** @value {string} flat|portal|immersive */
 	get displayMode() {
 		return this._displayMode
 	}

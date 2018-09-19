@@ -27,7 +27,7 @@ export default class ActivePickFilter extends Filter {
 		return [!!inputValue, { targetComponent: this._getTarget(filterParameters.pickPath) }]
 	}
 
-	// @return picked Potassium.Component or null
+	/** @return picked Potassium.Component or null */
 	_getTarget(pickPath) {
 		const pick = this._queryInputPath(pickPath)[0]
 		if (pick === null) return null

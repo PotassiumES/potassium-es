@@ -58,7 +58,7 @@ export default class PickingInputSource extends InputSource {
 	}
 
 	/**
-	@param partialPath {string} the relative semantic path for an input
+	@param {string} partialPath the relative semantic path for an input
 	@return the value of the the input, or null if the path does not exist
 	*/
 	queryInputPath(partialPath) {

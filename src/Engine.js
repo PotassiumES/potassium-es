@@ -88,8 +88,8 @@ const Engine = class extends EventHandler {
 
 	/**
 	Determines the available display APIs (WebXR or WebVR) and uses that info to set up an appropriate SceneDisplay for each Engine
-	@param portalEngine {Engine}
-	@param immersiveEngine {Engine}
+	@param {Engine} portalEngine
+	@param {Engine} immersiveEngine
 	*/
 	static async chooseDisplays(portalEngine, immersiveEngine){		
 		// If WebXR is present
@@ -172,10 +172,10 @@ See {@link WebVRDisplay} for {@link WebXRDisplay} ancestor classes that use diff
 */
 const SceneDisplay = class extends EventHandler {
 	/**
-	@param displayMode {string} one of Engine.DISPLAY_MODES
-	@param camera {THREE.Camera}
-	@param scene {THREE.Scene}
-	@param tickCallback {function}
+	@param {string} displayMode one of Engine.DISPLAY_MODES
+	@param {THREE.Camera} camera
+	@param {THREE.Scene} scene
+	@param {function} tickCallback
 	*/
 	constructor(displayMode, camera, scene, tickCallback=null){
 		if (Engine.DISPLAY_MODES.indexOf(displayMode) === -1) {
