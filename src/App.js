@@ -44,9 +44,6 @@ const App = class extends EventHandler {
 		this._handleImmersiveTick = this._handleImmersiveTick.bind(this)
 
 		this._stylist = new Stylist()
-		this._stylist.addListener((eventName, stylist) => {
-			console.log('Styles loaded', stylist._kssData)
-		}, Stylist.LINKS_LOADED_EVENT)
 		this._stylist.loadLinks()
 
 		this._router = new Router()
