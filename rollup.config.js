@@ -1,22 +1,20 @@
-import replace from 'rollup-plugin-replace';
-import cleanup from 'rollup-plugin-cleanup';
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
+import cleanup from 'rollup-plugin-cleanup'
+import commonjs from 'rollup-plugin-commonjs'
+import resolve from 'rollup-plugin-node-resolve'
+
+const production = !process.env.ROLLUP_WATCH;
 
 export default {
-  input: 'src/module.js',
+  input: './hello-world/app.js',
   output: {
-    file: './dist/potassium.js',
+    file: './hello-world/build.js',
     format: 'es'
   },
   plugins: [
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    }),
     commonjs(),
     resolve(),
     cleanup({
-      comments: 'none',
+      comments: 'none'
     })
   ]
-};
+}

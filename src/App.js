@@ -2,6 +2,7 @@ import el from "./El.js"
 import graph from "./Graph.js"
 import Engine from "./Engine.js"
 import Router from "./Router.js"
+import Stylist from "./Stylist.js"
 import Component from "./Component.js"
 import AssetLoader from './AssetLoader.js'
 import EventHandler from "./EventHandler.js"
@@ -41,6 +42,12 @@ const App = class extends EventHandler {
 		super()
 		this._handlePortalTick = this._handlePortalTick.bind(this)
 		this._handleImmersiveTick = this._handleImmersiveTick.bind(this)
+
+		this._stylist = new Stylist()
+		this._stylist.addListener((eventName, stylist) => {
+			console.log('Styles loaded', stylist._kssData)
+		}, Stylist.LINKS_LOADED_EVENT)
+		this._stylist.loadLinks()
 
 		this._router = new Router()
 		this._assetLoader = AssetLoader.Singleton
@@ -333,7 +340,11 @@ const App = class extends EventHandler {
 			this._pickingInputSource.touch = this._portalEngine.pickScreen(...touchInput[0])
 		}
 
+		// Update actions
 		this._actionManager.poll()
+
+		// Update styles
+		this._stylist.applyStyles(this._portalScene)
 	}
 
 	_handleImmersiveTick() {
@@ -389,6 +400,9 @@ const App = class extends EventHandler {
 		}
 		this._virtualKeyboardInputSource.handlePick(this._pickingInputSource.left, this._pickingInputSource.right)
 		this._actionManager.poll()
+
+		// Update styles
+		this._stylist.applyStyles(this._immersiveScene)
 	}
 
 	_handleWindowAnimationFrame() {
