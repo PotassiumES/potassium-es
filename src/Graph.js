@@ -2,6 +2,7 @@
 A handy, chain oriented API for creating Three.js scenes
 */
 import AssetLoader from './AssetLoader.js'
+import LocalStyles from './style/LocalStyles.js'
 
 const graph = {}
 export default graph
@@ -10,6 +11,100 @@ const assetLoader = AssetLoader.Singleton
 const fontLoader = new THREE.FontLoader()
 const mtlLoader = new THREE.MTLLoader()
 const objLoader = new THREE.OBJLoader()
+
+// Used by KSS tag selectors
+THREE.Object3D.prototype.isNode = true
+THREE.Scene.prototype.isScene = true
+
+/**
+Helper functions to handling classes used by the Stylist
+*/
+THREE.Object3D.prototype.addClass = function(...classNames){
+	if(typeof this.userData.classes === 'undefined'){
+		this.userData.classes = [...classNames]
+		return
+	}
+	for(let className of classNames){
+		if(this.userData.classes.includes(className)) continue
+		this.userData.classes.push(className)
+	}
+}
+THREE.Object3D.prototype.removeClass = function(...classNames){
+	if(typeof this.userData.classes === 'undefined' || this.userData.classes.length === 0) return
+	for(let className of classNames){
+		const index = this.userData.classes.indexOf(className)
+		if(index === -1) continue
+		this.userData.classes.splice(index, 1)
+	}
+}
+THREE.Object3D.prototype.hasClass = function(className){
+	if(typeof this.userData.classes === 'undefined') return false
+	return this.userData.classes.includes(className)
+}
+THREE.Object3D.prototype.getClasses = function(){
+	if(!this.userData.classes || this.userData.classes.length === 0) return []
+	return this.userData.classes
+}
+
+/**
+Object3D.matchingRules is used by the Stylist to track rules with selectors that match this node
+*/
+Object.defineProperty(THREE.Object3D.prototype, 'matchingRules', {
+	/** @type {Array[{
+		rule: { selectors, declarations },
+		stylesheet: Stylesheet,
+		selector: SelectorFragmentList
+	}]} */
+	get: function() {
+		if(typeof this._matchingRules === 'undefined') this._matchingRules = []
+		return this._matchingRules
+	}
+})
+
+/**
+Object3D.localStyles holds the individual styles that apply to this node
+*/
+Object.defineProperty(THREE.Object3D.prototype, 'localStyles', {
+	/**
+	@type {LocalStyles}
+	*/
+	get: function(){
+		if(typeof this._localStyles === 'undefined') this._localStyles = new LocalStyles()
+		return this._localStyles
+	}
+})
+
+THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
+	let tabs = ""
+	for (let i = 0; i < depth; i++) {
+		tabs += "  "
+	}
+	console.log(
+		tabs,
+		this.name || "-",
+		this.position.x,
+		this.position.y,
+		this.position.z,
+		"[",
+		this.quaternion.x,
+		this.quaternion.y,
+		this.quaternion.z,
+		this.quaternion.w,
+		"]"
+	)
+	for (let i = 0; i < this.children.length; i++) {
+		this.children[i].prettyPrint(depth + 1)
+	}
+}
+
+THREE.Object3D.prototype.getComponent = function() {
+	let obj = this
+	while (true) {
+		if (obj.component) return obj.component
+		if (!obj.parent) return null
+		obj = obj.parent
+	}
+}
 
 /*
 	if the first elements in `params` is an array, the values of the array will be passed as separate parameters into the constructor of the instance
@@ -182,38 +277,6 @@ for (let graphClassInfo of graph.GRAPH_CLASSES) {
 	const innerClazz = graphClassInfo.class
 	graph[graphClassInfo.name] = function(...params) {
 		return graph.nodeFunction(innerClazz, ...params)
-	}
-}
-
-THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
-	let tabs = ""
-	for (let i = 0; i < depth; i++) {
-		tabs += "  "
-	}
-	console.log(
-		tabs,
-		this.name || "-",
-		this.position.x,
-		this.position.y,
-		this.position.z,
-		"[",
-		this.quaternion.x,
-		this.quaternion.y,
-		this.quaternion.z,
-		this.quaternion.w,
-		"]"
-	)
-	for (let i = 0; i < this.children.length; i++) {
-		this.children[i].prettyPrint(depth + 1)
-	}
-}
-
-THREE.Object3D.prototype.getComponent = function() {
-	let obj = this
-	while (true) {
-		if (obj.component) return obj.component
-		if (!obj.parent) return null
-		obj = obj.parent
 	}
 }
 

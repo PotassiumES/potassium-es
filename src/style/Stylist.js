@@ -1,5 +1,5 @@
 import Stylesheet from './Stylesheet.js'
-import EventHandler from './EventHandler.js'
+import EventHandler from '../EventHandler.js'
 
 const LinkRelativeType = 'spatial-stylesheet'
 
@@ -19,16 +19,30 @@ const Stylist = class extends EventHandler {
 	Called before rendering a THREE.Scene, applyStyles updates the scene to match the styles defined by KSS
 	*/
 	applyStyles(node){
-		/** @todo actually apply the styles */
+		node.traverse(nd => {
+			/** @todo cache unchanged data instead of repeating work */
+			nd.matchingRules.splice(0, nd.matchingRules.length)
+			nd.localStyles.clear()
+		})
 
-		// Traverse the tree and update each node's computed styles data structure
+		// Refresh each node's styles
+		for(let stylesheet of this._stylesheets){
+			stylesheet.updateLocalStyles(node)
+		}
 
-		// Apply visual styles
+		// Sort rules for each node based on importance, specificity, and order
+		node.traverse(nd => {
+			this._sortMatchingRules(nd)
+		})
+
+		// Compute the cascade with initial and inherited values
+		this._computeCascade(node)
+
+		// Apply per-element styles
 
 		// Perform layout
 
 		// Apply animations
-
 	}
 
 	/**
@@ -57,8 +71,35 @@ const Stylist = class extends EventHandler {
 	loadData(kssData){
 		const stylesheet = new Stylesheet(kssData)
 		this._stylesheets.push(stylesheet)
+		// Set the load order index to use when breaking cascade precedence ties
+		stylesheet.loadIndex = this._stylesheets.length - 1
 		this.trigger(Stylist.KSS_LOADED_EVENT, this, stylesheet)
 	}
+
+	_sortMatchingRules(node){
+		/** @todo actually do it */
+	}
+
+	_computeCascade(node){
+		/** @todo actually do it */
+		// width first traversal
+	}
+
+	_logStyles(node, tabDepth=0){
+		const tabs = _generateTabs(tabDepth)
+		console.log(tabs + '>', (node.name || 'unnamed') + ':',  node.getClasses().map(clazz => `.${clazz}`).join(''))
+		for(let [property, styleInfos] of node.localStyles){
+			console.log(tabs + '\t' + property + ':', styleInfos[0].value)
+		}
+		for(let child of node.children) this._logStyles(child, tabDepth + 1)
+	}
+}
+
+function _generateTabs(depth){
+	if(depth === 0) return ''
+	const result = []
+	result[depth - 1] = null
+	return result.fill('\t').join('')
 }
 
 Stylist.LINKS_LOADED_EVENT = 'stylist-links-loaded'

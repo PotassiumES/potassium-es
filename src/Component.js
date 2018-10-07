@@ -234,6 +234,8 @@ const Component = class extends EventHandler {
 		classNames.forEach(className => {
 			this._flatEl.addClass(className)
 			this._portalEl.addClass(className)
+			this._portalGraph.addClass(className)
+			this._immersiveGraph.addClass(className)
 		})
 	}
 
@@ -245,6 +247,8 @@ const Component = class extends EventHandler {
 		classNames.forEach(className => {
 			this._flatEl.removeClass(className)
 			this._portalEl.removeClass(className)
+			this._portalGraph.removeClass(className)
+			this._immersiveGraph.removeClass(className)
 		})
 	}
 

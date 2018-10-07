@@ -2,12 +2,13 @@ import el from "./El.js"
 import graph from "./Graph.js"
 import Engine from "./Engine.js"
 import Router from "./Router.js"
-import Stylist from "./Stylist.js"
 import Component from "./Component.js"
 import AssetLoader from './AssetLoader.js'
 import EventHandler from "./EventHandler.js"
 import { throttledConsoleLog } from "./throttle.js"
 import DisplayModeTracker from './DisplayModeTracker.js'
+
+import Stylist from "./style/Stylist.js"
 
 import ActionMap from "action-input/src/action/ActionMap"
 import ClickFilter from "action-input/src/filter/ClickFilter"
@@ -44,6 +45,9 @@ const App = class extends EventHandler {
 		this._handleImmersiveTick = this._handleImmersiveTick.bind(this)
 
 		this._stylist = new Stylist()
+		this._stylist.addListener((eventName, stylist) => {
+			console.log('Styles loaded', stylist.stylesheets)
+		}, Stylist.LINKS_LOADED_EVENT)
 		this._stylist.loadLinks()
 
 		this._router = new Router()
