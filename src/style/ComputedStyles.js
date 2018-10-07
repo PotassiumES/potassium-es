@@ -62,6 +62,10 @@ class ComputedStyles {
 		}
 	}
 
+	get(property){
+		return this._currentStyles.get(property) || null
+	}
+
 	/**
 	changes is used by the Stylist to know which styles need to be updated on the Three.Object3D
 	@return {Array<property{string}>} the declarations that changed since the last update

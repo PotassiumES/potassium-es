@@ -1,4 +1,5 @@
 import Stylesheet from './Stylesheet.js'
+import Applicators from './Applicators.js'
 import EventHandler from '../EventHandler.js'
 
 const LinkRelativeType = 'spatial-stylesheet'
@@ -30,15 +31,13 @@ const Stylist = class extends EventHandler {
 			stylesheet.updateLocalStyles(node)
 		}
 
-		// Sort rules for each node based on importance, specificity, and order
-		node.traverse(nd => {
-			this._sortMatchingRules(nd)
-		})
-
 		// Compute the cascade with initial and inherited values
 		this._computeCascade(node)
 
 		// Apply per-element styles
+		node.traverse(nd => {
+			this._updateNodeStyles(nd)
+		})
 
 		// Perform layout
 
@@ -76,8 +75,15 @@ const Stylist = class extends EventHandler {
 		this.trigger(Stylist.KSS_LOADED_EVENT, this, stylesheet)
 	}
 
-	_sortMatchingRules(node){
-		/** @todo actually do it */
+	_updateNodeStyles(node){
+		for(let changedProperty of node.computedStyles.changes){
+			// @todo calculate variables
+			if(changedProperty.startsWith('--')) continue
+			// @todo merge properties like `border` and `border-top`
+			const applicatorFunction = Applicators.get(changedProperty) || null
+			if(applicatorFunction === null) continue
+			applicatorFunction(node, node.computedStyles.get(changedProperty))
+		}
 	}
 
 	/**
