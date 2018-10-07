@@ -53,12 +53,12 @@ class ComputedStyles {
 		}
 
 		//Recalculate the changes list
-		for(let [property, value] of this._currentStyles){
-			let previousValue = this._previousStyles.get(property)
-			if(previousValue !== value) this._changes.push(property)
+		for(let [property, styleInfo] of this._currentStyles){
+			let previousInfo = this._previousStyles.get(property) || null
+			if(previousInfo === null || previousInfo.value !== styleInfo.value) this._changes.push(property)
 		}
-		for(let [property, previousValue] of this._previousStyles){
-			if(!this._currentStyles.has(property)) this._changes.push(property)
+		for(let [property, previousInfo] of this._previousStyles){
+			if(this._currentStyles.has(property) === false) this._changes.push(property)
 		}
 	}
 
