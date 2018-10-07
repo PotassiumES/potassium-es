@@ -80,18 +80,22 @@ const Stylist = class extends EventHandler {
 		/** @todo actually do it */
 	}
 
+	/**
+	Traverse the graph and update each Object3D.computedStyles to reflect the local and inherited properties
+	*/
 	_computeCascade(node){
-		/** @todo actually do it */
-		// width first traversal
+		node.computedStyles.computeStyles(node.localStyles, node.parent ? node.parent.computedStyles : null)
+		for(let child of node.children) this._computeCascade(child)
 	}
 
-	_logStyles(node, tabDepth=0){
+	_logStyles(node, tabDepth=0, showVars=false){
 		const tabs = _generateTabs(tabDepth)
 		console.log(tabs + '>', (node.name || 'unnamed') + ':',  node.getClasses().map(clazz => `.${clazz}`).join(''))
-		for(let [property, styleInfos] of node.localStyles){
-			console.log(tabs + '\t' + property + ':', styleInfos[0].value)
+		for(let styleInfo of node.computedStyles){
+			if(showVars === false && styleInfo.property.startsWith('--')) continue
+			console.log(tabs + '\t' + styleInfo.property + ':', styleInfo.value, styleInfo.important ? '!important' : '')
 		}
-		for(let child of node.children) this._logStyles(child, tabDepth + 1)
+		for(let child of node.children) this._logStyles(child, tabDepth + 1, showVars)
 	}
 }
 

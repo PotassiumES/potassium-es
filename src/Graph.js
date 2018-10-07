@@ -3,6 +3,7 @@ A handy, chain oriented API for creating Three.js scenes
 */
 import AssetLoader from './AssetLoader.js'
 import LocalStyles from './style/LocalStyles.js'
+import ComputedStyles from './style/ComputedStyles.js'
 
 const graph = {}
 export default graph
@@ -62,7 +63,8 @@ Object.defineProperty(THREE.Object3D.prototype, 'matchingRules', {
 })
 
 /**
-Object3D.localStyles holds the individual styles that apply to this node
+Object3D.localStyles holds the individual styles that were assigned to this node
+You should use Object3D.computedStyles to see the final values after inheriting values via the cascade
 */
 Object.defineProperty(THREE.Object3D.prototype, 'localStyles', {
 	/**
@@ -71,6 +73,19 @@ Object.defineProperty(THREE.Object3D.prototype, 'localStyles', {
 	get: function(){
 		if(typeof this._localStyles === 'undefined') this._localStyles = new LocalStyles()
 		return this._localStyles
+	}
+})
+
+/**
+Object3D.computedStyles holds the final computed styles that apply to this node
+*/
+Object.defineProperty(THREE.Object3D.prototype, 'computedStyles', {
+	/**
+	@type {ComputedStyles}
+	*/
+	get: function(){
+		if(typeof this._computedStyles === 'undefined') this._computedStyles = new ComputedStyles()
+		return this._computedStyles
 	}
 })
 

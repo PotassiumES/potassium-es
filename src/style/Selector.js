@@ -234,7 +234,9 @@ class SelectorElement extends SelectorFragment {
 	}
 
 	_pseudoMatches(pseudo, node){
-		return false
+		const checkFunction = SelectorElement.PSEUDO_CHECK_FUNCTIONS.get(pseudo.value) || null
+		if(!checkFunction) return false
+		return checkFunction(node)
 	}
 
 	_tagMatches(tag, node){
@@ -437,6 +439,11 @@ for(let tag of SpatialTags){
 		tag, _createCheckFunction(tag)
 	)
 }
+
+SelectorElement.PSEUDO_CHECK_FUNCTIONS = new Map()
+SelectorElement.PSEUDO_CHECK_FUNCTIONS.set('root', node => {
+	return node.parent === null
+})
 
 /**
 Combinator represents a relationship between two {SelectorElement}s, like descendance or sibling.
