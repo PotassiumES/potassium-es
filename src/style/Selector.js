@@ -34,7 +34,7 @@ class SelectorFragmentList {
 	@param {int} fragmentIndex the index in the reversed list of fragments at which to start
 	@return {bool}
 	*/
-	matches(node, fragmentIndex=0){
+	matches(node, fragmentIndex=0, previouslyMatchedNode=null){
 		if(fragmentIndex < 0 || fragmentIndex >= this._reversedFragments.length){
 			console.error('Invalid fragmentIndex', fragmentIndex, node, this)
 			return false
@@ -43,13 +43,15 @@ class SelectorFragmentList {
 
 		// Handle a combinator
 		if(fragment instanceof Combinator){
+			// Refuse if there is no previous matched node
+			if(previouslyMatchedNode === null) return false
 			// Refuse if there is a combinator but no following element
 			if(fragmentIndex + 1 >= this._reversedFragments.length) return false
 			// Refuse if there are two combinators in a row
 			if(this._reversedFragments[fragmentIndex + 1] instanceof Combinator) return false
 
 			switch(fragment.type){
-				case Combinator.DESCENDANT:
+				case Combinator.DESCENDANT: // >>
 					// Run up the ancestors until you either match or reach the root
 					let workingNode = node
 					let parentMatched = false
@@ -70,27 +72,26 @@ class SelectorFragmentList {
 					// Move on to the parent and next fragment
 					return this.matches(workingNode.parent, fragmentIndex + 2)
 
-				case Combinator.CHILD:
+				case Combinator.CHILD: // >
 					// Test against the next fragment
 					return this.matches(node, fragmentIndex + 1)
 
-				case Combinator.ADJACENT_SIBLING:
+				case Combinator.ADJACENT_SIBLING: // +
 					// Refuse if the node is the root, which fails this combinator
-					if(node.parent === null) return false
-					// Refuse if there are no siblings
-					if(node.parent.children.length === 1) return false
-					const thisNodeIndex = node.parent.children.indexOf(node)
-					// Refuse if there is no next sibling
-					if(thisNodeIndex + 1 >= node.parent.children.length) return false
-					const nextSibling = node.parent.children[thisNodeIndex + 1]
-					return this.matches(nextSibling, fragmentIndex + 1)
+					if(previouslyMatchedNode.parent === null) return false
+					const thisNodeIndex = previouslyMatchedNode.parent.children.indexOf(previouslyMatchedNode)
+					// Refuse if there is no previous sibling (remember, these fragments are ordered backward from leaf to root)
+					if(thisNodeIndex < 1){
+						return false
+					}
+					return this.matches(previouslyMatchedNode.parent.children[thisNodeIndex - 1], fragmentIndex + 1)
 
-				case Combinator.GENERAL_SIBLING:
+				case Combinator.GENERAL_SIBLING: // ~
 					// Refuse if the node is the root, which fails this combinator
-					if(node.parent === null) return false
+					if(previouslyMatchedNode.parent === null) return false
 					// Refuse if there are no siblings
-					if(node.parent.children.length === 1) return false
-					const siblings = node.parent.children.filter(child => child !== node)
+					if(previouslyMatchedNode.parent.children.length === 1) return false
+					const siblings = previouslyMatchedNode.parent.children.filter(child => child !== node)
 					for(let i=0; i < siblings.length; i++){
 						if(this.matches(siblings[i], fragmentIndex + 1)){
 							return true
@@ -112,7 +113,7 @@ class SelectorFragmentList {
 			// Refuse if there are more fragments but this is the root
 			if(node.parent === null) return false
 			// Move on to the next ancestor and fragment
-			return this.matches(node.parent, fragmentIndex + 1)
+			return this.matches(node.parent, fragmentIndex + 1, node)
 		}
 	}
 
