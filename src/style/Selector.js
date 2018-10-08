@@ -51,14 +51,14 @@ class SelectorFragmentList {
 			switch(fragment.type){
 				case Combinator.DESCENDANT:
 					// Run up the ancestors until you either match or reach the root
-					let parent = node.parent
+					let workingNode = node
 					let parentMatched = false
-					while(parent !== null){
-						if(this.matches(parent, fragmentIndex + 1)){
+					while(workingNode !== null){
+						if(this.matches(workingNode, fragmentIndex + 1)){
 							parentMatched = true
 							break
 						} else {
-							parent = parent.parent
+							workingNode = workingNode.parent
 						}
 					}
 					// Refuse if the descendent match failed
@@ -66,15 +66,13 @@ class SelectorFragmentList {
 					// Accept if there are no more fragments after the post-combinator fragment
 					if(fragmentIndex + 2 >= this._reversedFragments.length) return true
 					// Refuse if this is the root but there are more fragments to match
-					if(parent.parent === null) return false
+					if(workingNode.parent === null) return false
 					// Move on to the parent and next fragment
-					return this.matches(parent.parent, fragmentIndex + 2)
+					return this.matches(workingNode.parent, fragmentIndex + 2)
 
 				case Combinator.CHILD:
-					// Refuse if the node is the root, which fails this combinator
-					if(node.parent === null) return false
-					// Test the parent against the next fragment
-					return this.matches(node.parent, fragmentIndex + 1)
+					// Test against the next fragment
+					return this.matches(node, fragmentIndex + 1)
 
 				case Combinator.ADJACENT_SIBLING:
 					// Refuse if the node is the root, which fails this combinator
@@ -409,6 +407,7 @@ const SpatialTags = [
 	'scene',
 	'node',
 	'group',
+	'text',
 
 	'bone',
 	'line',

@@ -217,10 +217,15 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 
 	const resultGroup = new THREE.Group()
 	resultGroup.name = "text"
+	resultGroup.isText = true
 
 	const textGroup = new THREE.Group()
 	resultGroup.add(textGroup)
 	loadText(textGroup, text, material, font, options)
+
+	resultGroup.setRGB = (red, green, blue) => {
+		resultGroup.children[0].children[0].material.color.setRGB(red, green, blue)
+	}
 
 	resultGroup.setText = newText => {
 		resultGroup.remove(...resultGroup.children)

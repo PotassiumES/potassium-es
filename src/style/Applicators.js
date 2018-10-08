@@ -7,10 +7,10 @@ Applicator holds functions that apply a declared style property (color, font-siz
 const Applicators = new Map()
 
 Applicators.set('color', (node, styleInfo) => {
-	if(!node.material) return
+	if(!node.isText) return
 	const parsedValue = Evaluators.parse(styleInfo.value)
 	if(typeof parsedValue === 'undefined') return
-	node.material.color.setRGB(...parsedValue)
+	node.setRGB(...parsedValue)
 })
 
 export default Applicators

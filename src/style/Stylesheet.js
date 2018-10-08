@@ -77,13 +77,22 @@ class Stylesheet {
 	*/
 	_parseSelector(rawSelector){
 		const rawFragments = rawSelector.split(/\s/).filter(rf => rf.trim().length > 0)
-		return rawFragments.map(rf => {
+		const results = []
+		let previousWasElement = false
+		for(let rf of rawFragments){
 			if(Combinator.TYPES.includes(rf)){
-				return new Combinator(rf)
+				results.push(new Combinator(rf))
+				previousWasElement = false
 			} else {
-				return new SelectorElement(rf)
+				if(previousWasElement){
+					// Insert an implied descendant combinator
+					results.push(new Combinator('>>'))
+				}
+				results.push(new SelectorElement(rf))
+				previousWasElement = true
 			}
-		})
+		}
+		return results
 	}
 
 	_parseDeclarations(rawDeclarations){
