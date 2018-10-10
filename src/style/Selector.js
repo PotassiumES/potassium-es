@@ -169,14 +169,18 @@ class SelectorElement extends SelectorFragment {
 	constructor(rawSelector){
 		super()
 		this._raw = rawSelector
-
 		const [rawElements, rawAttributes, rawPseudos] = this._splitRaw()
+		if(rawSelector.indexOf('[') !== -1){
+			console.log(rawSelector, rawAttributes)
+		}
 
 		/** @type {Array[Object{ type {SelectorElement.ELEMENT_TYPES}, value {string} }]} */
 		this._elements = this._parseElements(rawElements)
 
 		/** @type {Array[Object{ key {string}, operator {SelectorElement.ATTRIBUTE_TYPES}, value {string} }, caseInsensitive {bool}] } */
 		this._attributes = this._parseAttributes(rawAttributes)
+
+		if(this._attributes.length > 0) console.log('attributes', this._attributes)
 
 		/** @type {Array[Object{ type { SelectorElement.PSEUDO_CLASS | SelectorElement.PSEUDO_ELEMENT }, value, parameters[]:[] }]} */
 		this._pseudos = this._parsePseudos(rawPseudos)
@@ -229,7 +233,29 @@ class SelectorElement extends SelectorFragment {
 	}
 
 	_attributeMatches(attribute, node){
-		return false
+		if(attribute.operator === SelectorElement.ATTRIBUTE_EXISTS){
+			return node.attributes.has(attribute.key)
+		}
+
+		const nodeAttributeValue = attribute.caseInsensitive ? (node.attributes.get(attribute.key, '') + '').toLowerCase() :  (node.attributes.get(attribute.key, '') + '')
+		console.log('attribute', attribute, nodeAttributeValue)
+		switch(attribute.operator){
+			case SelectorElement.ATTRIBUTE_EQUALS:
+				return nodeAttributeValue == attribute.value
+			case SelectorElement.ATTRIBUTE_EQUALS_HYPHEN:
+				return nodeAttributeValue == attribute.value || nodeAttributeValue == attribute.value + '-'
+			case SelectorElement.ATTRIBUTE_LISTED:
+				return nodeAttributeValue.split(' ').includes(attribute.value)
+			case SelectorElement.ATTRIBUTE_CONTAINS:
+				return nodeAttributeValue.indexOf(attribute.value) !== -1
+			case SelectorElement.ATTRIBUTE_STARTS_WITH:
+				return nodeAttributeValue.startsWith(attribute.value)
+			case SelectorElement.ATTRIBUTE_ENDS_WITH:
+				return nodeAttributeValue.endsWith(attribute.value)
+			default:
+				console.error('Unknown attribute operator', attribute)
+				return false
+		}
 	}
 
 	_pseudoMatches(pseudo, node){
@@ -281,21 +307,30 @@ class SelectorElement extends SelectorFragment {
 
 	_parseAttributes(rawAttributes){
 		if(!rawAttributes) return []
+		console.log('ra', rawAttributes, rawAttributes.match(/\[[^\]]+\]/g))
 		return rawAttributes.match(/\[[^\]]+\]/g).map(ra => {
 			ra = ra.slice(1, ra.length - 1) // remove brackets
 			const key = ra.match(/[^=~+|*$\^]*/)[0] || ''
 			const operator = ra.match(/[=~+|*$\^]+/)[0] || ''
-			const value = ra.slice(key.length + operator.length)
+			let value = ra.slice(key.length + operator.length)
 			const caseInsensitive = value.endsWith(' i') || value.endsWith(' I')
 			if(caseInsensitive) value = value.substring(0, value.length - 2).toLowerCase()
 			return {
 				key: key,
 				operator: SelectorElement.ATTRIBUTE_TYPE_MAP.get(operator) || SelectorElement.ATTRIBUTE_EXISTS,
-				value: value,
+				value: this._cleanAttributeValue(value),
 				caseInsensitive: caseInsensitive
 			}
 		})
 	}
+
+	_cleanAttributeValue(val){
+		if(typeof val !== 'string') return val
+		if(val.startsWith('"') || val.startsWith("'")) val = val.slice(1)
+		if(val.endsWith('"') || val.endsWith("'")) val = val.slice(0, val.length - 1)
+		return val
+	}
+
 
 	/**
 	:active

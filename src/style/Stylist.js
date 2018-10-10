@@ -94,14 +94,18 @@ const Stylist = class extends EventHandler {
 		for(let child of node.children) this._computeCascade(child)
 	}
 
-	_logStyles(node, tabDepth=0, showVars=false){
+	/**
+	console.logs the computed styles for a node and its descendents
+	@param {bool} showVars if true, log the CSS variables of the form `--name`
+	*/
+	logStyles(node, tabDepth=0, showVars=false){
 		const tabs = _generateTabs(tabDepth)
 		console.log(tabs + '>', (node.name || 'unnamed') + ':',  node.getClasses().map(clazz => `.${clazz}`).join(''))
 		for(let styleInfo of node.computedStyles){
 			if(showVars === false && styleInfo.property.startsWith('--')) continue
 			console.log(tabs + '\t' + styleInfo.property + ':', styleInfo.value, styleInfo.important ? '!important' : '')
 		}
-		for(let child of node.children) this._logStyles(child, tabDepth + 1, showVars)
+		for(let child of node.children) this.logStyles(child, tabDepth + 1, showVars)
 	}
 }
 

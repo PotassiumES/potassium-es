@@ -2,6 +2,7 @@
 A handy, chain oriented API for creating Three.js scenes
 */
 import AssetLoader from './AssetLoader.js'
+import Attributes from './style/Attributes.js'
 import LocalStyles from './style/LocalStyles.js'
 import ComputedStyles from './style/ComputedStyles.js'
 
@@ -86,6 +87,19 @@ Object.defineProperty(THREE.Object3D.prototype, 'computedStyles', {
 	get: function(){
 		if(typeof this._computedStyles === 'undefined') this._computedStyles = new ComputedStyles()
 		return this._computedStyles
+	}
+})
+
+/**
+Object3D.attributes is a helper API for accessing attributes on the node or in node.userData
+*/
+Object.defineProperty(THREE.Object3D.prototype, 'attributes', {
+	/**
+	@type {Attributes}
+	*/
+	get: function(){
+		if(typeof this._attributes === 'undefined') this._attributes = new Attributes(this)
+		return this._attributes
 	}
 })
 

@@ -70,13 +70,44 @@ class Stylesheet {
 		})
 	}
 
+	_splitSelectors(rawSelector){
+		let results = []
+		let current = []
+		let startQuote = null
+		let inBrackets = false
+		for(let i=0; i < rawSelector.length; i++){
+			const char = rawSelector[i]
+			if(char === ' '){
+				if(current.length === 0) continue
+				if(startQuote === null && inBrackets === false){
+					results.push(current.join(''))
+					current = []
+				}
+			}
+			if((char === '"' || char === "'") && startQuote === null){
+				// start a quoted string
+				startQuote = char
+			} else if (startQuote === char){
+				// end a quoted string
+				startQuote = null
+			} else if(char === '['){
+				inBrackets = true
+			} else if(char === ']'){
+				inBrackets = false
+			}
+			current.push(char)
+		}
+		if(current.length !== 0) results.push(current.join(''))
+		return results
+	}
+
 	/*
 	Breaks up the rawSelector into an array of SelectorFragments (SelectorElements or Combinators)
-	@param {string} rawSelector a selector string like 'div.action[foo=23][bar~=grik] > .pickle:active'
+	@param {string} rawSelector a selector string like 'div.action[foo=23][bar~=grik i] > .pickle:active'
 	@return {Array<SelectorFragment>}
 	*/
 	_parseSelector(rawSelector){
-		const rawFragments = rawSelector.split(/\s/).filter(rf => rf.trim().length > 0)
+		const rawFragments = this._splitSelectors(rawSelector).filter(rf => rf.trim().length > 0)
 		const results = []
 		let previousWasElement = false
 		for(let rf of rawFragments){
