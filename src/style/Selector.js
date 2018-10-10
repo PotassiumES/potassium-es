@@ -170,17 +170,12 @@ class SelectorElement extends SelectorFragment {
 		super()
 		this._raw = rawSelector
 		const [rawElements, rawAttributes, rawPseudos] = this._splitRaw()
-		if(rawSelector.indexOf('[') !== -1){
-			console.log(rawSelector, rawAttributes)
-		}
 
 		/** @type {Array[Object{ type {SelectorElement.ELEMENT_TYPES}, value {string} }]} */
 		this._elements = this._parseElements(rawElements)
 
 		/** @type {Array[Object{ key {string}, operator {SelectorElement.ATTRIBUTE_TYPES}, value {string} }, caseInsensitive {bool}] } */
 		this._attributes = this._parseAttributes(rawAttributes)
-
-		if(this._attributes.length > 0) console.log('attributes', this._attributes)
 
 		/** @type {Array[Object{ type { SelectorElement.PSEUDO_CLASS | SelectorElement.PSEUDO_ELEMENT }, value, parameters[]:[] }]} */
 		this._pseudos = this._parsePseudos(rawPseudos)
@@ -238,7 +233,6 @@ class SelectorElement extends SelectorFragment {
 		}
 
 		const nodeAttributeValue = attribute.caseInsensitive ? (node.attributes.get(attribute.key, '') + '').toLowerCase() :  (node.attributes.get(attribute.key, '') + '')
-		console.log('attribute', attribute, nodeAttributeValue)
 		switch(attribute.operator){
 			case SelectorElement.ATTRIBUTE_EQUALS:
 				return nodeAttributeValue == attribute.value
@@ -307,7 +301,6 @@ class SelectorElement extends SelectorFragment {
 
 	_parseAttributes(rawAttributes){
 		if(!rawAttributes) return []
-		console.log('ra', rawAttributes, rawAttributes.match(/\[[^\]]+\]/g))
 		return rawAttributes.match(/\[[^\]]+\]/g).map(ra => {
 			ra = ra.slice(1, ra.length - 1) // remove brackets
 			const key = ra.match(/[^=~+|*$\^]*/)[0] || ''
