@@ -3,6 +3,7 @@ A handy, chain oriented API for creating Three.js scenes
 */
 import AssetLoader from './AssetLoader.js'
 import Attributes from './style/Attributes.js'
+import { SelectorFragmentList } from './style/Selector.js'
 import LocalStyles from './style/LocalStyles.js'
 import AssignedStyles from './style/AssignedStyles.js'
 import ComputedStyles from './style/ComputedStyles.js'
@@ -47,6 +48,22 @@ THREE.Object3D.prototype.hasClass = function(className){
 THREE.Object3D.prototype.getClasses = function(){
 	if(!this.userData.classes || this.userData.classes.length === 0) return []
 	return this.userData.classes
+}
+
+/**
+@param {string} selector like 'node[name=ModeSwitcherComponent] .button-component > text'
+@return {Array<Object3D>} nodes that match the selector
+*/
+THREE.Object3D.prototype.getObjectsBySelector = function(selector){
+	const selectorFragmentList = SelectorFragmentList.Parse(selector)
+	const results = []
+	this.traverse(node => {
+		if(node === this) return
+		if(selectorFragmentList.matches(node)){
+			results.push(node)
+		}
+	})
+	return results
 }
 
 /**

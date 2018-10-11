@@ -527,14 +527,6 @@ Combinator.TYPES = [
 	Combinator.GENERAL_SIBLING
 ]
 
-export {
-	SelectorFragment,
-	SelectorFragmentList,
-	SelectorElement,
-	Combinator,
-	SpatialTags
-}
-
 /**
 @param {string} rawSelector like 'div.class:first > p[name~=flowers][selected] + text'
 @return {Array<string>} an array of separate fragments like ['div.class:first', '>', 'p[name~=flowers i][selected]', '+', 'text']
@@ -569,4 +561,12 @@ const _splitSelectors = function(rawSelector){
 	}
 	if(current.length !== 0) results.push(current.join(''))
 	return results
+}
+
+export {
+	SelectorFragment,
+	SelectorFragmentList,
+	SelectorElement,
+	Combinator,
+	SpatialTags
 }
