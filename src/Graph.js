@@ -51,6 +51,50 @@ THREE.Object3D.prototype.getClasses = function(){
 }
 
 /**
+A handy function for depth first traversal of all children and this node
+@param {function} func a function of the signature function(Object3D)
+*/
+THREE.Object3D.prototype.traverseDepthFirst = function(func){
+	_traverseDepthFirst(this, func)
+}
+
+const _traverseDepthFirst = function(node, func){
+	for(let child of node.children){
+		_traverseDepthFirst(child, func)
+	}
+	func(node)
+}
+
+/**
+Used to determine when to trigger re-layout via styles
+*/
+THREE.Object3D.prototype.layoutIsDirty = false
+
+/**
+Sets this node layoutIsDirty to true and if it has a parent it calls parent.setLayoutDirty() (which calls its parent, etc)
+*/
+THREE.Object3D.prototype.setLayoutDirty = function(){
+	this.layoutIsDirty = true
+	if(this.parent) this.parent.setLayoutDirty()
+}
+
+/**
+Set the layout dirty when adding or removing a child
+*/
+const _oldAdd = THREE.Object3D.prototype.add
+THREE.Object3D.prototype.add = function(object){
+	_oldAdd.call(this, object)
+	object.setLayoutDirty()
+	return this
+}
+const _oldRemove = THREE.Object3D.prototype.remove
+THREE.Object3D.prototype.remove = function(object){
+	_oldRemove.call(this, object)
+	this.setLayoutDirty()
+	return this
+}
+
+/**
 @param {string} selector like 'node[name=ModeSwitcherComponent] .button-component > text'
 @return {Array<Object3D>} nodes that match the selector
 */
@@ -273,11 +317,14 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 	resultGroup.isText = true
 
 	resultGroup.setRGB = (red, green, blue) => {
+		if(
+			!resultGroup.children[0]
+			|| !resultGroup.children[0].children[0]
+			|| !resultGroup.children[0].children[0].material
+		) return
 		if(resultGroup.children[0].children[0].material.emissive){
-			console.log('emmissive', red, green, blue)
 			resultGroup.children[0].children[0].material.emissive.setRGB(red, green, blue)
 		} else {
-			console.log('color', red, green, blue)
 			resultGroup.children[0].children[0].material.color.setRGB(red, green, blue)
 		}
 	}

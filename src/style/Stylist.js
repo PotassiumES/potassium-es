@@ -20,18 +20,23 @@ const Stylist = class extends EventHandler {
 	Annotate each node in the scene with applicable direct or cascaded KSS-defined styles
 	*/
 	calculateStyles(scene){
-		scene.traverse(nd => {
-			/** @todo cache unchanged data instead of repeating work */
-			nd.matchingRules.splice(0, nd.matchingRules.length)
-			nd.localStyles.clear()
+		const dirtyNodes = []
+		scene.traverseDepthFirst(node => {
+			if(node.layoutIsDirty){
+				node.matchingRules.splice(0, node.matchingRules.length)
+				node.localStyles.clear()
+				dirtyNodes.push(node)
+			}
 		})
 
-		// Refresh each node's styles
-		for(let stylesheet of this._stylesheets){
-			stylesheet.updateLocalStyles(scene)
+		for(let node of dirtyNodes){
+			// Update each node's local styles
+			for(let stylesheet of this._stylesheets){
+				stylesheet.updateLocalStyles(node, false)
+			}
+			node.layoutIsDirty = false
 		}
 
-		// Compute the cascade with initial and inherited values
 		this._computeCascade(scene)
 	}
 

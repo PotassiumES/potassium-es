@@ -35,12 +35,16 @@ class Stylesheet {
 
 	get data(){ return this._data }
 
-	updateLocalStyles(node){
+	updateLocalStyles(node, traverseChildren=true){
 		// Get a list of this node and all descendents
 		const nodes = []
-		node.traverse(n => {
-			nodes.push(n)
-		})
+		if(traverseChildren){
+			node.traverse(n => {
+				nodes.push(n)
+			})
+		} else {
+			nodes.push(node)
+		}
 
 		// Now test each rule against each node in nodes
 		for(let rule of this._data.rules){

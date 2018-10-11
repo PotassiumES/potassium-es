@@ -47,6 +47,24 @@ const App = class extends EventHandler {
 		this._stylist = new Stylist()
 		this._stylist.addListener((eventName, stylist) => {
 			console.log('Styles loaded', stylist.stylesheets)
+			this._stylist.calculateStyles(this._portalScene)
+			this._stylist.applyStyles(this._portalScene)
+			this._stylist.calculateStyles(this._immersiveScene)
+			this._stylist.applyStyles(this._immersiveScene)
+			setInterval(() => {
+				switch(this.displayMode){
+					case App.IMMERSIVE:
+						console.log('styling immersive')
+						this._stylist.calculateStyles(this._immersiveScene)
+						this._stylist.applyStyles(this._immersiveScene)
+						break
+					case App.PORTAL:
+						console.log('styling portal')
+						this._stylist.calculateStyles(this._portalScene)
+						this._stylist.applyStyles(this._portalScene)
+						break
+				}
+			}, 500)
 		}, Stylist.LINKS_LOADED_EVENT)
 		this._stylist.loadLinks()
 
@@ -345,9 +363,6 @@ const App = class extends EventHandler {
 
 		// Update actions
 		this._actionManager.poll()
-
-		// Update styles
-		//this._stylist.applyStyles(this._portalScene)
 	}
 
 	_handleImmersiveTick() {
@@ -403,9 +418,6 @@ const App = class extends EventHandler {
 		}
 		this._virtualKeyboardInputSource.handlePick(this._pickingInputSource.left, this._pickingInputSource.right)
 		this._actionManager.poll()
-
-		// Update styles
-		//this._stylist.applyStyles(this._immersiveScene)
 	}
 
 	_handleWindowAnimationFrame() {
