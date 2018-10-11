@@ -13,4 +13,30 @@ Applicators.set('color', (node, styleInfo) => {
 	node.setRGB(...parsedValue)
 })
 
+Applicators.set('centroid', (node, styleInfo) => {
+	const parsedValue = Evaluators.parse(styleInfo.value)
+	if(typeof parsedValue === 'undefined') return
+	node.position.set(...parsedValue)
+})
+
+Applicators.set('centroid-x', (node, styleInfo) => {
+	const parsedValue = Evaluators.parse(styleInfo.value)
+	if(typeof parsedValue === 'undefined') return
+	node.position.setComponent(0, parsedValue[0]) // parsed distances are in meters
+})
+
+
+Applicators.set('centroid-y', (node, styleInfo) => {
+	const parsedValue = Evaluators.parse(styleInfo.value)
+	if(typeof parsedValue === 'undefined') return
+	node.position.setComponent(1, parsedValue[0]) // parsed distances are in meters
+})
+
+
+Applicators.set('centroid-z', (node, styleInfo) => {
+	const parsedValue = Evaluators.parse(styleInfo.value)
+	if(typeof parsedValue === 'undefined') return
+	node.position.setComponent(2, parsedValue[0]) // parsed distances are in meters
+})
+
 export default Applicators

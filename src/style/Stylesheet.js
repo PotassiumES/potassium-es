@@ -82,6 +82,7 @@ class Stylesheet {
 				if(startQuote === null && inBrackets === false){
 					results.push(current.join(''))
 					current = []
+					continue
 				}
 			}
 			if((char === '"' || char === "'") && startQuote === null){
