@@ -1,6 +1,8 @@
 
 /**
 ComputedStyles holds the previous and computed declarations for a single Object3D
+
+The computed styles are the combined output of a node's {AssignedStyles}, {LocalStyles}, and inherited computed parental styles.
 */
 class ComputedStyles {
 	constructor(){
@@ -14,16 +16,20 @@ class ComputedStyles {
 
 	/**
 	Compute the final styles for a node:
-	- apply local styles
-	- apply inherited styles that aren't overriden
+	- apply the assigned styles
+	- apply local styles that aren't assigned
+	- apply inherited styles that aren't assigned or local
 
-	@todo handle inherited --variables
 	@todo calculate relative units like `em`
 	@todo handle the 'inherit' and 'reset' style values
 	@todo handle inherited sub values like `border-top: 10px` inherited on top of `border: 0`
 	@todo handle value methods like `calc()`
+
+	@param {AssignedStyles} assignedStyles
+	@param {LocalStyles} localStyles
+	@param {ComputedStyles?} parentalComputedStyles
 	*/
-	computeStyles(localStyles, parentalComputedStyles=null){
+	computeStyles(assignedStyles, localStyles, parentalComputedStyles=null){
 		// Swap the previous and current maps
 		const holdingVariable = this._previousStyles
 		this._previousStyles = this._currentStyles
@@ -32,8 +38,15 @@ class ComputedStyles {
 		// Empty the change list
 		this._changes.splice(0, this._changes.length)
 
+		// Assign the assigned styles
+		for(let styleInfo of assignedStyles){
+			this._currentStyles.set(styleInfo.property, styleInfo)
+		}
+
 		// Assign the local styles
 		for(let styleInfo of localStyles){
+			// Don't overwrite assigned styles
+			if(assignedStyles.has(styleInfo.property)) continue
 			this._currentStyles.set(styleInfo.property, styleInfo)
 		}
 
@@ -45,7 +58,7 @@ class ComputedStyles {
 					styleInfo.property.startsWith('--') === false &&
 					InheritedProperties.includes(styleInfo.property) === false
 				) continue
-				// Skip if there is a local style that overrides the inherited property
+				// Skip if there is an assigned or local style that overrides the inherited property
 				if(this._currentStyles.has(styleInfo.property)) continue
 				// Ok, this is a cascaded style!
 				this._currentStyles.set(styleInfo.property, styleInfo)

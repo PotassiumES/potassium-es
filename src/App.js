@@ -131,6 +131,7 @@ const App = class extends EventHandler {
 		/** Portal display mode overlay DOM and 3D scene */
 		this._portalEl = el.div({ class: "portal-root" }).appendTo(this._el)
 		this._portalScene = graph.scene()
+		this._portalScene.name = 'PortalScene'
 		this._portalEngine = new Engine(this._portalScene, Engine.PORTAL, this._handlePortalTick)
 		this._portalEngine.addListener(Engine.STOPPED, (eventName, engine) => {
 			if(this._displayMode === App.PORTAL){
@@ -141,6 +142,7 @@ const App = class extends EventHandler {
 		/** Immersive display mode 3D scene */
 		this._immersiveEl = el.div({ class: "immersive-root" }).appendTo(this._el)
 		this._immersiveScene = graph.scene()
+		this._immersiveScene.name = 'ImmersiveScene'
 		this._immersiveEngine = new Engine(
 			this._immersiveScene,
 			Engine.IMMERSIVE,
@@ -345,7 +347,7 @@ const App = class extends EventHandler {
 		this._actionManager.poll()
 
 		// Update styles
-		this._stylist.applyStyles(this._portalScene)
+		//this._stylist.applyStyles(this._portalScene)
 	}
 
 	_handleImmersiveTick() {
@@ -403,7 +405,7 @@ const App = class extends EventHandler {
 		this._actionManager.poll()
 
 		// Update styles
-		this._stylist.applyStyles(this._immersiveScene)
+		//this._stylist.applyStyles(this._immersiveScene)
 	}
 
 	_handleWindowAnimationFrame() {

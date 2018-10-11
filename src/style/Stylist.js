@@ -87,7 +87,6 @@ const Stylist = class extends EventHandler {
 
 	_updateNodeStyles(node){
 		for(let changedProperty of node.computedStyles.changes){
-			// @todo calculate variables
 			if(changedProperty.startsWith('--')) continue
 			// @todo merge properties like `border` and `border-top`
 			const applicatorFunction = Applicators.get(changedProperty) || null
@@ -100,7 +99,7 @@ const Stylist = class extends EventHandler {
 	Traverse the graph and update each Object3D.computedStyles to reflect the local and inherited properties
 	*/
 	_computeCascade(node){
-		node.computedStyles.computeStyles(node.localStyles, node.parent ? node.parent.computedStyles : null)
+		node.computedStyles.computeStyles(node.assignedStyles, node.localStyles, node.parent ? node.parent.computedStyles : null)
 		for(let child of node.children) this._computeCascade(child)
 	}
 

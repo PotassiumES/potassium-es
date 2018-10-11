@@ -32,7 +32,15 @@ class Declaration {
 	get property(){ return this._property }
 	get value(){ return this._value }
 	get important(){ return this._important }
+
+	reset(property, value, important=false){
+		this._property = property
+		this._value = value
+		this._important = important
+	}
 }
+
+export default Declaration
 
 export {
 	Declaration,

@@ -24,10 +24,14 @@ Applicators.set('font-size', (node, styleInfo) => {
 })
 
 Applicators.set('material-color', (node, styleInfo) => {
-	if(!node.material || !node.material.color) return
+	if(!node.material) return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
 	if(typeof parsedValue === 'undefined') return
-	node.material.color.setRGB(...parsedValue)
+	if(node.material.emissive){
+		node.material.emissive.setRGB(...parsedValue)
+	} else {
+		node.material.color.setRGB(...parsedValue)
+	}
 })
 
 Applicators.set('centroid', (node, styleInfo) => {

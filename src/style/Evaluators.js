@@ -43,7 +43,9 @@ Singleton.add(new Evaluator('custom properties / variables', /^var\(\-\-[^-\)][\
 }))
 
 Singleton.add(new Evaluator('rgb color', /rgb\((?:([\.0-9])+,[\s]?){2}([\.0-9]{1})\)/gi, (value, node) => {
-	return _parseNumberArray(value.substring(4, value.length - 1))
+	const result = _parseNumberArray(value.substring(4, value.length - 1))
+	if(typeof result === 'undefined') return undefined
+	return result.map(val => val / 255.0)
 }))
 
 Singleton.add(new Evaluator('long hash color', /^#[0-9A-F]{6}$/i, (value, node) => {
@@ -53,7 +55,7 @@ Singleton.add(new Evaluator('long hash color', /^#[0-9A-F]{6}$/i, (value, node) 
 		_parseHexNumber(value.substring(5, 7))
 	]
 	if(result.some(num => Number.isNaN(num))) return undefined
-	return result
+	return result.map(val => val / 255.0)
 }))
 
 Singleton.add(new Evaluator('short hash color', /^#[0-9A-F]{3}$/i, (value, node) => {
@@ -63,10 +65,10 @@ Singleton.add(new Evaluator('short hash color', /^#[0-9A-F]{3}$/i, (value, node)
 		_parseHexNumber(value.substring(3, 4))
 	]
 	if(result.some(num => Number.isNaN(num))) return undefined
-	return result
+	return result.map(val => val / 255.0)
 }))
 
-const DistanceVectorRegex = /(\+?\-?\d+(?:cm|m)?)/gi
+const DistanceVectorRegex = /(\+?\-?[\d\.]+(?:cm|m)?)/gi
 Singleton.add(new Evaluator('distance vector', DistanceVectorRegex, (value, node) => {
 	const splitValues = value.match(DistanceVectorRegex)
 	const parsedValues = splitValues.map(val => {

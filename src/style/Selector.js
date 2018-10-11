@@ -115,6 +115,32 @@ class SelectorFragmentList {
 			// Move on to the next ancestor and fragment
 			return this.matches(node.parent, fragmentIndex + 1, node)
 		}
+
+	}
+
+	/*
+	Breaks up the rawSelector into a SelectorFragmentList which contains SelectorElements and Combinators
+	@param {string} rawSelector a selector string like 'div.action[foo=23][bar~=grik i] > .pickle:active'
+	@return {SelectorFragmentList}
+	*/
+	static Parse(rawSelector){
+		const rawFragments = _splitSelectors(rawSelector).filter(rf => rf.trim().length > 0)
+		const results = []
+		let previousWasElement = false
+		for(let rf of rawFragments){
+			if(Combinator.TYPES.includes(rf)){
+				results.push(new Combinator(rf))
+				previousWasElement = false
+			} else {
+				if(previousWasElement){
+					// Insert an implied descendant combinator
+					results.push(new Combinator('>>'))
+				}
+				results.push(new SelectorElement(rf))
+				previousWasElement = true
+			}
+		}
+		return new SelectorFragmentList(results)
 	}
 
 	/**
@@ -507,4 +533,40 @@ export {
 	SelectorElement,
 	Combinator,
 	SpatialTags
+}
+
+/**
+@param {string} rawSelector like 'div.class:first > p[name~=flowers][selected] + text'
+@return {Array<string>} an array of separate fragments like ['div.class:first', '>', 'p[name~=flowers i][selected]', '+', 'text']
+*/
+const _splitSelectors = function(rawSelector){
+	let results = []
+	let current = []
+	let startQuote = null
+	let inBrackets = false
+	for(let i=0; i < rawSelector.length; i++){
+		const char = rawSelector[i]
+		if(char === ' '){
+			if(current.length === 0) continue
+			if(startQuote === null && inBrackets === false){
+				results.push(current.join(''))
+				current = []
+				continue
+			}
+		}
+		if((char === '"' || char === "'") && startQuote === null){
+			// start a quoted string
+			startQuote = char
+		} else if (startQuote === char){
+			// end a quoted string
+			startQuote = null
+		} else if(char === '['){
+			inBrackets = true
+		} else if(char === ']'){
+			inBrackets = false
+		}
+		current.push(char)
+	}
+	if(current.length !== 0) results.push(current.join(''))
+	return results
 }

@@ -4,6 +4,7 @@ A handy, chain oriented API for creating Three.js scenes
 import AssetLoader from './AssetLoader.js'
 import Attributes from './style/Attributes.js'
 import LocalStyles from './style/LocalStyles.js'
+import AssignedStyles from './style/AssignedStyles.js'
 import ComputedStyles from './style/ComputedStyles.js'
 
 const graph = {}
@@ -87,6 +88,19 @@ Object.defineProperty(THREE.Object3D.prototype, 'computedStyles', {
 	get: function(){
 		if(typeof this._computedStyles === 'undefined') this._computedStyles = new ComputedStyles()
 		return this._computedStyles
+	}
+})
+
+/**
+Object3D.assignedStyles holds the styles that are programmatically (not via KSS) assigned to a node
+*/
+Object.defineProperty(THREE.Object3D.prototype, 'assignedStyles', {
+	/**
+	@type {AssignedStyles}
+	*/
+	get: function(){
+		if(typeof this._assignedStyles === 'undefined') this._assignedStyles = new AssignedStyles()
+		return this._assignedStyles
 	}
 })
 
@@ -184,7 +198,10 @@ graph.fonts = new Map() // url => THREE.Font
 function loadText(resultGroup, text, material, font, options) {
 	if (graph.fonts.has(font)) {
 		const textGeometry = new THREE.TextGeometry(text, Object.assign({ font: graph.fonts.get(font) }, options))
-		resultGroup.add(new THREE.Mesh(textGeometry, material))
+		textGeometry.name = 'TextGeometry'
+		const mesh = new THREE.Mesh(textGeometry, material)
+		mesh.name = 'TextMesh'
+		resultGroup.add(mesh)
 	} else {
 		assetLoader.get(font).then(blob => {
 			if(!blob){
@@ -197,7 +214,10 @@ function loadText(resultGroup, text, material, font, options) {
 				loadedFont => {
 					graph.fonts.set(font, loadedFont)
 					const textGeometry = new THREE.TextGeometry(text, Object.assign({ font: loadedFont }, options))
-					resultGroup.add(new THREE.Mesh(textGeometry, material))
+					textGeometry.name = 'TextGeometry'
+					const mesh = new THREE.Mesh(textGeometry, material)
+					mesh.name = 'TextMesh'
+					resultGroup.add(mesh)
 					URL.revokeObjectURL(blobURL)
 				},
 				() => {},
@@ -232,15 +252,17 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 	material = material || new THREE.MeshLambertMaterial({ color: 0x999999 })
 
 	const resultGroup = new THREE.Group()
-	resultGroup.name = "text"
+	resultGroup.name = 'Text'
 	resultGroup.isText = true
 
-	const textGroup = new THREE.Group()
-	resultGroup.add(textGroup)
-	loadText(textGroup, currentText, material, font, options)
-
 	resultGroup.setRGB = (red, green, blue) => {
-		resultGroup.children[0].children[0].material.color.setRGB(red, green, blue)
+		if(resultGroup.children[0].children[0].material.emissive){
+			console.log('emmissive', red, green, blue)
+			resultGroup.children[0].children[0].material.emissive.setRGB(red, green, blue)
+		} else {
+			console.log('color', red, green, blue)
+			resultGroup.children[0].children[0].material.color.setRGB(red, green, blue)
+		}
 	}
 
 	resultGroup.setFontOptions = newOptions => {
@@ -251,10 +273,13 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 	resultGroup.setText = newText => {
 		resultGroup.remove(...resultGroup.children)
 		const textGroup = new THREE.Group()
+		textGroup.name = 'SubText'
 		resultGroup.add(textGroup)
 		currentText = newText
 		loadText(textGroup, currentText, material, font, options)
 	}
+
+	resultGroup.setText(currentText)
 	return resultGroup
 }
 
@@ -337,6 +362,7 @@ function loadGLTF(url) {
 				}
 			}
 			*/
+			gltf.name = 'GLTF'
 			resolve(gltf)
 		})
 	})
@@ -374,6 +400,7 @@ function loadObj(objPath) {
 							objURL,
 							obj => {
 								URL.revokeObjectURL(objURL)
+								obj.name = 'OBJ'
 								resolve(obj)
 							},
 							() => {},
