@@ -227,6 +227,8 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 		options || {}
 	)
 
+	let currentText = text
+
 	material = material || new THREE.MeshLambertMaterial({ color: 0x999999 })
 
 	const resultGroup = new THREE.Group()
@@ -235,17 +237,23 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 
 	const textGroup = new THREE.Group()
 	resultGroup.add(textGroup)
-	loadText(textGroup, text, material, font, options)
+	loadText(textGroup, currentText, material, font, options)
 
 	resultGroup.setRGB = (red, green, blue) => {
 		resultGroup.children[0].children[0].material.color.setRGB(red, green, blue)
+	}
+
+	resultGroup.setFontOptions = newOptions => {
+		Object.assign(options, newOptions)
+		loadText(textGroup, currentText, material, font, options)
 	}
 
 	resultGroup.setText = newText => {
 		resultGroup.remove(...resultGroup.children)
 		const textGroup = new THREE.Group()
 		resultGroup.add(textGroup)
-		loadText(textGroup, newText, material, font, options)
+		currentText = newText
+		loadText(textGroup, currentText, material, font, options)
 	}
 	return resultGroup
 }

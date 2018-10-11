@@ -64,7 +64,7 @@ context of, and then pass that as an argument into here:
 @example
 import {getScriptContext} from './ScriptContext.js'
 const context = getScriptContext(new Error)
-console.log('url', context.url)  // {string} URL of this script
+context.url  // {string} URL of this script
 
 @param {Error} err a JS Error created *in the script for which you want context*
 @return {Object}

@@ -17,10 +17,10 @@ const Stylist = class extends EventHandler {
 	get stylesheets(){ return this._stylesheets }
 
 	/**
-	Called before rendering a THREE.Scene, applyStyles updates the scene to match the styles defined by KSS
+	Annotate each node in the scene with applicable direct or cascaded KSS-defined styles
 	*/
-	applyStyles(node){
-		node.traverse(nd => {
+	calculateStyles(scene){
+		scene.traverse(nd => {
 			/** @todo cache unchanged data instead of repeating work */
 			nd.matchingRules.splice(0, nd.matchingRules.length)
 			nd.localStyles.clear()
@@ -28,20 +28,30 @@ const Stylist = class extends EventHandler {
 
 		// Refresh each node's styles
 		for(let stylesheet of this._stylesheets){
-			stylesheet.updateLocalStyles(node)
+			stylesheet.updateLocalStyles(scene)
 		}
 
 		// Compute the cascade with initial and inherited values
-		this._computeCascade(node)
+		this._computeCascade(scene)
+	}
 
+	/**
+	Apply the styles previously calculated in `calculateStyles` to the scene
+	*/
+	applyStyles(scene){
 		// Apply per-element styles
-		node.traverse(nd => {
+		scene.traverse(nd => {
 			this._updateNodeStyles(nd)
 		})
 
 		// Perform layout
 
 		// Apply animations
+	}
+
+	_calculateAndApplyStyles(scene){
+		this.calculateStyles(scene)
+		this.applyStyles(scene)
 	}
 
 	/**
@@ -95,7 +105,7 @@ const Stylist = class extends EventHandler {
 	}
 
 	/**
-	console.logs the computed styles for a node and its descendents
+	logs to the console the computed styles for a node and its descendents
 	@param {bool} showVars if true, log the CSS variables of the form `--name`
 	*/
 	logStyles(node, tabDepth=0, showVars=false, localsOnly=false){

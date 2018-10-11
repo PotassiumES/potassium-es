@@ -14,10 +14,10 @@ class Evaluators extends Set {
 		}
 		return null
 	}
-	parse(value){
+	parse(value, node){
 		const evaluator = this.getEvaluator(value)
 		if(evaluator === null) return undefined
-		return evaluator.parse(value)
+		return evaluator.parse(value, node)
 	}
 }
 
@@ -30,16 +30,23 @@ class Evaluator {
 
 	matches(value){ return value.match(this.regex) !== null }
 
-	parse(value){ return this._parseFunction(value) }
+	parse(value, node){ return this._parseFunction(value, node) }
 }
 
 const Singleton = new Evaluators()
 
-Singleton.add(new Evaluator('rgb color', /rgb\((?:([\.0-9])+,[\s]?){2}([\.0-9]{1})\)/gi, value => {
+Singleton.add(new Evaluator('custom properties / variables', /^var\(\-\-[^-\)][\-a-z0-9_]*\)$/i, (value, node) => {
+	const variableName = value.substring(4, value.length - 1)
+	const variableStyle = node.computedStyles.get(variableName)
+	if(!variableStyle) return undefined
+	return Singleton.parse(variableStyle.value, node)
+}))
+
+Singleton.add(new Evaluator('rgb color', /rgb\((?:([\.0-9])+,[\s]?){2}([\.0-9]{1})\)/gi, (value, node) => {
 	return _parseNumberArray(value.substring(4, value.length - 1))
 }))
 
-Singleton.add(new Evaluator('long hash color', /^#[0-9A-F]{6}$/i, value => {
+Singleton.add(new Evaluator('long hash color', /^#[0-9A-F]{6}$/i, (value, node) => {
 	const result = [
 		_parseHexNumber(value.substring(1, 3)),
 		_parseHexNumber(value.substring(3, 5)),
@@ -49,7 +56,7 @@ Singleton.add(new Evaluator('long hash color', /^#[0-9A-F]{6}$/i, value => {
 	return result
 }))
 
-Singleton.add(new Evaluator('short hash color', /^#[0-9A-F]{3}$/i, value => {
+Singleton.add(new Evaluator('short hash color', /^#[0-9A-F]{3}$/i, (value, node) => {
 	const result = [
 		_parseHexNumber(value.substring(1, 2)),
 		_parseHexNumber(value.substring(2, 3)),
@@ -60,7 +67,7 @@ Singleton.add(new Evaluator('short hash color', /^#[0-9A-F]{3}$/i, value => {
 }))
 
 const DistanceVectorRegex = /(\+?\-?\d+(?:cm|m)?)/gi
-Singleton.add(new Evaluator('distance vector', DistanceVectorRegex, value => {
+Singleton.add(new Evaluator('distance vector', DistanceVectorRegex, (value, node) => {
 	const splitValues = value.match(DistanceVectorRegex)
 	const parsedValues = splitValues.map(val => {
 		return _parseDistance(val, val.endsWith('cm') ? 0.01 : 1)
