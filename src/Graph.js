@@ -245,7 +245,7 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 
 	resultGroup.setFontOptions = newOptions => {
 		Object.assign(options, newOptions)
-		loadText(textGroup, currentText, material, font, options)
+		resultGroup.setText(currentText)
 	}
 
 	resultGroup.setText = newText => {
