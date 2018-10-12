@@ -8,7 +8,7 @@ class DeclarationList {
 }
 
 DeclarationList.prototype[Symbol.iterator] = function*() {
-	for (let declaration of this._declarations) yield declaration
+	for (const declaration of this._declarations) yield declaration
 }
 
 /**

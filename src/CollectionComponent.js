@@ -67,11 +67,12 @@ const CollectionComponent = class extends Component {
 	}
 	filter(filterFn = null) {
 		// filterFn must accept a DataModel and return a boolean indicating whether its Component.flatEl.style.display should be set to '' or 'none'
-		for (let [i, itemComponent] of this._dataObjectComponents) {
+		for (const [i, itemComponent] of this._dataObjectComponents) {
+			let display
 			if (typeof filterFn === 'function') {
-				var display = filterFn(itemComponent.dataObject)
+				display = filterFn(itemComponent.dataObject)
 			} else {
-				var display = true
+				display = true
 			}
 			itemComponent.flatEl.style.display = display ? '' : 'none'
 			itemComponent.portalEl.style.display = display ? '' : 'none'
@@ -82,7 +83,7 @@ const CollectionComponent = class extends Component {
 	}
 	_layoutGraph() {
 		let y = 0
-		for (let [id, component] of this._dataObjectComponents) {
+		for (const [id, component] of this._dataObjectComponents) {
 			if (component.visible === false) continue
 			component.portalGraph.position.set(component.portalGraph.position.x, y, component.portalGraph.position.z)
 			component.immersiveGraph.position.set(component.immersiveGraph.position.x, y, component.immersiveGraph.position.z)
@@ -93,7 +94,7 @@ const CollectionComponent = class extends Component {
 		this._add(this._createItemComponent(dataObject))
 	}
 	_handleCollectionRemoved(eventName, collection, dataObject) {
-		let component = this.componentForDataObject(dataObject)
+		const component = this.componentForDataObject(dataObject)
 		if (component) {
 			this._remove(component)
 		}
@@ -102,11 +103,11 @@ const CollectionComponent = class extends Component {
 		if (target !== this.dataObject) return // It was a reset for an item in the collection, not the collection itself
 		this._inGroupChange = true
 		this.trigger(CollectionComponent.Resetting, this)
-		for (let [_, itemComponent] of this._dataObjectComponents) {
+		for (const [_, itemComponent] of this._dataObjectComponents) {
 			this._remove(itemComponent)
 		}
 		this._dataObjectComponents.clear()
-		for (let dataObject of this.dataObject) {
+		for (const dataObject of this.dataObject) {
 			this._add(this._createItemComponent(dataObject))
 		}
 		this._inGroupChange = false
@@ -149,21 +150,23 @@ const CollectionComponent = class extends Component {
 	}
 	_handleDeleted(eventName, dataObject, error) {
 		if (error) return
-		let component = this._dataObjectComponents.get(dataObject.get('id'))
+		const component = this._dataObjectComponents.get(dataObject.get('id'))
 		if (component) {
 			this._remove(component)
 		}
 	}
 	_createItemComponent(itemDataObject) {
+		let options
 		if (this.options.itemOptions) {
-			var options = Object.assign({}, this.options.itemOptions)
+			options = Object.assign({}, this.options.itemOptions)
 		} else {
-			var options = {}
+			options = {}
 		}
+		let itemComponent
 		if (this.options.itemComponent) {
-			var itemComponent = new this.options.itemComponent(itemDataObject, options)
+			itemComponent = new this.options.itemComponent(itemDataObject, options)
 		} else {
-			var itemComponent = new DefaultItemComponent(itemDataObject, options)
+			itemComponent = new DefaultItemComponent(itemDataObject, options)
 		}
 		itemComponent.addClass('collection-item')
 		itemComponent.addClass('collection-item')

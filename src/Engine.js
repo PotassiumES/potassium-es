@@ -401,12 +401,13 @@ const WebXRDisplay = class extends SceneDisplay {
 
 	start() {
 		return new Promise((resolve, reject) => {
+			let sessionInitParamers
 			if (this._displayMode === Engine.PORTAL) {
-				var sessionInitParamers = {
+				sessionInitParamers = {
 					outputContext: this._xrContext
 				}
 			} else {
-				var sessionInitParamers = {
+				sessionInitParamers = {
 					exclusive: true
 				}
 			}

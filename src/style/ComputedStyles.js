@@ -38,12 +38,12 @@ class ComputedStyles {
 		this._changes.splice(0, this._changes.length)
 
 		// Assign the assigned styles
-		for (let styleInfo of assignedStyles) {
+		for (const styleInfo of assignedStyles) {
 			this._currentStyles.set(styleInfo.property, styleInfo)
 		}
 
 		// Assign the local styles
-		for (let styleInfo of localStyles) {
+		for (const styleInfo of localStyles) {
 			// Don't overwrite assigned styles
 			if (assignedStyles.has(styleInfo.property)) continue
 			this._currentStyles.set(styleInfo.property, styleInfo)
@@ -51,7 +51,7 @@ class ComputedStyles {
 
 		// If there are parental styles then add the inheritable ones for which there is not a local style
 		if (parentalComputedStyles !== null) {
-			for (let styleInfo of parentalComputedStyles) {
+			for (const styleInfo of parentalComputedStyles) {
 				// Skip if this is not a variable and not an inherited property
 				if (styleInfo.property.startsWith('--') === false && InheritedProperties.includes(styleInfo.property) === false)
 					continue
@@ -63,11 +63,11 @@ class ComputedStyles {
 		}
 
 		//Recalculate the changes list
-		for (let [property, styleInfo] of this._currentStyles) {
-			let previousInfo = this._previousStyles.get(property) || null
+		for (const [property, styleInfo] of this._currentStyles) {
+			const previousInfo = this._previousStyles.get(property) || null
 			if (previousInfo === null || previousInfo.value !== styleInfo.value) this._changes.push(property)
 		}
-		for (let [property, previousInfo] of this._previousStyles) {
+		for (const [property, previousInfo] of this._previousStyles) {
 			if (this._currentStyles.has(property) === false) this._changes.push(property)
 		}
 	}
@@ -86,7 +86,7 @@ class ComputedStyles {
 
 	/** Iterate over the current declarations */
 	*[Symbol.iterator]() {
-		for (let [property, styleInfo] of this._currentStyles) yield styleInfo
+		for (const [property, styleInfo] of this._currentStyles) yield styleInfo
 	}
 }
 

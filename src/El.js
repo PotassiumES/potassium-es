@@ -34,12 +34,12 @@ el.domElementFunction = function(tagName, ...params) {
 		if (typeof child === 'string') {
 			this.appendChild(document.createTextNode(child))
 		} else if (Array.isArray(child)) {
-			for (let subChild of child) {
+			for (const subChild of child) {
 				this.append(subChild)
 			}
 			// If it's an object but not a DOM element, consider it a dictionary of attributes
 		} else if (typeof child === 'object' && typeof child.nodeType === 'undefined') {
-			for (let key in child) {
+			for (const key in child) {
 				if (child.hasOwnProperty(key) == false) {
 					continue
 				}
@@ -66,7 +66,7 @@ el.domElementFunction = function(tagName, ...params) {
 			holdingArray.push(this.removeChild(this.children.item(0)))
 		}
 		holdingArray.sort(comparator)
-		for (let child of holdingArray) {
+		for (const child of holdingArray) {
 			this.appendChild(child)
 		}
 		return this
@@ -110,7 +110,7 @@ el.domElementFunction = function(tagName, ...params) {
 	}
 
 	// Append the children parameters
-	for (let child of params) {
+	for (const child of params) {
 		element.append(child)
 	}
 	return element
@@ -256,7 +256,7 @@ el.TAGS = [
 ]
 
 // This loop generates the element generating functions like el.div(...)
-for (let tag of el.TAGS) {
+for (const tag of el.TAGS) {
 	const innerTag = tag
 	el[innerTag] = function(...params) {
 		return el.domElementFunction(innerTag, ...params)

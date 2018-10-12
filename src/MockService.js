@@ -46,7 +46,7 @@ export default class MockService {
 	*/
 	attachToDataObject() {
 		DataObject.prototype._innerFetch = (url, ...params) => {
-			for (let endpoint of this.endpoints) {
+			for (const endpoint of this.endpoints) {
 				if (endpoint.match(url)) {
 					return new Promise((resolve, reject) => {
 						resolve(endpoint.service(url, ...params))

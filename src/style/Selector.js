@@ -41,7 +41,7 @@ class SelectorFragmentList {
 			console.error('Invalid fragmentIndex', fragmentIndex, node, this)
 			return false
 		}
-		let fragment = this._reversedFragments[fragmentIndex]
+		const fragment = this._reversedFragments[fragmentIndex]
 
 		// Handle a combinator
 		if (fragment instanceof Combinator) {
@@ -128,7 +128,7 @@ class SelectorFragmentList {
 		const rawFragments = _splitSelectors(rawSelector).filter(rf => rf.trim().length > 0)
 		const results = []
 		let previousWasElement = false
-		for (let rf of rawFragments) {
+		for (const rf of rawFragments) {
 			if (Combinator.TYPES.includes(rf)) {
 				results.push(new Combinator(rf))
 				previousWasElement = false
@@ -156,7 +156,7 @@ class SelectorFragmentList {
 		// Ones: Score one in this column for each element selector or pseudo-element contained inside the overall selector.
 		let oneCount = 0
 
-		for (let fragment of this._reversedFragments) {
+		for (const fragment of this._reversedFragments) {
 			if (fragment instanceof Combinator) continue
 			// IDs
 			hundredCount += fragment._elements.filter(element => element.type === SelectorElement.ID_ELEMENT).length
@@ -508,7 +508,7 @@ const SpatialTags = [
 Maps a spatial tag name like 'scene' to a function that returns true if it's the named node (like a THREE.SCENE)
 */
 SelectorElement.TAG_CHECK_FUNCTIONS = new Map()
-for (let tag of SpatialTags) {
+for (const tag of SpatialTags) {
 	SelectorElement.TAG_CHECK_FUNCTIONS.set(tag, _createCheckFunction(tag))
 }
 
@@ -549,7 +549,7 @@ Combinator.TYPES = [Combinator.DESCENDANT, Combinator.CHILD, Combinator.ADJACENT
 @return {Array<string>} an array of separate fragments like ['div.class:first', '>', 'p[name~=flowers i][selected]', '+', 'text']
 */
 const _splitSelectors = function(rawSelector) {
-	let results = []
+	const results = []
 	let current = []
 	let startQuote = null
 	let inBrackets = false

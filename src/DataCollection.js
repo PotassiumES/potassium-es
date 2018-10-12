@@ -17,13 +17,13 @@ const DataCollection = class extends DataObject {
 		this._inAddBatch = false
 		this._boundRelayListener = this._relayListener.bind(this)
 		this.dataObjects = []
-		for (let datum of data) {
+		for (const datum of data) {
 			this.add(this.generateDataObject(datum))
 		}
 	}
 	cleanup() {
 		super.cleanup()
-		for (let obj of this.dataObjects) {
+		for (const obj of this.dataObjects) {
 			obj.removeListener(this._boundRelayListener)
 		}
 		this.dataObjects.length = 0
@@ -88,7 +88,7 @@ const DataCollection = class extends DataObject {
 		this._inAddBatch = false
 	}
 	indexOf(dataObject) {
-		for (var i = 0; i < this.dataObjects.length; i++) {
+		for (let i = 0; i < this.dataObjects.length; i++) {
 			if (this.dataObjects[i].equals(dataObject)) {
 				return i
 			}
@@ -96,7 +96,7 @@ const DataCollection = class extends DataObject {
 		return -1
 	}
 	firstByField(fieldName, value) {
-		for (let model of this) {
+		for (const model of this) {
 			if (model.get(fieldName) === value) {
 				return model
 			}
@@ -115,10 +115,10 @@ const DataCollection = class extends DataObject {
 	}
 	reset(data) {
 		this._inReset = true
-		for (let obj of this.dataObjects.slice()) {
+		for (const obj of this.dataObjects.slice()) {
 			this.remove(obj)
 		}
-		for (let datum of data) {
+		for (const datum of data) {
 			this.add(this.generateDataObject(datum))
 		}
 		this._inReset = false
@@ -147,7 +147,7 @@ const DataCollection = class extends DataObject {
 		}, 'changed:' + fieldName)
 	}
 	*[Symbol.iterator]() {
-		for (let obj of this.dataObjects) {
+		for (const obj of this.dataObjects) {
 			yield obj
 		}
 	}
@@ -156,10 +156,11 @@ const DataCollection = class extends DataObject {
 	}
 	generateDataObject(data) {
 		const options = { collection: this }
+		let dataObj
 		if (this.options.dataObject) {
-			var dataObj = new this.options.dataObject(data, options)
+			dataObj = new this.options.dataObject(data, options)
 		} else {
-			var dataObj = new DataModel(data, options)
+			dataObj = new DataModel(data, options)
 		}
 		dataObj._new = false
 		return dataObj

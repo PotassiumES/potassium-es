@@ -28,14 +28,14 @@ THREE.Object3D.prototype.addClass = function(...classNames) {
 		this.userData.classes = [...classNames]
 		return
 	}
-	for (let className of classNames) {
+	for (const className of classNames) {
 		if (this.userData.classes.includes(className)) continue
 		this.userData.classes.push(className)
 	}
 }
 THREE.Object3D.prototype.removeClass = function(...classNames) {
 	if (typeof this.userData.classes === 'undefined' || this.userData.classes.length === 0) return
-	for (let className of classNames) {
+	for (const className of classNames) {
 		const index = this.userData.classes.indexOf(className)
 		if (index === -1) continue
 		this.userData.classes.splice(index, 1)
@@ -59,7 +59,7 @@ THREE.Object3D.prototype.traverseDepthFirst = function(func) {
 }
 
 const _traverseDepthFirst = function(node, func) {
-	for (let child of node.children) {
+	for (const child of node.children) {
 		_traverseDepthFirst(child, func)
 	}
 	func(node)
@@ -244,7 +244,7 @@ graph.nodeFunction = function(clazz, ...params) {
 		}
 		if (typeof child === 'object' && typeof child.matrixWorld === 'undefined') {
 			// If it's an object but not an Object3D, consider it a dictionary of attributes
-			for (let key in child) {
+			for (const key in child) {
 				if (child.hasOwnProperty(key) == false) continue
 				this[key] = child[key]
 			}
@@ -379,7 +379,7 @@ Load a glTF file
 @return {THREE.Group}
 */
 graph.gltf = path => {
-	let group = graph.group()
+	const group = graph.group()
 	loadGLTF(path)
 		.then(gltf => {
 			group.add(gltf.scene)
@@ -403,7 +403,7 @@ graph.SUPPORT_CLASSES = [
 	{ class: 'LineBasicMaterial', name: 'lineBasicMaterial' },
 	{ class: 'MeshLambertMaterial', name: 'meshLambertMaterial' }
 ]
-for (let classInfo of graph.SUPPORT_CLASSES) {
+for (const classInfo of graph.SUPPORT_CLASSES) {
 	const innerClazz = classInfo.class
 	graph[classInfo.name] = function(...params) {
 		return new THREE[innerClazz](...params)
@@ -424,7 +424,7 @@ graph.GRAPH_CLASSES = [
 ]
 
 // This loop generates the element generating functions like graph.group(...)
-for (let graphClassInfo of graph.GRAPH_CLASSES) {
+for (const graphClassInfo of graph.GRAPH_CLASSES) {
 	const innerClazz = graphClassInfo.class
 	graph[graphClassInfo.name] = function(...params) {
 		return graph.nodeFunction(innerClazz, ...params)

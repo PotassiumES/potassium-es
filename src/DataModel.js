@@ -41,7 +41,7 @@ export default class extends DataObject {
 	Set a key/value pair
 	*/
 	set(fieldName, value) {
-		var batch = {}
+		const batch = {}
 		batch[fieldName] = value
 		return this.setBatch(batch)
 	}
@@ -53,7 +53,7 @@ export default class extends DataObject {
 	setBatch(values) {
 		const changes = {}
 		let changed = false
-		for (let key in values) {
+		for (const key in values) {
 			const result = this._set(key, values[key])
 			if (result !== DataObject._NO_CHANGE) {
 				changed = true
@@ -112,7 +112,7 @@ export default class extends DataObject {
 		})
 	}
 	reset(data = {}) {
-		for (var key in this.data) {
+		for (const key in this.data) {
 			if (typeof data[key] === 'undefined') {
 				this.data[key] = null
 			}

@@ -107,10 +107,10 @@ const Component = class extends EventHandler {
 		if (this.cleanedUp) return
 		this.cleanedUp = true
 		this.clearListeners()
-		for (let bindInfo of this.boundCallbacks) {
+		for (const bindInfo of this.boundCallbacks) {
 			bindInfo.dataObject.removeListener(bindInfo.callback)
 		}
-		for (let domInfo of this.domEventCallbacks) {
+		for (const domInfo of this.domEventCallbacks) {
 			domInfo.targetEl.removeEventListener(domInfo.eventName, domInfo.callback)
 		}
 	}

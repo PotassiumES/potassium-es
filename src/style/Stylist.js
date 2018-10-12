@@ -31,9 +31,9 @@ const Stylist = class extends EventHandler {
 			}
 		})
 
-		for (let node of dirtyNodes) {
+		for (const node of dirtyNodes) {
 			// Update each node's local styles
-			for (let stylesheet of this._stylesheets) {
+			for (const stylesheet of this._stylesheets) {
 				stylesheet.updateLocalStyles(node, false)
 			}
 			node.layoutIsDirty = false
@@ -69,7 +69,7 @@ const Stylist = class extends EventHandler {
 		</head>
 	*/
 	async loadLinks() {
-		let links = document.getElementsByTagName('link')
+		const links = document.getElementsByTagName('link')
 		for (let i = 0; i < links.length; i++) {
 			if (links[i].getAttribute('rel') !== LinkRelativeType) continue
 			if (!links[i].getAttribute('href')) continue
@@ -93,7 +93,7 @@ const Stylist = class extends EventHandler {
 	}
 
 	_updateNodeStyles(node) {
-		for (let changedProperty of node.computedStyles.changes) {
+		for (const changedProperty of node.computedStyles.changes) {
 			if (changedProperty.startsWith('--')) continue
 			// @todo merge properties like `border` and `border-top`
 			const applicatorFunction = Applicators.get(changedProperty) || null
@@ -111,7 +111,7 @@ const Stylist = class extends EventHandler {
 			node.localStyles,
 			node.parent ? node.parent.computedStyles : null
 		)
-		for (let child of node.children) this._computeCascade(child)
+		for (const child of node.children) this._computeCascade(child)
 	}
 
 	/**
@@ -132,17 +132,17 @@ const Stylist = class extends EventHandler {
 				.join('')
 		)
 		if (localsOnly) {
-			for (let styleInfo of node.localStyles) {
+			for (const styleInfo of node.localStyles) {
 				if (showVars === false && styleInfo.property.startsWith('--')) continue
 				console.log(tabs + '\t' + styleInfo.property + ':', styleInfo.value, styleInfo.important ? '!important' : '')
 			}
 		} else {
-			for (let styleInfo of node.computedStyles) {
+			for (const styleInfo of node.computedStyles) {
 				if (showVars === false && styleInfo.property.startsWith('--')) continue
 				console.log(tabs + '\t' + styleInfo.property + ':', styleInfo.value, styleInfo.important ? '!important' : '')
 			}
 		}
-		for (let child of node.children) this.logStyles(child, tabDepth + 1, showVars)
+		for (const child of node.children) this.logStyles(child, tabDepth + 1, showVars)
 	}
 }
 

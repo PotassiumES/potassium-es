@@ -42,7 +42,7 @@ const Router = class extends EventHandler {
 		this._handleNewPath(document.location.hash.slice(1))
 	}
 	_handleNewPath(path) {
-		for (let route of this.routes) {
+		for (const route of this.routes) {
 			const matches = route.matches(path)
 			if (matches == null) {
 				continue

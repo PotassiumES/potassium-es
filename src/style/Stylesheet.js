@@ -46,8 +46,8 @@ class Stylesheet {
 		}
 
 		// Now test each rule against each node in nodes
-		for (let rule of this._data.rules) {
-			for (let n of nodes) {
+		for (const rule of this._data.rules) {
+			for (const n of nodes) {
 				const matchingSelector = rule.selectors.find(sfList => sfList.matches(n))
 				if (!matchingSelector) continue
 				n.matchingRules.push({
@@ -55,7 +55,7 @@ class Stylesheet {
 					stylesheet: this,
 					selector: matchingSelector
 				})
-				for (let declaration of rule.declarations) {
+				for (const declaration of rule.declarations) {
 					n.localStyles.add(declaration, matchingSelector, this, rule)
 				}
 				n.localStyles.sort()

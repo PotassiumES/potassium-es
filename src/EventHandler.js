@@ -26,12 +26,12 @@ const EventHandler = class {
 	/** Send an event to listeners */
 	trigger(eventName, ...params) {
 		const listenersToRemove = []
-		for (let listener of this.listeners) {
+		for (const listener of this.listeners) {
 			if (listener.distributeEvent(eventName, ...params) && listener.once) {
 				listenersToRemove.push(listener)
 			}
 		}
-		for (let listener of listenersToRemove) {
+		for (const listener of listenersToRemove) {
 			this.removeListener(listener.callback, listener.eventName)
 		}
 	}

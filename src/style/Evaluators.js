@@ -9,7 +9,7 @@ class Evaluators extends Set {
 	@return {Evaluator}
 	*/
 	getEvaluator(value) {
-		for (let evaluator of this) {
+		for (const evaluator of this) {
 			if (evaluator.matches(value)) return evaluator
 		}
 		return null

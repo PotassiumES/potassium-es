@@ -8,7 +8,7 @@ class LocalStyles {
 
 	// sorts each property array so that the highest weight in the cascade is first
 	sort() {
-		for (let [property, infos] of this._map) {
+		for (const [property, infos] of this._map) {
 			infos.sort(styleInfoComparator)
 		}
 	}
@@ -41,7 +41,7 @@ class LocalStyles {
 	}
 
 	*[Symbol.iterator]() {
-		for (let [property, infos] of this._map) {
+		for (const [property, infos] of this._map) {
 			yield infos[0]
 		}
 	}

@@ -101,7 +101,7 @@ const DataObject = class extends EventHandler {
 	*/
 	static fetchAll(...dataObjects) {
 		const allAreFetched = () => {
-			for (let dataObject of dataObjects) {
+			for (const dataObject of dataObjects) {
 				if (dataObject.isNew) return false
 			}
 			return true
@@ -111,7 +111,7 @@ const DataObject = class extends EventHandler {
 				resolve(...dataObjects)
 				return
 			}
-			for (let dataObject of dataObjects) {
+			for (const dataObject of dataObjects) {
 				dataObject
 					.fetch()
 					.then(() => {
