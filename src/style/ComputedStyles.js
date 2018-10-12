@@ -1,11 +1,10 @@
-
 /**
 ComputedStyles holds the previous and computed declarations for a single Object3D
 
 The computed styles are the combined output of a node's {AssignedStyles}, {LocalStyles}, and inherited computed parental styles.
 */
 class ComputedStyles {
-	constructor(){
+	constructor() {
 		/** @type {Map<string, StyleInfo>} property -> style */
 		this._previousStyles = new Map()
 		/** @type {Map<string, StyleInfo>} property -> style */
@@ -29,7 +28,7 @@ class ComputedStyles {
 	@param {LocalStyles} localStyles
 	@param {ComputedStyles} [parentalComputedStyles=null]
 	*/
-	computeStyles(assignedStyles, localStyles, parentalComputedStyles=null){
+	computeStyles(assignedStyles, localStyles, parentalComputedStyles = null) {
 		// Swap the previous and current maps
 		const holdingVariable = this._previousStyles
 		this._previousStyles = this._currentStyles
@@ -39,43 +38,41 @@ class ComputedStyles {
 		this._changes.splice(0, this._changes.length)
 
 		// Assign the assigned styles
-		for(let styleInfo of assignedStyles){
+		for (let styleInfo of assignedStyles) {
 			this._currentStyles.set(styleInfo.property, styleInfo)
 		}
 
 		// Assign the local styles
-		for(let styleInfo of localStyles){
+		for (let styleInfo of localStyles) {
 			// Don't overwrite assigned styles
-			if(assignedStyles.has(styleInfo.property)) continue
+			if (assignedStyles.has(styleInfo.property)) continue
 			this._currentStyles.set(styleInfo.property, styleInfo)
 		}
 
 		// If there are parental styles then add the inheritable ones for which there is not a local style
-		if(parentalComputedStyles !== null){
-			for(let styleInfo of parentalComputedStyles){
+		if (parentalComputedStyles !== null) {
+			for (let styleInfo of parentalComputedStyles) {
 				// Skip if this is not a variable and not an inherited property
-				if(
-					styleInfo.property.startsWith('--') === false &&
-					InheritedProperties.includes(styleInfo.property) === false
-				) continue
+				if (styleInfo.property.startsWith('--') === false && InheritedProperties.includes(styleInfo.property) === false)
+					continue
 				// Skip if there is an assigned or local style that overrides the inherited property
-				if(this._currentStyles.has(styleInfo.property)) continue
+				if (this._currentStyles.has(styleInfo.property)) continue
 				// Ok, this is a cascaded style!
 				this._currentStyles.set(styleInfo.property, styleInfo)
 			}
 		}
 
 		//Recalculate the changes list
-		for(let [property, styleInfo] of this._currentStyles){
+		for (let [property, styleInfo] of this._currentStyles) {
 			let previousInfo = this._previousStyles.get(property) || null
-			if(previousInfo === null || previousInfo.value !== styleInfo.value) this._changes.push(property)
+			if (previousInfo === null || previousInfo.value !== styleInfo.value) this._changes.push(property)
 		}
-		for(let [property, previousInfo] of this._previousStyles){
-			if(this._currentStyles.has(property) === false) this._changes.push(property)
+		for (let [property, previousInfo] of this._previousStyles) {
+			if (this._currentStyles.has(property) === false) this._changes.push(property)
 		}
 	}
 
-	get(property){
+	get(property) {
 		return this._currentStyles.get(property) || null
 	}
 
@@ -83,11 +80,13 @@ class ComputedStyles {
 	changes is used by the Stylist to know which styles need to be updated on the Three.Object3D
 	@return {Array<property{string}>} the declarations that changed since the last update
 	*/
-	get changes(){ return this._changes }
+	get changes() {
+		return this._changes
+	}
 
 	/** Iterate over the current declarations */
-	*[Symbol.iterator](){
-		for(let [property, styleInfo] of this._currentStyles) yield styleInfo
+	*[Symbol.iterator]() {
+		for (let [property, styleInfo] of this._currentStyles) yield styleInfo
 	}
 }
 

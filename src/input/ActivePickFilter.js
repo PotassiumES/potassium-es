@@ -1,6 +1,6 @@
-import Filter from "action-input/src/filter/Filter"
+import Filter from 'action-input/src/filter/Filter'
 
-import { throttledConsoleLog } from "../throttle.js"
+import { throttledConsoleLog } from '../throttle.js'
 
 /**
  * ActivePickFilter activates the action if the input is truthy.

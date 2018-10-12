@@ -1,8 +1,8 @@
-import el from "./El.js"
-import graph from "./Graph.js"
-import Component from "./Component.js"
-import DataObject from "./DataObject.js"
-import DataCollection from "./DataCollection.js"
+import el from './El.js'
+import graph from './Graph.js'
+import Component from './Component.js'
+import DataObject from './DataObject.js'
+import DataCollection from './DataCollection.js'
 
 /**
 DefaultItemComponent is used by CollectionComponent if no itemComponent option is passed
@@ -10,12 +10,12 @@ DefaultItemComponent is used by CollectionComponent if no itemComponent option i
 const DefaultItemComponent = class extends Component {
 	constructor(dataObject = null, options = {}) {
 		super(dataObject, Object.assign({ flatEl: el.li() }, options))
-		if(dataObject instanceof DataObject === false) throw "DefaultItemComponent requires a dataObject"
+		if (dataObject instanceof DataObject === false) throw 'DefaultItemComponent requires a dataObject'
 		this.addClass('default-item-component')
-		this.flatEl.appendChild(el.span("Item: " + dataObject))
-		this.portalEl.appendChild(el.span("Item: " + dataObject))
-		this.portalGraph.add(graph.text("Item: " + dataObject))
-		this.immersiveGraph.add(graph.text("Item: " + dataObject))
+		this.flatEl.appendChild(el.span('Item: ' + dataObject))
+		this.portalEl.appendChild(el.span('Item: ' + dataObject))
+		this.portalGraph.add(graph.text('Item: ' + dataObject))
+		this.immersiveGraph.add(graph.text('Item: ' + dataObject))
 	}
 }
 
@@ -32,23 +32,26 @@ const CollectionComponent = class extends Component {
 	constructor(dataObject = null, options = {}) {
 		super(
 			dataObject,
-			Object.assign({
-				flatEl: el.ul(),
-				portalEl: el.ul(),
-				itemGraphHeight: 0.3
-			}, options)
+			Object.assign(
+				{
+					flatEl: el.ul(),
+					portalEl: el.ul(),
+					itemGraphHeight: 0.3
+				},
+				options
+			)
 		)
-		this.addClass("collection-component")
-		if (dataObject instanceof DataCollection === false) throw "CollectionComponent requires a DataCollection dataObject"
+		this.addClass('collection-component')
+		if (dataObject instanceof DataCollection === false) throw 'CollectionComponent requires a DataCollection dataObject'
 		this._inGroupChange = false // True while resetting or other group change
 		this._dataObjectComponents = new Map() // dataObject.id -> Component
 
 		this.dataObject.addListener((...params) => {
 			this._handleCollectionReset(...params)
-		}, "reset")
+		}, 'reset')
 		this.dataObject.addListener((...params) => {
 			this._handleCollectionAdded(...params)
-		}, "added")
+		}, 'added')
 		if (this.dataObject.isNew === false) {
 			this._handleCollectionReset()
 		}
@@ -60,18 +63,18 @@ const CollectionComponent = class extends Component {
 		return this.flatEl.children.item(index).component
 	}
 	componentForDataObject(dataObject) {
-		return this._dataObjectComponents.get(dataObject.get("id"))
+		return this._dataObjectComponents.get(dataObject.get('id'))
 	}
 	filter(filterFn = null) {
 		// filterFn must accept a DataModel and return a boolean indicating whether its Component.flatEl.style.display should be set to '' or 'none'
 		for (let [i, itemComponent] of this._dataObjectComponents) {
-			if (typeof filterFn === "function") {
+			if (typeof filterFn === 'function') {
 				var display = filterFn(itemComponent.dataObject)
 			} else {
 				var display = true
 			}
-			itemComponent.flatEl.style.display = display ? "" : "none"
-			itemComponent.portalEl.style.display = display ? "" : "none"
+			itemComponent.flatEl.style.display = display ? '' : 'none'
+			itemComponent.portalEl.style.display = display ? '' : 'none'
 			itemComponent.portalGraph.visible = display
 			itemComponent.immersiveGraph.visible = display
 		}
@@ -117,36 +120,36 @@ const CollectionComponent = class extends Component {
 		}
 	}
 	_add(itemComponent) {
-		if (this._dataObjectComponents.get(itemComponent.dataObject.get("id"))) {
+		if (this._dataObjectComponents.get(itemComponent.dataObject.get('id'))) {
 			// Already have it, ignore the add
 			return
 		}
-		this._dataObjectComponents.set(itemComponent.dataObject.get("id"), itemComponent)
+		this._dataObjectComponents.set(itemComponent.dataObject.get('id'), itemComponent)
 
 		this.appendComponent(itemComponent)
 		// TODO switch to action-input
 		if (this.options.onClick) {
-			itemComponent.flatEl.addEventListener("click", ev => {
+			itemComponent.flatEl.addEventListener('click', ev => {
 				this._handleItemClick(ev, itemComponent)
 			})
 		}
 
 		if (this._inGroupChange === false) this._layoutGraph()
 
-		itemComponent.dataObject.addListener(this._handleDeleted.bind(this), "deleted", true)
+		itemComponent.dataObject.addListener(this._handleDeleted.bind(this), 'deleted', true)
 	}
 	_remove(itemComponent) {
-		this._dataObjectComponents.delete(itemComponent.dataObject.get("id"))
+		this._dataObjectComponents.delete(itemComponent.dataObject.get('id'))
 		this.removeComponent(itemComponent)
-		itemComponent.flatEl.removeEventListener("click", null)
-		itemComponent.portalEl.removeEventListener("click", null)
+		itemComponent.flatEl.removeEventListener('click', null)
+		itemComponent.portalEl.removeEventListener('click', null)
 		itemComponent.cleanup()
 
 		if (this._inGroupChange === false) this._layoutGraph()
 	}
 	_handleDeleted(eventName, dataObject, error) {
 		if (error) return
-		let component = this._dataObjectComponents.get(dataObject.get("id"))
+		let component = this._dataObjectComponents.get(dataObject.get('id'))
 		if (component) {
 			this._remove(component)
 		}
@@ -162,12 +165,12 @@ const CollectionComponent = class extends Component {
 		} else {
 			var itemComponent = new DefaultItemComponent(itemDataObject, options)
 		}
-		itemComponent.addClass("collection-item")
-		itemComponent.addClass("collection-item")
+		itemComponent.addClass('collection-item')
+		itemComponent.addClass('collection-item')
 		return itemComponent
 	}
 }
-CollectionComponent.Resetting = "collection-component-resetting"
-CollectionComponent.Reset = "collection-component-reset"
+CollectionComponent.Resetting = 'collection-component-resetting'
+CollectionComponent.Reset = 'collection-component-reset'
 
 export default CollectionComponent

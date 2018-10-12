@@ -1,4 +1,4 @@
-import Filter from "action-input/src/filter/Filter"
+import Filter from 'action-input/src/filter/Filter'
 
 /**
  * TextInputFilter

@@ -16,7 +16,7 @@ const url = getScriptURL(new Error) // `https://some-domain/path/to/script.js`
 @param {Error} err a JS Error created *in the script for which you want context*
 @return {string} url of the script in which the err Error was created
 */
-function getScriptURL(err){
+function getScriptURL(err) {
 	return getScriptContext(err).location.href
 }
 
@@ -31,7 +31,7 @@ const path = getScriptPathname(new Error) // '/path/to/script.js'
 @param {Error} err a JS Error created *in the script for which you want context*
 @return {string} path/name like `/path/to/script.js` of the script in which the err Error was created
 */
-function getScriptPathname(err){
+function getScriptPathname(err) {
 	return getScriptContext(err).location.pathname
 }
 
@@ -46,10 +46,9 @@ const path = getScriptPath(new Error) // '/path/to/' (does not include the scrip
 @param {Error} err a JS Error created *in the script for which you want context*
 @return {string} path like `/path/to/` of the script in which the err Error was created, but not the script name itself
 */
-function getScriptPath(err){
+function getScriptPath(err) {
 	return getScriptContext(err).location.path
 }
-
 
 /**
 When the browser encounters an error it creates an “Error Stack”
@@ -69,40 +68,40 @@ context.url  // {string} URL of this script
 @param {Error} err a JS Error created *in the script for which you want context*
 @return {Object}
 */
-function getScriptContext(err){
-	const context = {}	// Package everything into a “context” object.
+function getScriptContext(err) {
+	const context = {} // Package everything into a “context” object.
 
 	// The error object is regular old human-readable text.
 	// We’re going to have to pull it apart to get what we’re after.
 
 	const errorMessage = err.stack
-	const stop   = errorMessage.lastIndexOf(':')
-	const start  = errorMessage.substring(0, stop).lastIndexOf(':')
+	const stop = errorMessage.lastIndexOf(':')
+	const start = errorMessage.substring(0, stop).lastIndexOf(':')
 	const column = errorMessage.substring(stop + 1, errorMessage.length - 1)
-	const line   = errorMessage.substring(start + 1, stop)
+	const line = errorMessage.substring(start + 1, stop)
 
 	let url = errorMessage.substring(errorMessage.indexOf('//'), errorMessage.lastIndexOf(':'))
 	url = url.substring(0, url.lastIndexOf(':'))
 
-	// We need to extract the search params from 
+	// We need to extract the search params from
 	// the URL used to load this particular JS file.
 	// But might also be nice to just hold on to
 	// all of that location info too, eh?
 	const parser = document.createElement('a')
 	parser.href = url
 	context.location = {
-		href:     parser.href,      // 'http://example.com:8080/pathname/with/slashes/index.html?search=kittens#hash'
-		origin:   parser.origin,    // 'http://'
-		protocol: parser.protocol,  // 'http:'
-		host:     parser.host,      // 'example.com:8080'
-		hostname: parser.hostname,  // 'example.com'
-		port:     parser.port,      // '8080'
-		pathname: parser.pathname,  // '/path/with/slashes/name.js'
-		path:     parser.pathname.substring(0, parser.pathname.lastIndexOf('/') + 1), // '/path/with/slashes/'
-		search:   parser.search,    // '?search=kittens'
-		hash:     parser.hash,      // '#hash'
-		line:     line,             // '14'
-		column:   column            // '37'
+		href: parser.href, // 'http://example.com:8080/pathname/with/slashes/index.html?search=kittens#hash'
+		origin: parser.origin, // 'http://'
+		protocol: parser.protocol, // 'http:'
+		host: parser.host, // 'example.com:8080'
+		hostname: parser.hostname, // 'example.com'
+		port: parser.port, // '8080'
+		pathname: parser.pathname, // '/path/with/slashes/name.js'
+		path: parser.pathname.substring(0, parser.pathname.lastIndexOf('/') + 1), // '/path/with/slashes/'
+		search: parser.search, // '?search=kittens'
+		hash: parser.hash, // '#hash'
+		line: line, // '14'
+		column: column // '37'
 	}
 
 	// We’ve possibly placed arguments in the search string
@@ -111,15 +110,14 @@ function getScriptContext(err){
 	// and not parser.hash because Chrome seems to strip out
 	// hashes from JavaScript includes. Why? Meh.
 	context.data = {}
-	if(parser.search){
+	if (parser.search) {
 		search = parser.search
-		if(search.substr(0, 1) === '?') search = search.substr(1)
+		if (search.substr(0, 1) === '?') search = search.substr(1)
 		search.replace(/\?/g, '&')
 		pairs = search.split('&')
-		pairs.forEach(function(pair){
+		pairs.forEach(function(pair) {
 			pair = pair.split('=')
-			if(pair[1].indexOf(',') > -1)
-				context.data[pair[0]] = pair[1].split(',')
+			if (pair[1].indexOf(',') > -1) context.data[pair[0]] = pair[1].split(',')
 			else context.data[pair[0]] = pair[1]
 		})
 	}
@@ -127,9 +125,4 @@ function getScriptContext(err){
 	return context
 }
 
-export {getScriptContext, getScriptURL, getScriptPathname, getScriptPath}
-
-
-
-
-
+export { getScriptContext, getScriptURL, getScriptPathname, getScriptPath }

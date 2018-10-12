@@ -1,4 +1,4 @@
-import DataObject from "./DataObject.js"
+import DataObject from './DataObject.js'
 
 /**
 	DataModel holds a map of string,value pairs, sometimes fetched from or sent to a back-end server.
@@ -13,7 +13,7 @@ export default class extends DataObject {
 	*/
 	constructor(data = {}, options = {}) {
 		super(options)
-		if (typeof this.options.fieldDataObjects === "undefined") {
+		if (typeof this.options.fieldDataObjects === 'undefined') {
 			this.options.fieldDataObjects = {}
 		}
 		this.data = {}
@@ -25,14 +25,14 @@ export default class extends DataObject {
 		this.data = null
 	}
 	has(fieldName) {
-		return typeof this.data[fieldName] !== "undefined"
+		return typeof this.data[fieldName] !== 'undefined'
 	}
 	/**
 	Find a value held within this DataModel. 
 	@return may be native types or, if mapped by options.fieldDataObjects, another DataObject
 	*/
 	get(fieldName, defaultValue = null) {
-		if (typeof this.data[fieldName] === "undefined" || this.data[fieldName] === null || this.data[fieldName] === "") {
+		if (typeof this.data[fieldName] === 'undefined' || this.data[fieldName] === null || this.data[fieldName] === '') {
 			return defaultValue
 		}
 		return this.data[fieldName]
@@ -62,7 +62,7 @@ export default class extends DataObject {
 			}
 		}
 		if (changed) {
-			this.trigger("changed", this, changes)
+			this.trigger('changed', this, changes)
 		}
 		return changes
 	}
@@ -113,18 +113,18 @@ export default class extends DataObject {
 	}
 	reset(data = {}) {
 		for (var key in this.data) {
-			if (typeof data[key] === "undefined") {
+			if (typeof data[key] === 'undefined') {
 				this.data[key] = null
 			}
 		}
 		this.setBatch(data)
-		this.trigger("reset", this)
+		this.trigger('reset', this)
 	}
 	equals(obj) {
-		if (obj === null || typeof obj === "undefined") return false
+		if (obj === null || typeof obj === 'undefined') return false
 		if (this === obj) return true
 		if (typeof obj !== typeof this) return false
-		if (obj.get("id") === this.get("id")) return true
+		if (obj.get('id') === this.get('id')) return true
 		return false
 	}
 }

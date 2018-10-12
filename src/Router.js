@@ -1,4 +1,4 @@
-import EventHandler from "./EventHandler.js"
+import EventHandler from './EventHandler.js'
 
 /*
 	Router maps window.history events and URL path fragments to events
@@ -24,12 +24,12 @@ const Router = class extends EventHandler {
 		this.cleanedUp = false
 		this.routes = []
 		this.hashListener = this._checkHash.bind(this)
-		window.addEventListener("hashchange", this.hashListener, false)
+		window.addEventListener('hashchange', this.hashListener, false)
 	}
 	cleanup() {
 		if (this.cleanedUp) return
 		this.cleanedUp = true
-		window.removeEventListener("hashchange", this.hashListener)
+		window.removeEventListener('hashchange', this.hashListener)
 		this.clearListeners()
 	}
 	addRoute(regex, eventName, ...parameters) {
@@ -54,10 +54,9 @@ const Router = class extends EventHandler {
 	}
 }
 
-
-Router.RouteAddedEvent = "route-added"
-Router.StartedRoutingEvent = "started-routing"
-Router.UnknownRouteEvent = "unknown-route"
+Router.RouteAddedEvent = 'route-added'
+Router.StartedRoutingEvent = 'started-routing'
+Router.UnknownRouteEvent = 'unknown-route'
 
 export default Router
 

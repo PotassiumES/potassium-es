@@ -1,4 +1,4 @@
-import EventHandler from "./EventHandler.js"
+import EventHandler from './EventHandler.js'
 
 /**
 The abstract class for DataModel and DataCollection
@@ -25,12 +25,12 @@ const DataObject = class extends EventHandler {
 	}
 	/** @type {string} the URL (relative or full) as a string for the endpoint used by this.fetch */
 	get url() {
-		throw new Error("Extending classes must implement url()")
+		throw new Error('Extending classes must implement url()')
 	}
 
 	/** Clear out old data and set it to data, should trigger a 'reset' event */
 	reset(data = {}) {
-		throw new Error("Extending classes must implement reset")
+		throw new Error('Extending classes must implement reset')
 	}
 	parse(data) {
 		// Extending classes can override this to parse the data received via a fetch
@@ -47,7 +47,7 @@ const DataObject = class extends EventHandler {
 				() => {
 					func(this)
 				},
-				"reset",
+				'reset',
 				true
 			)
 		} else {
@@ -57,18 +57,18 @@ const DataObject = class extends EventHandler {
 	get fetchOptions() {
 		// Extending classes can override this to add headers, methods, etc to the fetch call
 		return {
-			credentials: "same-origin"
+			credentials: 'same-origin'
 		}
 	}
 	fetch() {
 		// Ask the server for data for this model or collection
 		return new Promise(
 			function(resolve, reject) {
-				this.trigger("fetching", this)
+				this.trigger('fetching', this)
 				this._innerFetch(this.url, this.fetchOptions)
 					.then(response => {
 						if (response.status != 200) {
-							throw "Fetch failed with status " + response.status
+							throw 'Fetch failed with status ' + response.status
 						}
 						return response.json()
 					})
@@ -76,12 +76,12 @@ const DataObject = class extends EventHandler {
 						data = this.parse(data)
 						this._new = false
 						this.reset(data)
-						this.trigger("fetched", this, data, null)
+						this.trigger('fetched', this, data, null)
 						resolve(this)
 					})
 					.catch(err => {
 						this._new = false
-						this.trigger("fetched", this, null, err)
+						this.trigger('fetched', this, null, err)
 						reject(err)
 					})
 			}.bind(this)
@@ -127,18 +127,18 @@ const DataObject = class extends EventHandler {
 		// Tell the server to create (POST) or update (PUT) this model or collection
 		return new Promise(
 			function(resolve, reject) {
-				this.trigger("saving", this)
+				this.trigger('saving', this)
 				const options = Object.assign({}, this.fetchOptions)
 				if (this.isNew) {
-					options.method = "post"
+					options.method = 'post'
 				} else {
-					options.method = "put"
+					options.method = 'put'
 				}
 				options.body = JSON.stringify(this.data)
 				this._innerFetch(this.url, options)
 					.then(response => {
 						if (response.status != 200) {
-							throw "Save failed with status " + response.status
+							throw 'Save failed with status ' + response.status
 						}
 						return response.json()
 					})
@@ -146,11 +146,11 @@ const DataObject = class extends EventHandler {
 						data = this.parse(data)
 						this.reset(data)
 						this._new = false
-						this.trigger("saved", this, data, null)
+						this.trigger('saved', this, data, null)
 						resolve(this)
 					})
 					.catch(err => {
-						this.trigger("saved", this, null, err)
+						this.trigger('saved', this, null, err)
 						reject(err)
 					})
 			}.bind(this)
@@ -159,19 +159,19 @@ const DataObject = class extends EventHandler {
 	delete() {
 		return new Promise(
 			function(resolve, reject) {
-				this.trigger("deleting", this)
+				this.trigger('deleting', this)
 				const options = Object.assign({}, this.fetchOptions)
-				options.method = "delete"
+				options.method = 'delete'
 				this._innerFetch(this.url, options)
 					.then(response => {
 						if (response.status != 200) {
-							throw "Delete failed with status " + response.status
+							throw 'Delete failed with status ' + response.status
 						}
-						this.trigger("deleted", this, null)
+						this.trigger('deleted', this, null)
 						resolve()
 					})
 					.catch(err => {
-						this.trigger("deleted", this, err)
+						this.trigger('deleted', this, err)
 						reject(err)
 					})
 			}.bind(this)
@@ -179,6 +179,6 @@ const DataObject = class extends EventHandler {
 	}
 }
 
-DataObject._NO_CHANGE = Symbol("no change")
+DataObject._NO_CHANGE = Symbol('no change')
 
 export default DataObject

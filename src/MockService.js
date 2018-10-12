@@ -1,4 +1,4 @@
-import DataObject from "./DataObject.js"
+import DataObject from './DataObject.js'
 
 /*
 MockService attaches itself to DataObject and will service fetches if it has a matching endpoint, otherwise it uses window.fetch.
@@ -31,11 +31,11 @@ export default class MockService {
 		this.addEndpoint(urlRegex, (url, ...params) => {
 			const json = jsonServiceFunction(url, ...params)
 			if (json === null) {
-				return new Response(new Blob(), { status: 404, statusText: "File not found, yo" })
+				return new Response(new Blob(), { status: 404, statusText: 'File not found, yo' })
 			} else {
-				return new Response(new Blob([JSON.stringify(json, null, 2)], { type: "application/json" }), {
+				return new Response(new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' }), {
 					status: 200,
-					statusText: "OK"
+					statusText: 'OK'
 				})
 			}
 		})

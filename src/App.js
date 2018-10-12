@@ -1,43 +1,43 @@
-import el from "./El.js"
-import graph from "./Graph.js"
-import Engine from "./Engine.js"
-import Router from "./Router.js"
-import Component from "./Component.js"
+import el from './El.js'
+import graph from './Graph.js'
+import Engine from './Engine.js'
+import Router from './Router.js'
+import Component from './Component.js'
 import AssetLoader from './AssetLoader.js'
-import EventHandler from "./EventHandler.js"
-import { throttledConsoleLog } from "./throttle.js"
+import EventHandler from './EventHandler.js'
+import { throttledConsoleLog } from './throttle.js'
 import DisplayModeTracker from './DisplayModeTracker.js'
 
-import Stylist from "./style/Stylist.js"
+import Stylist from './style/Stylist.js'
 
-import ActionMap from "action-input/src/action/ActionMap"
-import ClickFilter from "action-input/src/filter/ClickFilter"
-import MinMaxFilter from "action-input/src/filter/MinMaxFilter"
-import ActionManager from "action-input/src/action/ActionManager"
-import MouseInputSource from "action-input/src/input/MouseInputSource"
-import TouchInputSource from "action-input/src/input/TouchInputSource"
-import GamepadInputSource from "action-input/src/input/GamepadInputSource"
-import KeyboardInputSource from "action-input/src/input/KeyboardInputSource"
+import ActionMap from 'action-input/src/action/ActionMap'
+import ClickFilter from 'action-input/src/filter/ClickFilter'
+import MinMaxFilter from 'action-input/src/filter/MinMaxFilter'
+import ActionManager from 'action-input/src/action/ActionManager'
+import MouseInputSource from 'action-input/src/input/MouseInputSource'
+import TouchInputSource from 'action-input/src/input/TouchInputSource'
+import GamepadInputSource from 'action-input/src/input/GamepadInputSource'
+import KeyboardInputSource from 'action-input/src/input/KeyboardInputSource'
 
-import TextInputFilter from "./input/TextInputFilter.js"
-import ActivePickFilter from "./input/ActivePickFilter.js"
-import PickingInputSource from "./input/PickingInputSource.js"
-import VirtualKeyboardInputSource from "./input/VirtualKeyboardInputSource.js"
+import TextInputFilter from './input/TextInputFilter.js'
+import ActivePickFilter from './input/ActivePickFilter.js'
+import PickingInputSource from './input/PickingInputSource.js'
+import VirtualKeyboardInputSource from './input/VirtualKeyboardInputSource.js'
 
 /**
-* App contains the orchestration logic for the entirety of what is being displayed for a given app, including the app chrome like navigation.
-*
-* It contains the root data structures for each display mode:
-*
-* - For flat mode it holds a DOM element.
-* - For portal mode it holds a DOM element for overlay controls and a 3D scene for spatial controls and virtual environments.
-* - For immersive mode it holds a 3D scene for spatial controls as well as virtual environments.
-*
-* It manages WebXR sessions for portal and immersive modes. 
-* It also toggles the visibility of the flat and portal DOM fragments as display modes change.
-*
-* App communicates these changes to {@link Component}s via events so that they may react. 
-*/
+ * App contains the orchestration logic for the entirety of what is being displayed for a given app, including the app chrome like navigation.
+ *
+ * It contains the root data structures for each display mode:
+ *
+ * - For flat mode it holds a DOM element.
+ * - For portal mode it holds a DOM element for overlay controls and a 3D scene for spatial controls and virtual environments.
+ * - For immersive mode it holds a 3D scene for spatial controls as well as virtual environments.
+ *
+ * It manages WebXR sessions for portal and immersive modes.
+ * It also toggles the visibility of the flat and portal DOM fragments as display modes change.
+ *
+ * App communicates these changes to {@link Component}s via events so that they may react.
+ */
 const App = class extends EventHandler {
 	constructor() {
 		super()
@@ -52,7 +52,7 @@ const App = class extends EventHandler {
 			this._stylist.calculateStyles(this._immersiveScene)
 			this._stylist.applyStyles(this._immersiveScene)
 			setInterval(() => {
-				switch(this.displayMode){
+				switch (this.displayMode) {
 					case App.IMMERSIVE:
 						console.log('styling immersive')
 						this._stylist.calculateStyles(this._immersiveScene)
@@ -78,57 +78,57 @@ const App = class extends EventHandler {
 		this._virtualKeyboardInputSource.keyboardGroup.quaternion.setFromEuler(graph.euler(0, -45, 0))
 		this._virtualKeyboardInputSource.keyboardGroup.position.set(0.8, 0, -0.8)
 		this._virtualKeyboardInputSource.keyboardGroup.visible = false
-		
+
 		this._pickingInputSource = new PickingInputSource()
 
 		this._actionManager = new ActionManager(false)
-		this._actionManager.addFilter("click", new ClickFilter(this._actionManager.queryInputPath))
-		this._actionManager.addFilter("active-pick", new ActivePickFilter(this._actionManager.queryInputPath))
-		this._actionManager.addFilter("text-input", new TextInputFilter())
-		this._actionManager.addFilter("min-max", new MinMaxFilter())
-		this._actionManager.addInputSource("picking", this._pickingInputSource)
-		this._actionManager.addInputSource("mouse", new MouseInputSource())
-		this._actionManager.addInputSource("touch", new TouchInputSource())
-		this._actionManager.addInputSource("gamepad", new GamepadInputSource())
-		this._actionManager.addInputSource("keyboard", new KeyboardInputSource())
-		this._actionManager.addInputSource("virtual-keyboard", this._virtualKeyboardInputSource)
+		this._actionManager.addFilter('click', new ClickFilter(this._actionManager.queryInputPath))
+		this._actionManager.addFilter('active-pick', new ActivePickFilter(this._actionManager.queryInputPath))
+		this._actionManager.addFilter('text-input', new TextInputFilter())
+		this._actionManager.addFilter('min-max', new MinMaxFilter())
+		this._actionManager.addInputSource('picking', this._pickingInputSource)
+		this._actionManager.addInputSource('mouse', new MouseInputSource())
+		this._actionManager.addInputSource('touch', new TouchInputSource())
+		this._actionManager.addInputSource('gamepad', new GamepadInputSource())
+		this._actionManager.addInputSource('keyboard', new KeyboardInputSource())
+		this._actionManager.addInputSource('virtual-keyboard', this._virtualKeyboardInputSource)
 
 		/** @todo figure out how action map files should be bundled */
 		this._actionManager.addActionMap(
-			"flat",
-			new ActionMap([...this._actionManager.filters], "/static/potassium-es/actions/flat-action-map.json")
+			'flat',
+			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/flat-action-map.json')
 		)
 		this._actionManager.addActionMap(
-			"portal",
-			new ActionMap([...this._actionManager.filters], "/static/potassium-es/actions/portal-action-map.json")
+			'portal',
+			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/portal-action-map.json')
 		)
 		this._actionManager.addActionMap(
-			"immersive",
-			new ActionMap([...this._actionManager.filters], "/static/potassium-es/actions/immersive-action-map.json")
+			'immersive',
+			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/immersive-action-map.json')
 		)
-		this._actionManager.switchToActionMaps("flat")
+		this._actionManager.switchToActionMaps('flat')
 
 		// Route activate actions to the target Component
-		this._actionManager.addActionListener("/action/activate", (actionName, value, actionParameters) => {
+		this._actionManager.addActionListener('/action/activate', (actionName, value, actionParameters) => {
 			if (actionParameters !== null && actionParameters.targetComponent) {
 				actionParameters.targetComponent.handleAction(actionName, value, actionParameters)
 			}
-			if (value && actionParameters !== null && actionParameters.pointer === "left") {
+			if (value && actionParameters !== null && actionParameters.pointer === 'left') {
 				this._virtualKeyboardInputSource.handleLeftActivate()
 			}
-			if (value && actionParameters !== null && actionParameters.pointer === "right") {
+			if (value && actionParameters !== null && actionParameters.pointer === 'right') {
 				this._virtualKeyboardInputSource.handleRightActivate()
 			}
 		})
 
-		this._actionManager.addActionListener("/action/activate-dom", (actionName, value, actionParameters) => {
+		this._actionManager.addActionListener('/action/activate-dom', (actionName, value, actionParameters) => {
 			if (actionParameters !== null && actionParameters.targetComponent) {
-				actionParameters.targetComponent.handleAction("/action/activate", value, actionParameters)
+				actionParameters.targetComponent.handleAction('/action/activate', value, actionParameters)
 			}
 		})
 
 		// Route text input actions to the Component that has text input focus
-		this._actionManager.addActionListener("/action/text-input", (actionName, value, actionParameters) => {
+		this._actionManager.addActionListener('/action/text-input', (actionName, value, actionParameters) => {
 			if (Component.TextInputFocus !== null) {
 				Component.TextInputFocus.handleAction(actionName, value, actionParameters)
 			}
@@ -141,43 +141,41 @@ const App = class extends EventHandler {
 		The root DOM elmenent that will contain everything for every display mode
 		Add this to your app's DOM
 		*/
-		this._el = el.div({ class: "app" })
+		this._el = el.div({ class: 'app' })
 
 		/** Flat display mode DOM elements */
-		this._flatEl = el.div({ class: "flat-root" }).appendTo(this._el)
+		this._flatEl = el.div({ class: 'flat-root' }).appendTo(this._el)
 
 		/** Portal display mode overlay DOM and 3D scene */
-		this._portalEl = el.div({ class: "portal-root" }).appendTo(this._el)
+		this._portalEl = el.div({ class: 'portal-root' }).appendTo(this._el)
 		this._portalScene = graph.scene()
 		this._portalScene.name = 'PortalScene'
 		this._portalEngine = new Engine(this._portalScene, Engine.PORTAL, this._handlePortalTick)
 		this._portalEngine.addListener(Engine.STOPPED, (eventName, engine) => {
-			if(this._displayMode === App.PORTAL){
+			if (this._displayMode === App.PORTAL) {
 				this.setDisplayMode(App.FLAT)
 			}
 		})
 
 		/** Immersive display mode 3D scene */
-		this._immersiveEl = el.div({ class: "immersive-root" }).appendTo(this._el)
+		this._immersiveEl = el.div({ class: 'immersive-root' }).appendTo(this._el)
 		this._immersiveScene = graph.scene()
 		this._immersiveScene.name = 'ImmersiveScene'
-		this._immersiveEngine = new Engine(
-			this._immersiveScene,
-			Engine.IMMERSIVE,
-			this._handleImmersiveTick
-		)
+		this._immersiveEngine = new Engine(this._immersiveScene, Engine.IMMERSIVE, this._handleImmersiveTick)
 		this._immersiveEngine.addListener((eventName, engine) => {
-			if(this._displayMode === App.IMMERSIVE){
+			if (this._displayMode === App.IMMERSIVE) {
 				this.setDisplayMode(App.FLAT)
 			}
 		}, Engine.STOPPED)
 
 		/* Set up WebXR, WebVR, or fallback based displays for the portal and immersive engines */
-		Engine.chooseDisplays(this._portalEngine, this._immersiveEngine).then(() => {
-			this._displayModeTracker.setModes(true, this._portalEngine.hasDisplay, this._immersiveEngine.hasDisplay)
-		}).catch(err => {
-			console.error('Error setting engine displays', err)
-		})
+		Engine.chooseDisplays(this._portalEngine, this._immersiveEngine)
+			.then(() => {
+				this._displayModeTracker.setModes(true, this._portalEngine.hasDisplay, this._immersiveEngine.hasDisplay)
+			})
+			.catch(err => {
+				console.error('Error setting engine displays', err)
+			})
 
 		/* Set up hands and pointers */
 		this._leftHand = graph.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
@@ -197,7 +195,7 @@ const App = class extends EventHandler {
 
 			/** @todo use a better method than flatEl traversal */
 			const dive = node => {
-				if (typeof node.component !== "undefined" && typeof node.component.handleDisplayModeChange === "function") {
+				if (typeof node.component !== 'undefined' && typeof node.component.handleDisplayModeChange === 'function') {
 					node.component.handleDisplayModeChange(mode)
 				}
 				for (let i = 0; i < node.children.length; i++) {
@@ -216,7 +214,7 @@ const App = class extends EventHandler {
 		return this._router
 	}
 	/** @value {AssetLoader} */
-	get assetLoader(){
+	get assetLoader() {
 		return this._assetLoader
 	}
 	/** @value {HTMLElement} */
@@ -323,23 +321,23 @@ const App = class extends EventHandler {
 					})
 			})
 		}
-		throw new Error("Unhandled display mode", value)
+		throw new Error('Unhandled display mode', value)
 	}
 
 	_makeHand(color) {
 		/** @todo make this a portable resource, perhaps by embedding it in an ES module */
 		return graph.obj(
-			"/static/potassium-es/models/Controller.obj",
+			'/static/potassium-es/models/Controller.obj',
 			(group, obj) => {
-				const body = group.getObjectByName("Body_Cylinder") // Magic string for temp OBJ
+				const body = group.getObjectByName('Body_Cylinder') // Magic string for temp OBJ
 				if (!body) {
-					console.error("Did not find a hand group to color", group)
+					console.error('Did not find a hand group to color', group)
 					return
 				}
 				body.material.color.set(color)
 			},
 			(...params) => {
-				console.error("Error loading hands", ...params)
+				console.error('Error loading hands', ...params)
 			}
 		)
 	}
@@ -349,14 +347,14 @@ const App = class extends EventHandler {
 		const geometry = graph.geometry()
 		geometry.vertices.push(graph.vector3(0, 0, 0), graph.vector3(0, 0, -1000))
 		const pointer = graph.line(geometry, material)
-		pointer.name = "pointer"
+		pointer.name = 'pointer'
 		return pointer
 	}
 
 	_handlePortalTick() {
 		// Update picking
 		this._pickingInputSource.clearIntersectObjects()
-		const touchInput = this._actionManager.queryInputPath("/input/touch/normalized-position")
+		const touchInput = this._actionManager.queryInputPath('/input/touch/normalized-position')
 		if (touchInput !== null && touchInput[0] !== null) {
 			this._pickingInputSource.touch = this._portalEngine.pickScreen(...touchInput[0])
 		}
@@ -367,33 +365,32 @@ const App = class extends EventHandler {
 
 	_handleImmersiveTick() {
 		// Update hand poses, visibility, and pointers
-		const leftPosition = this._actionManager.queryInputPath("/input/gamepad/left/position")[0]
+		const leftPosition = this._actionManager.queryInputPath('/input/gamepad/left/position')[0]
 		if (leftPosition) {
 			this._leftHand.position.set(...leftPosition)
 		} else {
 			this._leftHand.position.set(...App.DefaultLeftHandPosition)
 		}
-		const leftOrientation = this._actionManager.queryInputPath("/input/gamepad/left/orientation")[0]
+		const leftOrientation = this._actionManager.queryInputPath('/input/gamepad/left/orientation')[0]
 		if (leftOrientation) {
 			this._leftHand.quaternion.set(...leftOrientation)
-			this._leftPointer.visible =
-				this._actionManager.queryInputPath("/input/gamepad/left/button/0/touched")[0] || false
+			this._leftPointer.visible = this._actionManager.queryInputPath('/input/gamepad/left/button/0/touched')[0] || false
 			this._leftHand.visible = true
 		} else {
 			// If it's not at least a 3dof controller, we don't show it
 			this._leftHand.visible = false
 		}
-		const rightPosition = this._actionManager.queryInputPath("/input/gamepad/right/position")[0]
+		const rightPosition = this._actionManager.queryInputPath('/input/gamepad/right/position')[0]
 		if (rightPosition) {
 			this._rightHand.position.set(...rightPosition)
 		} else {
 			this._rightHand.position.set(...App.DefaultRightHandPosition)
 		}
-		const rightOrientation = this._actionManager.queryInputPath("/input/gamepad/right/orientation")[0]
+		const rightOrientation = this._actionManager.queryInputPath('/input/gamepad/right/orientation')[0]
 		if (rightOrientation) {
 			this._rightHand.quaternion.set(...rightOrientation)
 			this._rightPointer.visible =
-				this._actionManager.queryInputPath("/input/gamepad/right/button/0/touched")[0] || false
+				this._actionManager.queryInputPath('/input/gamepad/right/button/0/touched')[0] || false
 			this._rightHand.visible = true
 		} else {
 			// If it's not at least a 3dof controller, we don't show it
@@ -427,22 +424,22 @@ const App = class extends EventHandler {
 	}
 
 	_updateClasses() {
-		this._el.removeClass("flat-mode")
-		this._el.removeClass("portal-mode")
-		this._el.removeClass("immersive-mode")
-		this._el.addClass(this._displayMode + "-mode")
+		this._el.removeClass('flat-mode')
+		this._el.removeClass('portal-mode')
+		this._el.removeClass('immersive-mode')
+		this._el.addClass(this._displayMode + '-mode')
 	}
 }
 
 App.DefaultLeftHandPosition = [-0.1, -0.4, -0.2]
 App.DefaultRightHandPosition = [0.1, -0.4, -0.2]
 
-App.FLAT = "flat"
-App.PORTAL = "portal"
-App.IMMERSIVE = "immersive"
+App.FLAT = 'flat'
+App.PORTAL = 'portal'
+App.IMMERSIVE = 'immersive'
 App.DISPLAY_MODES = [App.FLAT, App.PORTAL, App.IMMERSIVE]
 
-App.DisplayModeChangedEvent = "display-mode-changed"
-App.DisplayModeFailedEvent = "display-mode-failed"
+App.DisplayModeChangedEvent = 'display-mode-changed'
+App.DisplayModeFailedEvent = 'display-mode-failed'
 
 export default App

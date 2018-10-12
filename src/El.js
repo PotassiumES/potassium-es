@@ -31,14 +31,14 @@ el.domElementFunction = function(tagName, ...params) {
 		if (child === null) {
 			return
 		}
-		if (typeof child === "string") {
+		if (typeof child === 'string') {
 			this.appendChild(document.createTextNode(child))
 		} else if (Array.isArray(child)) {
 			for (let subChild of child) {
 				this.append(subChild)
 			}
 			// If it's an object but not a DOM element, consider it a dictionary of attributes
-		} else if (typeof child === "object" && typeof child.nodeType === "undefined") {
+		} else if (typeof child === 'object' && typeof child.nodeType === 'undefined') {
 			for (let key in child) {
 				if (child.hasOwnProperty(key) == false) {
 					continue
@@ -82,17 +82,17 @@ el.domElementFunction = function(tagName, ...params) {
 
 	// Convenience functions to add and remove classes from this element without duplication
 	element.addClass = function(className) {
-		const classAttribute = this.getAttribute("class") || ""
+		const classAttribute = this.getAttribute('class') || ''
 		const classes = classAttribute.split(/\s+/)
 		if (classes.indexOf(className) != -1) {
 			// Already has that class
 			return this
 		}
-		this.setAttribute("class", (classAttribute + " " + className).trim())
+		this.setAttribute('class', (classAttribute + ' ' + className).trim())
 		return this
 	}
 	element.removeClass = function(className) {
-		let classAttribute = this.getAttribute("class") || ""
+		let classAttribute = this.getAttribute('class') || ''
 		const classes = classAttribute.split(/\s+/)
 		const index = classes.indexOf(className)
 		if (index == -1) {
@@ -100,11 +100,11 @@ el.domElementFunction = function(tagName, ...params) {
 			return this
 		}
 		classes.splice(index, 1)
-		classAttribute = classes.join(" ").trim()
+		classAttribute = classes.join(' ').trim()
 		if (classAttribute.length == 0) {
-			this.removeAttribute("class")
+			this.removeAttribute('class')
 		} else {
-			this.setAttribute("class", classes.join(" ").trim())
+			this.setAttribute('class', classes.join(' ').trim())
 		}
 		return this
 	}
@@ -119,8 +119,8 @@ el.domElementFunction = function(tagName, ...params) {
 // This comparator stringifies the passed values and returns the comparison of those values
 el.defaultComparator = function(el1, el2) {
 	if (el1 === el2) return 0
-	const str1 = "" + el1
-	const str2 = "" + el2
+	const str1 = '' + el1
+	const str2 = '' + el2
 	if (str1 == str2) return 0
 	if (str1 < str2) return -1
 	return 1
@@ -147,112 +147,112 @@ These names were ovingly copied from the excellent Laconic.js
 @see https://github.com/joestelmach/laconic/blob/master/laconic.js
 */
 el.TAGS = [
-	"a",
-	"abbr",
-	"address",
-	"area",
-	"article",
-	"aside",
-	"audio",
-	"b",
-	"base",
-	"bdo",
-	"blockquote",
-	"body",
-	"br",
-	"button",
-	"canvas",
-	"caption",
-	"cite",
-	"code",
-	"col",
-	"colgroup",
-	"command",
-	"datalist",
-	"dd",
-	"del",
-	"details",
-	"dfn",
-	"div",
-	"dl",
-	"dt",
-	"em",
-	"embed",
-	"fieldset",
-	"figcaption",
-	"figure",
-	"footer",
-	"form",
-	"h1",
-	"h2",
-	"h3",
-	"h4",
-	"h5",
-	"h6",
-	"head",
-	"header",
-	"hgroup",
-	"hr",
-	"html",
-	"i",
-	"iframe",
-	"img",
-	"input",
-	"ins",
-	"keygen",
-	"kbd",
-	"label",
-	"legend",
-	"li",
-	"link",
-	"map",
-	"mark",
-	"menu",
-	"meta",
-	"meter",
-	"nav",
-	"noscript",
-	"object",
-	"ol",
-	"optgroup",
-	"option",
-	"output",
-	"p",
-	"picture",
-	"param",
-	"pre",
-	"progress",
-	"q",
-	"rp",
-	"rt",
-	"ruby",
-	"s",
-	"samp",
-	"script",
-	"section",
-	"select",
-	"small",
-	"source",
-	"span",
-	"strong",
-	"style",
-	"sub",
-	"summary",
-	"sup",
-	"table",
-	"tbody",
-	"td",
-	"textarea",
-	"tfoot",
-	"th",
-	"thead",
-	"time",
-	"title",
-	"tr",
-	"ul",
-	"var",
-	"video",
-	"wbr"
+	'a',
+	'abbr',
+	'address',
+	'area',
+	'article',
+	'aside',
+	'audio',
+	'b',
+	'base',
+	'bdo',
+	'blockquote',
+	'body',
+	'br',
+	'button',
+	'canvas',
+	'caption',
+	'cite',
+	'code',
+	'col',
+	'colgroup',
+	'command',
+	'datalist',
+	'dd',
+	'del',
+	'details',
+	'dfn',
+	'div',
+	'dl',
+	'dt',
+	'em',
+	'embed',
+	'fieldset',
+	'figcaption',
+	'figure',
+	'footer',
+	'form',
+	'h1',
+	'h2',
+	'h3',
+	'h4',
+	'h5',
+	'h6',
+	'head',
+	'header',
+	'hgroup',
+	'hr',
+	'html',
+	'i',
+	'iframe',
+	'img',
+	'input',
+	'ins',
+	'keygen',
+	'kbd',
+	'label',
+	'legend',
+	'li',
+	'link',
+	'map',
+	'mark',
+	'menu',
+	'meta',
+	'meter',
+	'nav',
+	'noscript',
+	'object',
+	'ol',
+	'optgroup',
+	'option',
+	'output',
+	'p',
+	'picture',
+	'param',
+	'pre',
+	'progress',
+	'q',
+	'rp',
+	'rt',
+	'ruby',
+	's',
+	'samp',
+	'script',
+	'section',
+	'select',
+	'small',
+	'source',
+	'span',
+	'strong',
+	'style',
+	'sub',
+	'summary',
+	'sup',
+	'table',
+	'tbody',
+	'td',
+	'textarea',
+	'tfoot',
+	'th',
+	'thead',
+	'time',
+	'title',
+	'tr',
+	'ul',
+	'var',
+	'video',
+	'wbr'
 ]
 
 // This loop generates the element generating functions like el.div(...)

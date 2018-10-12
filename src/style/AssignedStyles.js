@@ -6,7 +6,7 @@ AssignedStyles tracks programmatically (not via KSS) assigned styles for a node
 Assigned styles are never overwritten by local (KSS defined) or inherited styles
 */
 class AssignedStyles {
-	constructor(){
+	constructor() {
 		/** @type Map<string, StyleInfo> property -> style info */
 		this._map = new Map()
 	}
@@ -15,7 +15,7 @@ class AssignedStyles {
 	@param {string} property like 'font-size'
 	@return {bool} true if the property is set
 	*/
-	has(property){
+	has(property) {
 		return this._map.has(property)
 	}
 
@@ -23,7 +23,7 @@ class AssignedStyles {
 	@param {string} property like 'font-size'
 	@return {StyleInfo}
 	*/
-	get(property){
+	get(property) {
 		return this._map.get(property) || null
 	}
 
@@ -31,7 +31,7 @@ class AssignedStyles {
 	@param {string} property like 'font-size'
 	@return {bool} true if property existed
 	*/
-	delete(property){
+	delete(property) {
 		return this._map.delete(property)
 	}
 
@@ -40,8 +40,8 @@ class AssignedStyles {
 	@param {string} value like '2em'
 	@param {bool} important
 	*/
-	set(property, value, important=false){
-		if(this._map.has(property)){
+	set(property, value, important = false) {
+		if (this._map.has(property)) {
 			this._map.get(property).reset(property, value, important)
 		} else {
 			const declaration = new Declaration({
@@ -54,8 +54,8 @@ class AssignedStyles {
 	}
 
 	/** Iterate over the {StyleInfo}s */
-	*[Symbol.iterator](){
-		for(let [property, styleInfo] of this._map) yield styleInfo
+	*[Symbol.iterator]() {
+		for (let [property, styleInfo] of this._map) yield styleInfo
 	}
 }
 

@@ -1,4 +1,4 @@
-import InputSource from "action-input/src/input/InputSource"
+import InputSource from 'action-input/src/input/InputSource'
 
 /**
  *  PickingInputSource is used by App to track 3D objects that are:
@@ -63,15 +63,15 @@ export default class PickingInputSource extends InputSource {
 	*/
 	queryInputPath(partialPath) {
 		switch (partialPath) {
-			case "/mouse":
+			case '/mouse':
 				return this._mouse
-			case "/touch":
+			case '/touch':
 				return this._touch
-			case "/gaze":
+			case '/gaze':
 				return this._gaze
-			case "/left":
+			case '/left':
 				return this._left
-			case "/right":
+			case '/right':
 				return this._right
 			default:
 				return null

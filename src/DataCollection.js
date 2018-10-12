@@ -1,5 +1,5 @@
-import DataObject from "./DataObject.js"
-import DataModel from "./DataModel.js"
+import DataObject from './DataObject.js'
+import DataModel from './DataModel.js'
 
 /**
 	DataCollection represents an ordered list of DataModel instances
@@ -39,12 +39,12 @@ const DataCollection = class extends DataObject {
 		return new Promise(
 			function(resolve, reject) {
 				const fetchOptions = Object.assign(options, this.fetchOptions)
-				fetchOptions.method = "post"
+				fetchOptions.method = 'post'
 				fetchOptions.body = JSON.stringify(data)
 				this._innerFetch(this.url, fetchOptions)
 					.then(response => {
 						if (response.status != 200) {
-							throw "Create failed with status " + response.status
+							throw 'Create failed with status ' + response.status
 						}
 						return response.json()
 					})
@@ -67,7 +67,7 @@ const DataCollection = class extends DataObject {
 		}
 		this.dataObjects.push(dataObject)
 		dataObject.collection = this
-		this.trigger("added", this, dataObject)
+		this.trigger('added', this, dataObject)
 		if (this._comparator && this._inReset == false && this._inAddBatch == false) {
 			this.sort(this._comparator)
 		}
@@ -111,7 +111,7 @@ const DataCollection = class extends DataObject {
 		this.dataObjects[index].removeListener(this._boundRelayListener)
 		this.dataObjects.splice(index, 1)
 		dataObject.collection = null
-		this.trigger("removed", this, dataObject)
+		this.trigger('removed', this, dataObject)
 	}
 	reset(data) {
 		this._inReset = true
@@ -125,11 +125,11 @@ const DataCollection = class extends DataObject {
 		if (this._comparator) {
 			this.sort(this._comparator)
 		}
-		this.trigger("reset", this)
+		this.trigger('reset', this)
 	}
 	sort(comparator = DataCollection.defaultComparator) {
 		this.dataObjects.sort(comparator)
-		this.trigger("sorted", this)
+		this.trigger('sorted', this)
 	}
 	sortByAttribute(attributeName, comparator = DataCollection.defaultComparator) {
 		this.sort((obj1, obj2) => {
@@ -144,7 +144,7 @@ const DataCollection = class extends DataObject {
 			if (this._comparator && this._inReset == false && this._inAddBatch == false) {
 				this.sort(this._comparator)
 			}
-		}, "changed:" + fieldName)
+		}, 'changed:' + fieldName)
 	}
 	*[Symbol.iterator]() {
 		for (let obj of this.dataObjects) {
@@ -168,10 +168,10 @@ const DataCollection = class extends DataObject {
 
 DataCollection.defaultComparator = function(dataObject1, dataObject2) {
 	if (dataObject1 === dataObject2) return 0
-	if (typeof dataObject1.equals === "function" && dataObject1.equals(dataObject2)) return 0
-	if (typeof dataObject1.get === "function" && typeof dataObject2.get === "function") {
-		const val1 = dataObject1.get("id", -1)
-		const val2 = dataObject2.get("id", -1)
+	if (typeof dataObject1.equals === 'function' && dataObject1.equals(dataObject2)) return 0
+	if (typeof dataObject1.get === 'function' && typeof dataObject2.get === 'function') {
+		const val1 = dataObject1.get('id', -1)
+		const val2 = dataObject2.get('id', -1)
 		if (val1 === val2) return 0
 		if (val1 < val2) return -1
 		return 1

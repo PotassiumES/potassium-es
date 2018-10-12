@@ -1,9 +1,9 @@
 import el from './El.js'
 import graph from './Graph.js'
 import EventHandler from './EventHandler.js'
-import {throttledConsoleLog} from './throttle.js'
+import { throttledConsoleLog } from './throttle.js'
 
-const defaultBackgroundColor = new THREE.Color(0x99DDff)
+const defaultBackgroundColor = new THREE.Color(0x99ddff)
 
 /**
 Engine wraps up the THREE.Renderer and manages moving into and out of WebXR or WebVR Sessions
@@ -14,33 +14,39 @@ const Engine = class extends EventHandler {
 	@param {string} mode Engine.PORTAL or Engine.IMMERSIVE
 	@param {function} [tickCallback=null] this is called while rendering each frame 
 	*/
-	constructor(scene, mode, tickCallback=null) {
+	constructor(scene, mode, tickCallback = null) {
 		if (Engine.DISPLAY_MODES.indexOf(mode) === -1) {
-			throw new Error("Unknown engine mode", mode)
+			throw new Error('Unknown engine mode', mode)
 		}
 		super()
 		this._scene = scene
 		this._displayMode = mode
 		this._tickCallback = tickCallback
 
-		this._el = el.div({ class: "engine" }) // This will contain a canvas for portal mode
-		this._el.addClass(this._displayMode + "-engine")
+		this._el = el.div({ class: 'engine' }) // This will contain a canvas for portal mode
+		this._el.addClass(this._displayMode + '-engine')
 
 		this._camera = graph.perspectiveCamera([45, 1, 0.5, 10000])
-		this._camera.name = mode + "-camera"
+		this._camera.name = mode + '-camera'
 		this._camera.matrixAutoUpdate = false
 
 		this._raycaster = new THREE.Raycaster()
 		this._workingQuat = new THREE.Quaternion()
 
-		this._sceneDisplay = null 
+		this._sceneDisplay = null
 	}
 
-	get hasDisplay(){ return this._sceneDisplay !== null }
+	get hasDisplay() {
+		return this._sceneDisplay !== null
+	}
 
-	get sceneDisplay(){ return this._sceneDisplay }
+	get sceneDisplay() {
+		return this._sceneDisplay
+	}
 
-	set sceneDisplay(sceneDisplay){ this._sceneDisplay = sceneDisplay }
+	set sceneDisplay(sceneDisplay) {
+		this._sceneDisplay = sceneDisplay
+	}
 
 	get el() {
 		return this._el
@@ -54,17 +60,17 @@ const Engine = class extends EventHandler {
 		return this._camera
 	}
 
-	get tickCallback(){
+	get tickCallback() {
 		return this._tickCallback
 	}
 
-	start(){
-		if(this._sceneDisplay === null) return Promise.reject()
+	start() {
+		if (this._sceneDisplay === null) return Promise.reject()
 		return this._sceneDisplay.start()
 	}
 
-	stop(){
-		if(this._sceneDisplay === null) return Promise.resolve()
+	stop() {
+		if (this._sceneDisplay === null) return Promise.resolve()
 		return this._sceneDisplay.stop()
 	}
 
@@ -96,23 +102,30 @@ const Engine = class extends EventHandler {
 	@param {Engine} portalEngine
 	@param {Engine} immersiveEngine
 	*/
-	static async chooseDisplays(portalEngine, immersiveEngine){		
+	static async chooseDisplays(portalEngine, immersiveEngine) {
 		// If WebXR is present
-		if(navigator.xr && typeof navigator.xr.requestDevice === 'function'){
+		if (navigator.xr && typeof navigator.xr.requestDevice === 'function') {
 			try {
 				const xrDevice = await navigator.xr.requestDevice()
 				// If WebXR can do exclusive AR sessions
 				try {
-					const xrContext = el.canvas().getContext("xrpresent")
-					if(!xrContext){
-						throw new Error('Could not create an xr context')						
+					const xrContext = el.canvas().getContext('xrpresent')
+					if (!xrContext) {
+						throw new Error('Could not create an xr context')
 					}
 					await xrDevice.supportsSession({
 						outputContext: xrContext
 					})
 					// set portal engine display to WebXR
-					portalEngine.sceneDisplay = new WebXRDisplay(xrDevice, Engine.PORTAL, portalEngine.el, portalEngine.camera, portalEngine.scene, portalEngine.tickCallback)
-				} catch(err){
+					portalEngine.sceneDisplay = new WebXRDisplay(
+						xrDevice,
+						Engine.PORTAL,
+						portalEngine.el,
+						portalEngine.camera,
+						portalEngine.scene,
+						portalEngine.tickCallback
+					)
+				} catch (err) {
 					// Portal mode not available via WebXR
 				}
 
@@ -122,23 +135,35 @@ const Engine = class extends EventHandler {
 						immersive: true
 					})
 					// set immersive engine to WebXR mode
-					immersiveEngine.sceneDisplay = new WebXRDisplay(xrDevice, Engine.PORTAL, portalEngine.el, portalEngine.camera, portalEngine.scene, portalEngine.tickCallback)
-				} catch (err){
+					immersiveEngine.sceneDisplay = new WebXRDisplay(
+						xrDevice,
+						Engine.PORTAL,
+						portalEngine.el,
+						portalEngine.camera,
+						portalEngine.scene,
+						portalEngine.tickCallback
+					)
+				} catch (err) {
 					// Immersive mode not available via WebXR
 				}
-			} catch(err) {
+			} catch (err) {
 				// No available WebXR device
 			}
 		}
 
 		// If the immersive engine does not have a display and WebVR is present
-		if(immersiveEngine.hasDisplay === false && typeof navigator.getVRDisplays === 'function'){
+		if (immersiveEngine.hasDisplay === false && typeof navigator.getVRDisplays === 'function') {
 			let displays = await navigator.getVRDisplays()
 			// If there is a WebVR device
 			displays = displays.filter(display => display.capabilities.canPresent)
-			if(displays.length > 0){
+			if (displays.length > 0) {
 				// set immersive engine display to use WebVR
-				immersiveEngine.sceneDisplay = new WebVRDisplay(displays[0], immersiveEngine.camera, immersiveEngine.scene, immersiveEngine.tickCallback)
+				immersiveEngine.sceneDisplay = new WebVRDisplay(
+					displays[0],
+					immersiveEngine.camera,
+					immersiveEngine.scene,
+					immersiveEngine.tickCallback
+				)
 				immersiveEngine.sceneDisplay.addListener((eventName, isPresenting) => {
 					immersiveEngine.trigger(isPresenting ? Engine.STARTED : Engine.STOPPED, immersiveEngine)
 				})
@@ -156,13 +181,13 @@ const Engine = class extends EventHandler {
 	}
 }
 
-Engine.PORTAL = "portal"
-Engine.IMMERSIVE = "immersive"
+Engine.PORTAL = 'portal'
+Engine.IMMERSIVE = 'immersive'
 Engine.DISPLAY_MODES = [Engine.PORTAL, Engine.IMMERSIVE]
 
-Engine.OPAQUE = "opaque"
-Engine.ADDITIVE = "additive"
-Engine.ALPHA_BLEND = "alpha-blend"
+Engine.OPAQUE = 'opaque'
+Engine.ADDITIVE = 'additive'
+Engine.ALPHA_BLEND = 'alpha-blend'
 Engine.BLEND_MODES = [Engine.OPAQUE, Engine.ADDITIVE, Engine.ALPHA_BLEND]
 
 Engine.STARTED = 'engine-started'
@@ -182,9 +207,9 @@ const SceneDisplay = class extends EventHandler {
 	@param {THREE.Scene} scene
 	@param {function} tickCallback
 	*/
-	constructor(displayMode, camera, scene, tickCallback=null){
+	constructor(displayMode, camera, scene, tickCallback = null) {
 		if (Engine.DISPLAY_MODES.indexOf(displayMode) === -1) {
-			throw new Error("Unknown display mode", displayMode)
+			throw new Error('Unknown display mode', displayMode)
 		}
 		super()
 		this._displayMode = displayMode
@@ -193,19 +218,19 @@ const SceneDisplay = class extends EventHandler {
 		this._tickCallback = tickCallback
 	}
 
-	get blendMode(){
+	get blendMode() {
 		throw new Error('Not implemented')
 	}
 
-	get isStarted(){
+	get isStarted() {
 		throw new Error('Not implemented')
 	}
 
-	start(){
+	start() {
 		throw new Error('Not implemented')
 	}
 
-	stop(){
+	stop() {
 		throw new Error('Not implemented')
 	}
 }
@@ -214,7 +239,7 @@ const SceneDisplay = class extends EventHandler {
 WebVRDisplay uses WebVR 1.1 to render a scene
 */
 const WebVRDisplay = class extends SceneDisplay {
-	constructor(vrDisplay, camera, scene, tickCallback){
+	constructor(vrDisplay, camera, scene, tickCallback) {
 		super(Engine.IMMERSIVE, camera, scene, tickCallback)
 		this._render = this._render.bind(this)
 		this._vrDisplay = vrDisplay
@@ -243,48 +268,57 @@ const WebVRDisplay = class extends SceneDisplay {
 		this._updateSize()
 
 		window.addEventListener('vrdisplaypresentchange', ev => {
-			if(this._vrDisplay === null) return
+			if (this._vrDisplay === null) return
 			this.trigger('vr-display-change', this._vrDisplay.isPresenting)
-			if(this._vrDisplay.isPresenting === false){
+			if (this._vrDisplay.isPresenting === false) {
 				document.body.removeChild(this._renderer.domElement)
 			}
 		})
 	}
 
-	get blendMode(){ return Engine.OPAQUE }
+	get blendMode() {
+		return Engine.OPAQUE
+	}
 
-	get isStarted(){ return this._isStarted }
+	get isStarted() {
+		return this._isStarted
+	}
 
-	start(){
-		if(this._isStarted) return Promise.reject('Already started')			
+	start() {
+		if (this._isStarted) return Promise.reject('Already started')
 		this._isStarted = true
 		return new Promise((resolve, reject) => {
 			document.body.appendChild(this._renderer.domElement)
-			this._vrDisplay.requestPresent([{
-				source: this._renderer.domElement
-			}]).then(() => {
-				this._updateSize()
-				this._vrDisplay.requestAnimationFrame(this._render)
-				resolve()
-			}).catch(err => {
-				this._isStarted = false
-				document.body.removeChild(this._renderer.domElement)
-				console.error('Error starting WebVR', err)
-				reject(err)
-			})
+			this._vrDisplay
+				.requestPresent([
+					{
+						source: this._renderer.domElement
+					}
+				])
+				.then(() => {
+					this._updateSize()
+					this._vrDisplay.requestAnimationFrame(this._render)
+					resolve()
+				})
+				.catch(err => {
+					this._isStarted = false
+					document.body.removeChild(this._renderer.domElement)
+					console.error('Error starting WebVR', err)
+					reject(err)
+				})
 		})
 	}
 
-	stop(){
-		if(this._isStarted === false) return Promise.resolve()
+	stop() {
+		if (this._isStarted === false) return Promise.resolve()
 		this._isStarted = false
-		if(this._vrDisplay.isPresenting === false) return Promise.resolve()
+		if (this._vrDisplay.isPresenting === false) return Promise.resolve()
 		return this._vrDisplay.exitPresent()
 	}
 
-	_render(){
-		if(this._vrDisplay === null) return
-		if(this._vrDisplay.isPresenting === false) return
+	_render() {
+		if (this._vrDisplay === null) return
+		if (this._vrDisplay.isPresenting === false) return
 		this._vrDisplay.requestAnimationFrame(this._render)
 
 		this._delta = this._clock.getDelta()
@@ -316,8 +350,8 @@ const WebVRDisplay = class extends SceneDisplay {
 		this._vrDisplay.submitFrame()
 	}
 
-	_updateSize(){
-		if(!this._vrDisplay) return
+	_updateSize() {
+		if (!this._vrDisplay) return
 		const eyeParams = this._vrDisplay.getEyeParameters('left')
 		this._width = eyeParams.renderWidth * 2
 		this._height = eyeParams.renderHeight
@@ -332,7 +366,7 @@ const WebVRDisplay = class extends SceneDisplay {
 WebXRDisplay uses the WebXR Device API to render a scene
 */
 const WebXRDisplay = class extends SceneDisplay {
-	constructor(xrDevice, displayMode, domEl, camera, scene, tickCallback = null){
+	constructor(xrDevice, displayMode, domEl, camera, scene, tickCallback = null) {
 		super(displayMode, camera, scene, tickCallback)
 		this._render = this._render.bind(this)
 		this._xrDevice = xrDevice
@@ -349,19 +383,19 @@ const WebXRDisplay = class extends SceneDisplay {
 
 		if (this._displayMode === Engine.PORTAL) {
 			// Create the output context for the composited session render
-			this._xrCanvas = el.canvas({ class: "xr-canvas" })
-			this._xrContext = this._xrCanvas.getContext("xrpresent")
+			this._xrCanvas = el.canvas({ class: 'xr-canvas' })
+			this._xrContext = this._xrCanvas.getContext('xrpresent')
 			if (this._xrContext === null) {
-				throw new Error("Could not create the XR context")
+				throw new Error('Could not create the XR context')
 			}
 		} else {
 			// immersive mode engines don't use this canvas as the composited results are rendered into the headset
 			this._xrCanvas = null
 			this._xrContext = null
-		}		
+		}
 	}
 
-	get isStarted(){
+	get isStarted() {
 		return this._session !== null
 	}
 
@@ -381,11 +415,11 @@ const WebXRDisplay = class extends SceneDisplay {
 				this._session = null
 			}
 
-			this._glCanvas = el.canvas({ class: "gl-canvas" })
-			this._glContext = this._glCanvas.getContext("webgl", {
+			this._glCanvas = el.canvas({ class: 'gl-canvas' })
+			this._glContext = this._glCanvas.getContext('webgl', {
 				compatibleXRDevice: this._xrDevice
 			})
-			if (!this._glContext) throw new Error("Could not create a webgl context")
+			if (!this._glContext) throw new Error('Could not create a webgl context')
 
 			this._renderer = new THREE.WebGLRenderer({
 				canvas: this._glCanvas,
@@ -395,7 +429,7 @@ const WebXRDisplay = class extends SceneDisplay {
 			})
 			this._renderer.autoClear = false
 			this._renderer.setPixelRatio(1)
-			this._renderer.setClearColor("#000", 0)
+			this._renderer.setClearColor('#000', 0)
 
 			this._xrDevice
 				.requestSession(sessionInitParamers)
@@ -409,7 +443,7 @@ const WebXRDisplay = class extends SceneDisplay {
 					}
 
 					this._session
-						.requestFrameOfReference("eye-level")
+						.requestFrameOfReference('eye-level')
 						.then(frameOfReference => {
 							this._eyeLevelFrameOfReference = frameOfReference
 							this._session.requestAnimationFrame(this._render)
@@ -443,24 +477,24 @@ const WebXRDisplay = class extends SceneDisplay {
 	}
 
 	_render(t, frame) {
-		if(this._session === null || !this._session.baseLayer){
+		if (this._session === null || !this._session.baseLayer) {
 			return
 		}
 		this._session.requestAnimationFrame(this._render)
 
 		const pose = frame.getDevicePose(this._eyeLevelFrameOfReference)
 		if (!pose) {
-			console.log("No pose")
+			console.log('No pose')
 			return
 		}
 
-		if(this._tickCallback) {
+		if (this._tickCallback) {
 			this._tickCallback()
 		}
-		if(this._session === null || !this._session.baseLayer){
+		if (this._session === null || !this._session.baseLayer) {
 			return
 		}
-	
+
 		this._renderer.setSize(this._session.baseLayer.framebufferWidth, this._session.baseLayer.framebufferHeight, false)
 		this._renderer.clear()
 
@@ -484,9 +518,9 @@ const WebXRDisplay = class extends SceneDisplay {
 FallbackPortalDisplay is used on handsets when WebXR and WebVR are not present
 */
 const FallbackPortalDisplay = class extends SceneDisplay {
-	constructor(camera, scene, tickCallback){
+	constructor(camera, scene, tickCallback) {
 		super(Engine.PORTAL, camera, scene, tickCallback)
 	}
 
-	stop(){}
+	stop() {}
 }

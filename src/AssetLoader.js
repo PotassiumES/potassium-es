@@ -4,27 +4,35 @@ import EventHandler from './EventHandler.js'
 A utility class for holding Asset info like URL and loading state
 */
 const AssetInfo = class {
-	constructor(url){
+	constructor(url) {
 		this._url = url
 		this._state = AssetLoader.LOADING
 		this._blob = null
 		this._waitingResolveFunctions = []
 	}
-	get url(){ return this._url }
-	get state(){ return this._state }
-	get blob(){ return this._blob }
-	set state(value){ this._state = value }
+	get url() {
+		return this._url
+	}
+	get state() {
+		return this._state
+	}
+	get blob() {
+		return this._blob
+	}
+	set state(value) {
+		this._state = value
+	}
 
-	async fetch(){
+	async fetch() {
 		try {
 			const response = await fetch(this._url)
 			this._state = response.status === 200 ? AssetLoader.LOADED : AssetLoader.FAILED
-			if(this._state === AssetLoader.LOADED){
+			if (this._state === AssetLoader.LOADED) {
 				this._blob = response.blob()
 			}
 			this._resolveWaitingFunctions()
 			return this
-		} catch(err) {
+		} catch (err) {
 			this._state = AssetLoader.FAILED
 			this._resolveWaitingFunctions()
 			return this
@@ -32,8 +40,8 @@ const AssetInfo = class {
 	}
 
 	/** @return {Promise<AssetInfo>} */
-	waitForFetch(){
-		if(this.state !== AssetLoader.LOADING){
+	waitForFetch() {
+		if (this.state !== AssetLoader.LOADING) {
 			return Promise.resolve(this)
 		}
 		return new Promise((resolve, reject) => {
@@ -41,8 +49,8 @@ const AssetInfo = class {
 		})
 	}
 
-	_resolveWaitingFunctions(){
-		while(this._waitingResolveFunctions.length > 0){
+	_resolveWaitingFunctions() {
+		while (this._waitingResolveFunctions.length > 0) {
 			this._waitingResolveFunctions.pop()(this)
 		}
 	}
@@ -52,7 +60,7 @@ const AssetInfo = class {
 AssetLoader receives the URLs of assets to load, fetches them, and then fires an event when they're loaded or failed.
 */
 const AssetLoader = class extends EventHandler {
-	constructor(){
+	constructor() {
 		super()
 		this._handleAssetFetched = this._handleAssetFetched.bind(this)
 
@@ -60,17 +68,17 @@ const AssetLoader = class extends EventHandler {
 		this._currentFetchingAsset = null
 
 		// Assets move from loadingQueue to fetchedAssets after they are fetched
-		this._loadingQueue = []				// AssetInfos to load
-		this._fetchedAssets = new Map() 	// url -> AssetInfos that have been fetched, regardless of success or failure
+		this._loadingQueue = [] // AssetInfos to load
+		this._fetchedAssets = new Map() // url -> AssetInfos that have been fetched, regardless of success or failure
 	}
 
 	/**
 	@param {string} url
 	@return {boolean} true if the URL is queued for fetching
 	*/
-	isQueued(url){
-		for(let i=0; i < this._loadingQueue.length; i++){
-			if(this._loadingQueue[i].url === url) return true
+	isQueued(url) {
+		for (let i = 0; i < this._loadingQueue.length; i++) {
+			if (this._loadingQueue[i].url === url) return true
 		}
 		return false
 	}
@@ -79,13 +87,15 @@ const AssetLoader = class extends EventHandler {
 	@param {string} url
 	@return {boolean} true if the asset fetch has completed, even if it was a failure
 	*/
-	isFetched(url){ return this._fetchedAssets.has(url) }
+	isFetched(url) {
+		return this._fetchedAssets.has(url)
+	}
 
 	/**
 	@url {string url}
 	@return {boolean} url true if a fetch has completed successfully
 	*/
-	isLoaded(url){
+	isLoaded(url) {
 		return this.isFetched(url) && this._fetchedAssets.get(url).state === AssetLoader.LOADED
 	}
 
@@ -93,7 +103,7 @@ const AssetLoader = class extends EventHandler {
 	@url {string url}
 	@return {boolean} url true if a fetch has completed successfully
 	*/
-	isFailed(url){
+	isFailed(url) {
 		return this.isFetched(url) && this._fetchedAssets.get(url).state === AssetLoader.FAILED
 	}
 
@@ -101,7 +111,7 @@ const AssetLoader = class extends EventHandler {
 	@url {string} url
 	@return {boolean} true if the URL has been queued *or* fetched
 	*/
-	has(url){
+	has(url) {
 		return this.isQueued(url) || this.isFetched(url)
 	}
 
@@ -109,50 +119,53 @@ const AssetLoader = class extends EventHandler {
 	@param {string} url
 	@return {Promise<Blob?>}
 	*/
-	async get(url){
-		if(this.isFetched(url)){
+	async get(url) {
+		if (this.isFetched(url)) {
 			return this._fetchedAssets.get(url).blob
 		}
 		let assetInfo = this._getFromLoadingQueue(url)
-		if(!assetInfo){
+		if (!assetInfo) {
 			assetInfo = this._addToLoadingQueue(url)
 		}
 		await assetInfo.waitForFetch()
 		return assetInfo.blob
 	}
 
-	_checkLoadingQueue(){
-		if(this._currentFetchingAsset !== null) return
-		if(this._loadingQueue.length === 0) return
+	_checkLoadingQueue() {
+		if (this._currentFetchingAsset !== null) return
+		if (this._loadingQueue.length === 0) return
 		this._currentFetchingAsset = this._loadingQueue[0]
-		this._currentFetchingAsset.fetch().then(this._handleAssetFetched).catch(err => {
-			console.error('Error checking loading queue', err)
-		})
+		this._currentFetchingAsset
+			.fetch()
+			.then(this._handleAssetFetched)
+			.catch(err => {
+				console.error('Error checking loading queue', err)
+			})
 	}
 
-	_handleAssetFetched(assetInfo){
+	_handleAssetFetched(assetInfo) {
 		this._currentFetchingAsset = null
 		this._loadingQueue.splice(0, 1)
 		this._checkLoadingQueue()
 	}
 
-	_addToLoadingQueue(url){
-		if(this.has(url)) return
+	_addToLoadingQueue(url) {
+		if (this.has(url)) return
 		const assetInfo = new AssetInfo(url)
 		this._loadingQueue.push(assetInfo)
 		this._checkLoadingQueue()
 		return assetInfo
 	}
 
-	_getFromLoadingQueue(url){
-		for(let i=0; i < this._loadingQueue.length; i++){
-			if(this._loadingQueue[i].url === url) return this._loadingQueue[i]
+	_getFromLoadingQueue(url) {
+		for (let i = 0; i < this._loadingQueue.length; i++) {
+			if (this._loadingQueue[i].url === url) return this._loadingQueue[i]
 		}
 		return null
 	}
 
-	static get Singleton(){
-		if(singleton === null){
+	static get Singleton() {
+		if (singleton === null) {
 			singleton = new AssetLoader()
 		}
 		return singleton

@@ -1,4 +1,3 @@
-
 /**
 EventListener holds information about listeners on an object with the EventHandler
 */
@@ -66,19 +65,18 @@ const EventHandler = class {
 
 	/** @return {EventListener[]} */
 	get listeners() {
-		if (typeof this._listeners == "undefined") {
+		if (typeof this._listeners == 'undefined') {
 			this._listeners = []
 		}
 		return this._listeners
 	}
 
 	clearListeners() {
-		if (typeof this._listeners !== "undefined") {
+		if (typeof this._listeners !== 'undefined') {
 			this._listeners.length = 0
 		}
 	}
 }
-EventHandler.ALL_EVENTS = Symbol("all events")
-
+EventHandler.ALL_EVENTS = Symbol('all events')
 
 export default EventHandler

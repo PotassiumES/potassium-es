@@ -1,7 +1,7 @@
-import el from "./El.js"
-import graph from "./Graph.js"
-import EventHandler from "./EventHandler.js"
-import AudioManager from "./AudioManager.js"
+import el from './El.js'
+import graph from './Graph.js'
+import EventHandler from './EventHandler.js'
+import AudioManager from './AudioManager.js'
 
 /**
 Component contains the reactive logic for a responsive UI element.
@@ -49,10 +49,13 @@ const Component = class extends EventHandler {
 	constructor(dataObject = null, options = {}) {
 		super()
 		this.dataObject = dataObject // a DataModel or DataCollection
-		this.options = Object.assign({
-			portalOverlay: true,
-			portalSpatial: true
-		}, options)
+		this.options = Object.assign(
+			{
+				portalOverlay: true,
+				portalSpatial: true
+			},
+			options
+		)
 		this.cleanedUp = false
 
 		this.focus = this.focus.bind(this)
@@ -75,10 +78,10 @@ const Component = class extends EventHandler {
 		this._portalEl = this.options.portalEl || el.div()
 		this._portalEl.component = this
 
-		if(this.options.portalOverlay === false){
+		if (this.options.portalOverlay === false) {
 			this._portalEl.addClass('hidden')
 		}
-		if(this.options.portalSpatial === false){
+		if (this.options.portalSpatial === false) {
 			this._portalGraph.visible = false
 		}
 
@@ -94,10 +97,10 @@ const Component = class extends EventHandler {
 
 		this._updateClasses()
 
-		this.listenToEl("focus", this._flatEl, this.focus)
-		this.listenToEl("blur", this._flatEl, this.blur)
-		this.listenToEl("focus", this._portalEl, this.focus)
-		this.listenToEl("blur", this._portalEl, this.blur)
+		this.listenToEl('focus', this._flatEl, this.focus)
+		this.listenToEl('blur', this._flatEl, this.blur)
+		this.listenToEl('focus', this._portalEl, this.focus)
+		this.listenToEl('blur', this._portalEl, this.blur)
 	}
 
 	cleanup() {
@@ -118,11 +121,11 @@ const Component = class extends EventHandler {
 	handleDisplayModeChange(mode) {}
 
 	/** @type {string} */
-	get activationAnchor(){
+	get activationAnchor() {
 		return this.options.activationAnchor || null
 	}
 	/** @type {string} */
-	set activationAnchor(value){
+	set activationAnchor(value) {
 		this.options.activationAnchor = value
 		this._updateClasses()
 	}
@@ -131,14 +134,14 @@ const Component = class extends EventHandler {
 	Called when an action is targeted at a Component
 	*/
 	handleAction(actionName, value, actionParameters) {
-		if (actionName === "/action/activate" && value === true) {
-			if(typeof this.options.activationAnchor === 'string'){
+		if (actionName === '/action/activate' && value === true) {
+			if (typeof this.options.activationAnchor === 'string') {
 				document.location.href = this.options.activationAnchor
 			}
 			this.focus()
 		}
 		this.trigger(Component.ActionEvent, actionName, value, actionParameters)
-		if (actionName === "/action/text-input" && value && this === Component.TextInputFocus) {
+		if (actionName === '/action/text-input' && value && this === Component.TextInputFocus) {
 			this.trigger(Component.TextInputEvent, actionParameters)
 		}
 	}
@@ -191,7 +194,7 @@ const Component = class extends EventHandler {
 	}
 
 	/** @type {boolean} */
-	get hasFocus(){
+	get hasFocus() {
 		return this === Component._TextInputFocus
 	}
 
@@ -221,7 +224,7 @@ const Component = class extends EventHandler {
 	this._fooComponent = new FooComponent().appendTo(parentComponent)
 	@param {Component} parentComponent
 	*/
-	appendTo(parentComponent){
+	appendTo(parentComponent) {
 		parentComponent.appendComponent(this)
 		return this
 	}
@@ -256,10 +259,10 @@ const Component = class extends EventHandler {
 	hides the flatEl and immersiveGraph
 	optionally hides portalEl and portalGraph if portalOverlay and portalSpatial (respectively) are set to true
 	*/
-	hide(){
+	hide() {
 		this.flatEl.addClass('hidden')
-		if(this.options.portalOverlay) this.portalEl.addClass('hidden')
-		if(this.options.portalSpatial) this.portalGraph.visible = false
+		if (this.options.portalOverlay) this.portalEl.addClass('hidden')
+		if (this.options.portalSpatial) this.portalGraph.visible = false
 		this.immersiveGraph.visible = false
 	}
 
@@ -267,10 +270,10 @@ const Component = class extends EventHandler {
 	shows the flatEl and immersiveGraph
 	optionally shows portalEl and portalGraph if portalOverlay and portalSpatial (respectively) are set to true
 	*/
-	show(){
+	show() {
 		this.flatEl.removeClass('hidden')
-		if(this.options.portalOverlay) this.portalEl.removeClass('hidden')
-		if(this.options.portalSpatial) this.portalGraph.visible = true
+		if (this.options.portalOverlay) this.portalEl.removeClass('hidden')
+		if (this.options.portalSpatial) this.portalGraph.visible = true
 		this.immersiveGraph.visible = true
 	}
 
@@ -310,14 +313,14 @@ const Component = class extends EventHandler {
 	bindTextEl(fieldName, targetElement, formatter = null, dataModel = this.dataModel) {
 		if (formatter === null) {
 			formatter = value => {
-				if (value === null) return ""
-				if (typeof value === "string") return value
-				return "" + value
+				if (value === null) return ''
+				if (typeof value === 'string') return value
+				return '' + value
 			}
 		}
 		const callback = () => {
 			const result = formatter(dataModel.get(fieldName))
-			targetElement.innerText = typeof result === "string" ? result : ""
+			targetElement.innerText = typeof result === 'string' ? result : ''
 		}
 		dataModel.addListener(callback, `changed:${fieldName}`)
 		callback()
@@ -339,9 +342,9 @@ const Component = class extends EventHandler {
 	bindAttributeEl(fieldName, targetElement, attributeName, formatter = null, dataModel = this.dataModel) {
 		if (formatter === null) {
 			formatter = value => {
-				if (value === null) return ""
-				if (typeof value === "string") return value
-				return "" + value
+				if (value === null) return ''
+				if (typeof value === 'string') return value
+				return '' + value
 			}
 		}
 		const callback = () => {
@@ -358,13 +361,13 @@ const Component = class extends EventHandler {
 	/**
 	Updates classes based on activationAnchor and focus 
 	*/
-	_updateClasses(){
-		if(this.hasFocus){
+	_updateClasses() {
+		if (this.hasFocus) {
 			this.addClass('focus')
 		} else {
 			this.removeClass('focus')
 		}
-		if(this.activationAnchor){
+		if (this.activationAnchor) {
 			this.addClass('anchored')
 		} else {
 			this.removeClass('anchored')
@@ -390,7 +393,7 @@ const Component = class extends EventHandler {
 	}
 
 	/** @type {AudioManager} */
-	static get AudioManager(){
+	static get AudioManager() {
 		return Component._AudioManager
 	}
 }
@@ -402,9 +405,9 @@ Component._TextInputFocus = null
 Component._AudioManager = new AudioManager()
 
 /* Events */
-Component.ActionEvent = "component-action-event"
-Component.TextInputEvent = "component-text-input-event"
-Component.FocusEvent = "component-focus-event"
-Component.BlurEvent = "component-blur-event"
+Component.ActionEvent = 'component-action-event'
+Component.TextInputEvent = 'component-text-input-event'
+Component.FocusEvent = 'component-focus-event'
+Component.BlurEvent = 'component-blur-event'
 
 export default Component

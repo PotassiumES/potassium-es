@@ -23,30 +23,30 @@ THREE.Scene.prototype.isScene = true
 /**
 Helper functions to handling classes used by the Stylist
 */
-THREE.Object3D.prototype.addClass = function(...classNames){
-	if(typeof this.userData.classes === 'undefined'){
+THREE.Object3D.prototype.addClass = function(...classNames) {
+	if (typeof this.userData.classes === 'undefined') {
 		this.userData.classes = [...classNames]
 		return
 	}
-	for(let className of classNames){
-		if(this.userData.classes.includes(className)) continue
+	for (let className of classNames) {
+		if (this.userData.classes.includes(className)) continue
 		this.userData.classes.push(className)
 	}
 }
-THREE.Object3D.prototype.removeClass = function(...classNames){
-	if(typeof this.userData.classes === 'undefined' || this.userData.classes.length === 0) return
-	for(let className of classNames){
+THREE.Object3D.prototype.removeClass = function(...classNames) {
+	if (typeof this.userData.classes === 'undefined' || this.userData.classes.length === 0) return
+	for (let className of classNames) {
 		const index = this.userData.classes.indexOf(className)
-		if(index === -1) continue
+		if (index === -1) continue
 		this.userData.classes.splice(index, 1)
 	}
 }
-THREE.Object3D.prototype.hasClass = function(className){
-	if(typeof this.userData.classes === 'undefined') return false
+THREE.Object3D.prototype.hasClass = function(className) {
+	if (typeof this.userData.classes === 'undefined') return false
 	return this.userData.classes.includes(className)
 }
-THREE.Object3D.prototype.getClasses = function(){
-	if(!this.userData.classes || this.userData.classes.length === 0) return []
+THREE.Object3D.prototype.getClasses = function() {
+	if (!this.userData.classes || this.userData.classes.length === 0) return []
 	return this.userData.classes
 }
 
@@ -54,12 +54,12 @@ THREE.Object3D.prototype.getClasses = function(){
 A handy function for depth first traversal of all children and this node
 @param {function} func a function of the signature function(Object3D)
 */
-THREE.Object3D.prototype.traverseDepthFirst = function(func){
+THREE.Object3D.prototype.traverseDepthFirst = function(func) {
 	_traverseDepthFirst(this, func)
 }
 
-const _traverseDepthFirst = function(node, func){
-	for(let child of node.children){
+const _traverseDepthFirst = function(node, func) {
+	for (let child of node.children) {
 		_traverseDepthFirst(child, func)
 	}
 	func(node)
@@ -73,22 +73,22 @@ THREE.Object3D.prototype.layoutIsDirty = false
 /**
 Sets this node layoutIsDirty to true and if it has a parent it calls parent.setLayoutDirty() (which calls its parent, etc)
 */
-THREE.Object3D.prototype.setLayoutDirty = function(){
+THREE.Object3D.prototype.setLayoutDirty = function() {
 	this.layoutIsDirty = true
-	if(this.parent) this.parent.setLayoutDirty()
+	if (this.parent) this.parent.setLayoutDirty()
 }
 
 /**
 Set the layout dirty when adding or removing a child
 */
 const _oldAdd = THREE.Object3D.prototype.add
-THREE.Object3D.prototype.add = function(object){
+THREE.Object3D.prototype.add = function(object) {
 	_oldAdd.call(this, object)
 	object.setLayoutDirty()
 	return this
 }
 const _oldRemove = THREE.Object3D.prototype.remove
-THREE.Object3D.prototype.remove = function(object){
+THREE.Object3D.prototype.remove = function(object) {
 	_oldRemove.call(this, object)
 	this.setLayoutDirty()
 	return this
@@ -98,12 +98,12 @@ THREE.Object3D.prototype.remove = function(object){
 @param {string} selector like 'node[name=ModeSwitcherComponent] .button-component > text'
 @return {Array<Object3D>} nodes that match the selector
 */
-THREE.Object3D.prototype.getObjectsBySelector = function(selector){
+THREE.Object3D.prototype.getObjectsBySelector = function(selector) {
 	const selectorFragmentList = SelectorFragmentList.Parse(selector)
 	const results = []
 	this.traverse(node => {
-		if(node === this) return
-		if(selectorFragmentList.matches(node)){
+		if (node === this) return
+		if (selectorFragmentList.matches(node)) {
 			results.push(node)
 		}
 	})
@@ -120,7 +120,7 @@ Object.defineProperty(THREE.Object3D.prototype, 'matchingRules', {
 		selector: SelectorFragmentList
 	}]} */
 	get: function() {
-		if(typeof this._matchingRules === 'undefined') this._matchingRules = []
+		if (typeof this._matchingRules === 'undefined') this._matchingRules = []
 		return this._matchingRules
 	}
 })
@@ -133,8 +133,8 @@ Object.defineProperty(THREE.Object3D.prototype, 'localStyles', {
 	/**
 	@type {LocalStyles}
 	*/
-	get: function(){
-		if(typeof this._localStyles === 'undefined') this._localStyles = new LocalStyles()
+	get: function() {
+		if (typeof this._localStyles === 'undefined') this._localStyles = new LocalStyles()
 		return this._localStyles
 	}
 })
@@ -146,8 +146,8 @@ Object.defineProperty(THREE.Object3D.prototype, 'computedStyles', {
 	/**
 	@type {ComputedStyles}
 	*/
-	get: function(){
-		if(typeof this._computedStyles === 'undefined') this._computedStyles = new ComputedStyles()
+	get: function() {
+		if (typeof this._computedStyles === 'undefined') this._computedStyles = new ComputedStyles()
 		return this._computedStyles
 	}
 })
@@ -159,8 +159,8 @@ Object.defineProperty(THREE.Object3D.prototype, 'assignedStyles', {
 	/**
 	@type {AssignedStyles}
 	*/
-	get: function(){
-		if(typeof this._assignedStyles === 'undefined') this._assignedStyles = new AssignedStyles()
+	get: function() {
+		if (typeof this._assignedStyles === 'undefined') this._assignedStyles = new AssignedStyles()
 		return this._assignedStyles
 	}
 })
@@ -172,8 +172,8 @@ Object.defineProperty(THREE.Object3D.prototype, 'attributes', {
 	/**
 	@type {Attributes}
 	*/
-	get: function(){
-		if(typeof this._attributes === 'undefined') this._attributes = new Attributes(this)
+	get: function() {
+		if (typeof this._attributes === 'undefined') this._attributes = new Attributes(this)
 		return this._attributes
 	}
 })
@@ -182,22 +182,22 @@ Object.defineProperty(THREE.Object3D.prototype, 'attributes', {
 Logs to the console info about this node
 */
 THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
-	let tabs = ""
+	let tabs = ''
 	for (let i = 0; i < depth; i++) {
-		tabs += "  "
+		tabs += '  '
 	}
 	console.log(
 		tabs,
-		this.name || "-",
+		this.name || '-',
 		this.position.x,
 		this.position.y,
 		this.position.z,
-		"[",
+		'[',
 		this.quaternion.x,
 		this.quaternion.y,
 		this.quaternion.z,
 		this.quaternion.w,
-		"]"
+		']'
 	)
 	for (let i = 0; i < this.children.length; i++) {
 		this.children[i].prettyPrint(depth + 1)
@@ -242,7 +242,7 @@ graph.nodeFunction = function(clazz, ...params) {
 		if (child === null) {
 			return
 		}
-		if (typeof child === "object" && typeof child.matrixWorld === "undefined") {
+		if (typeof child === 'object' && typeof child.matrixWorld === 'undefined') {
 			// If it's an object but not an Object3D, consider it a dictionary of attributes
 			for (let key in child) {
 				if (child.hasOwnProperty(key) == false) continue
@@ -273,7 +273,7 @@ function loadText(resultGroup, text, material, font, options) {
 		resultGroup.add(mesh)
 	} else {
 		assetLoader.get(font).then(blob => {
-			if(!blob){
+			if (!blob) {
 				console.error('Failed to fetch the font', font)
 				return
 			}
@@ -291,12 +291,10 @@ function loadText(resultGroup, text, material, font, options) {
 				},
 				() => {},
 				err => {
-					console.error("Could not load font", font, err)
+					console.error('Could not load font', font, err)
 					URL.revokeObjectURL(blobURL)
 				}
 			)
-
-
 		})
 	}
 }
@@ -304,8 +302,8 @@ function loadText(resultGroup, text, material, font, options) {
 /**
 Creates a THREE.Group that manages a chunk of text
 */
-graph.text = (text = "", material = null, fontPath = null, options = {}) => {
-	const font = fontPath || "/static/potassium-es/fonts/helvetiker_regular.typeface.json"
+graph.text = (text = '', material = null, fontPath = null, options = {}) => {
+	const font = fontPath || '/static/potassium-es/fonts/helvetiker_regular.typeface.json'
 	options = Object.assign(
 		{
 			size: 0.25,
@@ -328,12 +326,13 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 	resultGroup.isText = true
 
 	resultGroup.setRGB = (red, green, blue) => {
-		if(
-			!resultGroup.children[0]
-			|| !resultGroup.children[0].children[0]
-			|| !resultGroup.children[0].children[0].material
-		) return
-		if(resultGroup.children[0].children[0].material.emissive){
+		if (
+			!resultGroup.children[0] ||
+			!resultGroup.children[0].children[0] ||
+			!resultGroup.children[0].children[0].material
+		)
+			return
+		if (resultGroup.children[0].children[0].material.emissive) {
 			resultGroup.children[0].children[0].material.emissive.setRGB(red, green, blue)
 		} else {
 			resultGroup.children[0].children[0].material.color.setRGB(red, green, blue)
@@ -386,7 +385,7 @@ graph.gltf = path => {
 			group.add(gltf.scene)
 		})
 		.catch((...params) => {
-			console.error("could not load gltf", ...params)
+			console.error('could not load gltf', ...params)
 		})
 	return group
 }
@@ -396,13 +395,13 @@ The methods created from these info just pass through any params to the class co
 For example, creating a MeshBasicMaterial will be graph.meshBasicMaterial(...params).
 */
 graph.SUPPORT_CLASSES = [
-	{ class: "Line", name: "line" },
-	{ class: "Euler", name: "euler" },
-	{ class: "Vector3", name: "vector3" },
-	{ class: "Geometry", name: "geometry" },
-	{ class: "MeshBasicMaterial", name: "meshBasicMaterial" },
-	{ class: "LineBasicMaterial", name: "lineBasicMaterial" },
-	{ class: "MeshLambertMaterial", name: "meshLambertMaterial" }
+	{ class: 'Line', name: 'line' },
+	{ class: 'Euler', name: 'euler' },
+	{ class: 'Vector3', name: 'vector3' },
+	{ class: 'Geometry', name: 'geometry' },
+	{ class: 'MeshBasicMaterial', name: 'meshBasicMaterial' },
+	{ class: 'LineBasicMaterial', name: 'lineBasicMaterial' },
+	{ class: 'MeshLambertMaterial', name: 'meshLambertMaterial' }
 ]
 for (let classInfo of graph.SUPPORT_CLASSES) {
 	const innerClazz = classInfo.class
@@ -415,13 +414,13 @@ for (let classInfo of graph.SUPPORT_CLASSES) {
 The methods created from these classes use the graph.nodeFuction (see below)
 */
 graph.GRAPH_CLASSES = [
-	{ class: "Scene", name: "scene" },
-	{ class: "Group", name: "group" },
-	{ class: "AmbientLight", name: "ambientLight" },
-	{ class: "PerspectiveCamera", name: "perspectiveCamera" },
-	{ class: "HemisphereLight", name: "hemisphereLight" },
-	{ class: "DirectionalLight", name: "directionalLight" },
-	{ class: "AmbientLight", name: "ambientLight" }
+	{ class: 'Scene', name: 'scene' },
+	{ class: 'Group', name: 'group' },
+	{ class: 'AmbientLight', name: 'ambientLight' },
+	{ class: 'PerspectiveCamera', name: 'perspectiveCamera' },
+	{ class: 'HemisphereLight', name: 'hemisphereLight' },
+	{ class: 'DirectionalLight', name: 'directionalLight' },
+	{ class: 'AmbientLight', name: 'ambientLight' }
 ]
 
 // This loop generates the element generating functions like graph.group(...)
@@ -454,20 +453,20 @@ function loadGLTF(url) {
 }
 
 function loadObj(objPath) {
-	const objName = objPath.split("/")[objPath.split("/").length - 1]
+	const objName = objPath.split('/')[objPath.split('/').length - 1]
 	const baseURL = objPath.substring(0, objPath.length - objName.length)
-	const mtlName = objName.split(".")[objName.split(":").length - 1] + ".mtl"
+	const mtlName = objName.split('.')[objName.split(':').length - 1] + '.mtl'
 	const mtlPath = baseURL + mtlName
 
 	return new Promise((resolve, reject) => {
 		assetLoader.get(mtlPath).then(mtlBlob => {
-			if(mtlBlob === null){
+			if (mtlBlob === null) {
 				reject(`Could not load ${mtlPath}`)
 				return
 			}
 
 			assetLoader.get(objPath).then(objBlob => {
-				if(objBlob === null) {
+				if (objBlob === null) {
 					reject(`Could not load ${objPath}`)
 					return
 				}
@@ -490,7 +489,7 @@ function loadObj(objPath) {
 							},
 							() => {},
 							(...params) => {
-								console.error("Failed to load obj", ...params)
+								console.error('Failed to load obj', ...params)
 								reject(...params)
 								URL.revokeObjectURL(objURL)
 							}
@@ -499,7 +498,7 @@ function loadObj(objPath) {
 					},
 					() => {},
 					(...params) => {
-						console.error("Failed to load mtl", ...params)
+						console.error('Failed to load mtl', ...params)
 						reject(...params)
 						URL.revokeObjectURL(mtlURL)
 					}

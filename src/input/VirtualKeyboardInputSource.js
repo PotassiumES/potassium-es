@@ -1,5 +1,5 @@
-import graph from "../Graph.js"
-import InputSource from "action-input/src/input/InputSource"
+import graph from '../Graph.js'
+import InputSource from 'action-input/src/input/InputSource'
 
 /**
  *  VirtualKeyboardInputSource watches events on a Three.js based keyboard
@@ -16,10 +16,10 @@ export default class VirtualKeyboardInputSource extends InputSource {
 		this._command = null
 
 		// TODO make this a portable asset, perhaps by embedding it in an ES module
-		this.keyboardGroup = graph.obj("/static/potassium-es/models/Keyboard.obj", null, (...params) => {
-			console.error("Could not load virtual keyboard OBJ", ...params)
+		this.keyboardGroup = graph.obj('/static/potassium-es/models/Keyboard.obj', null, (...params) => {
+			console.error('Could not load virtual keyboard OBJ', ...params)
 		})
-		this.keyboardGroup.name = "virtual-keyboard"
+		this.keyboardGroup.name = 'virtual-keyboard'
 	}
 
 	handleLeftActivate() {
@@ -54,10 +54,10 @@ export default class VirtualKeyboardInputSource extends InputSource {
 	@return the value of the the input, or null if the path does not exist
 	*/
 	queryInputPath(partialPath) {
-		const tokens = partialPath.substring(1).split("/")
+		const tokens = partialPath.substring(1).split('/')
 		if (tokens.length !== 1) return null
 		switch (tokens[0]) {
-			case "command":
+			case 'command':
 				const command = this._command
 				this._command = null
 				return command
