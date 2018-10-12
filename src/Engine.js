@@ -5,10 +5,15 @@ import {throttledConsoleLog} from './throttle.js'
 
 const defaultBackgroundColor = new THREE.Color(0x99DDff)
 
-/*
+/**
 Engine wraps up the THREE.Renderer and manages moving into and out of WebXR or WebVR Sessions
 */
 const Engine = class extends EventHandler {
+	/**
+	@param {THREE.Scene} scene
+	@param {string} mode Engine.PORTAL or Engine.IMMERSIVE
+	@param {function} [tickCallback=null] this is called while rendering each frame 
+	*/
 	constructor(scene, mode, tickCallback=null) {
 		if (Engine.DISPLAY_MODES.indexOf(mode) === -1) {
 			throw new Error("Unknown engine mode", mode)

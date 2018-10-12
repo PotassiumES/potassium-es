@@ -1,7 +1,7 @@
 import EventHandler from './EventHandler.js'
 
 /**
-Handy class for holding Asset info like URL and loading state
+A utility class for holding Asset info like URL and loading state
 */
 const AssetInfo = class {
 	constructor(url){

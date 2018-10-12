@@ -4,7 +4,7 @@ import Component from "./Component.js"
 import DataObject from "./DataObject.js"
 import DataCollection from "./DataCollection.js"
 
-/*
+/**
 DefaultItemComponent is used by CollectionComponent if no itemComponent option is passed
 */
 const DefaultItemComponent = class extends Component {
@@ -19,12 +19,14 @@ const DefaultItemComponent = class extends Component {
 	}
 }
 
-/*
+/**
 CollectionComponent provides a generic list UI for DataCollections.
-Options:
-	itemComponent (DefaultItemComponent): a Component class used to render each item in this list
-	itemOptions ({}): a set of options to pass to each item Component
-	onClick (null): a function to call with the dataObject whose item Component is clicked
+
+@param {DataObject} [dataObject=null]
+@param {Object} [options={}]
+@param {Component} [options.itemComponent=DefaultItemComponent] a Component class used to render each item in this list
+@param {Object} [options.itemOptions] a set of options to pass to each item Component
+@param {function} [options.onClick] a function to call with the dataObject whose item Component is clicked
 */
 const CollectionComponent = class extends Component {
 	constructor(dataObject = null, options = {}) {

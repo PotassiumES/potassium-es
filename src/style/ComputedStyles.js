@@ -27,7 +27,7 @@ class ComputedStyles {
 
 	@param {AssignedStyles} assignedStyles
 	@param {LocalStyles} localStyles
-	@param {ComputedStyles?} parentalComputedStyles
+	@param {ComputedStyles} [parentalComputedStyles=null]
 	*/
 	computeStyles(assignedStyles, localStyles, parentalComputedStyles=null){
 		// Swap the previous and current maps

@@ -65,8 +65,8 @@ class Stylesheet {
 	}
 
 	/**
-	@param {Array[selector data]}
-	@return {Array[SelectorFragmentList]}
+	@param {Array<string>} rawSelectors selector strings
+	@return {Array<SelectorFragmentList>}
 	*/
 	_parseSelectors(rawSelectors){
 		return rawSelectors.map(rawSelector => {
@@ -75,7 +75,7 @@ class Stylesheet {
 	}
 
 	/**
-	@param {Array<{string} declaration>}
+	@param rawDeclarations {Array<string>}
 	@return {Array<DeclarationList>}
 	*/
 	_parseDeclarations(rawDeclarations){

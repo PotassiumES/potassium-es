@@ -1,10 +1,13 @@
 import EventHandler from "./EventHandler.js"
 
-/*
-	The parent class for DataModel and DataCollection
-	It holds the event mixin and the generic function of fetching data from a remote service
+/**
+The abstract class for DataModel and DataCollection
+It holds the event mixin and the generic function of fetching data from a remote service
 */
 const DataObject = class extends EventHandler {
+	/**
+	@param {Object} [options={}]
+	*/
 	constructor(options = {}) {
 		super()
 		this.options = options
@@ -16,16 +19,16 @@ const DataObject = class extends EventHandler {
 		this.cleanedUp = true
 		this.clearListeners()
 	}
-	// Return true until a fetch (even a failed fetch) returns
+	/** @type {bool} true until a fetch (even a failed fetch) returns */
 	get isNew() {
 		return this._new
 	}
-	// Return the URL (relative or full) as a string for the endpoint used by this.fetch
+	/** @type {string} the URL (relative or full) as a string for the endpoint used by this.fetch */
 	get url() {
 		throw new Error("Extending classes must implement url()")
 	}
 
-	// Clear out old data and set it to data, should trigger a 'reset' event
+	/** Clear out old data and set it to data, should trigger a 'reset' event */
 	reset(data = {}) {
 		throw new Error("Extending classes must implement reset")
 	}
@@ -84,15 +87,15 @@ const DataObject = class extends EventHandler {
 			}.bind(this)
 		)
 	}
-	/*
-	This can be used to override the use of window.fetch
+	/**
+	Use this to override the use of window.fetch
 	For example, MockService overrides this to intercept fetch calls and return its own responses for matched endpoints
 	*/
 	_innerFetch(...params) {
 		return fetch(...params)
 	}
 
-	/*
+	/**
 	Fetch each DataObject and then wait for them all to return
 	Note: this resolves when the fetches complete, regardless of whether they succeed or fail.
 	*/

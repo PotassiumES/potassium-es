@@ -23,7 +23,7 @@ class SelectorFragmentList {
 	}
 
 	/**
-	@see [Cascade on MDN](https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Cascade_and_inheritance)
+	@see https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Cascade_and_inheritance
 	@return {float} 
 	*/
 	get specificity(){ return this._specificity }
@@ -31,8 +31,9 @@ class SelectorFragmentList {
 	/**
 	Go through the list of selectors and combinators and check whether this node matches
 	@param {THREE.Object3D} node
-	@param {int} fragmentIndex the index in the reversed list of fragments at which to start
-	@return {bool}
+	@param {int} [fragmentIndex=0] the index in the reversed list of fragments at which to start
+	@param {THREE.Object3D} [previouslyMatchedNode=null]
+	@return {bool} true if the node is matched
 	*/
 	matches(node, fragmentIndex=0, previouslyMatchedNode=null){
 		if(fragmentIndex < 0 || fragmentIndex >= this._reversedFragments.length){

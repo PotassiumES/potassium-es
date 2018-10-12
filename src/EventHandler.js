@@ -1,6 +1,6 @@
 
 /**
-	EventListener holds information about listeners on an object with the EventHandler
+EventListener holds information about listeners on an object with the EventHandler
 */
 const EventListener = class {
 	constructor(eventName, callback, once = false) {
@@ -37,6 +37,11 @@ const EventHandler = class {
 		}
 	}
 
+	/**
+	@param {function(eventName: string, eventSource: EventHandler)} callback often includes more parameters that are specific to the event
+	@param {Object|Symbol} [eventName=EventHandler.ALL_EVENTS] a string or Symbol indicating the event to watch, defaults to ALL_EVENTS
+	@param {bool} [once=false] If true then the listener is removed after receiving one event
+	*/
 	addListener(callback, eventName = EventHandler.ALL_EVENTS, once = false) {
 		this.listeners.push(new EventListener(eventName, callback, once))
 	}
@@ -59,7 +64,7 @@ const EventHandler = class {
 		}
 	}
 
-	/** @return {@EventListener[]} */
+	/** @return {EventListener[]} */
 	get listeners() {
 		if (typeof this._listeners == "undefined") {
 			this._listeners = []

@@ -1,13 +1,15 @@
 import DataObject from "./DataObject.js"
 import DataModel from "./DataModel.js"
 
-/*
+/**
 	DataCollection represents an ordered list of DataModel instances
-
-	options:
-		dataObject (DataModel): the DataObject extending class to use to wrap each data item in this collection
 */
 const DataCollection = class extends DataObject {
+	/**
+	@param {Object[]} [data=null]
+	@param {Object} [options={}]
+	@param {class} [options.dataObject] the DataObject extending class to use to wrap each data item in this collection
+	*/
 	constructor(data = [], options = {}) {
 		super(options)
 		if (data == null) data = []

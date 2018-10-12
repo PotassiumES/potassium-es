@@ -1,12 +1,12 @@
-/*
-	Functions that generate DOM elements like el.div(...) will live in el
+/**
+Functions that generate DOM elements like el.div(...) will live in el
 */
 const el = {}
 export default el
 
-/*
-	domElementFunction is the behind the scenes logic for the functions like el.div(...)
-	Below you will find the loop that uses domElementFunction
+/**
+domElementFunction is the behind the scenes logic for the functions like el.div(...)
+Below you will find the loop that uses domElementFunction
 */
 el.domElementFunction = function(tagName, ...params) {
 	// Create a boring DOM element
@@ -141,10 +141,10 @@ el.documentOffset = function(element) {
 	return [left, top]
 }
 
-/* 
-	The tag names that will be used to generate all of the element generating functions like el.div(...) and el.button(...)
-	These names were ovingly copied from the excellent Laconic.js 
-	https://github.com/joestelmach/laconic/blob/master/laconic.js
+/** 
+The tag names that will be used to generate all of the element generating functions like el.div(...) and el.button(...)
+These names were ovingly copied from the excellent Laconic.js 
+@see https://github.com/joestelmach/laconic/blob/master/laconic.js
 */
 el.TAGS = [
 	"a",

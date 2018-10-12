@@ -18,6 +18,7 @@ class Attributes {
 
 	/**
 	@param {string} attribute texting is case insensitive!
+	@param {string} defaultValue
 	*/
 	get(attribute, defaultValue){
 		if(Attributes.PassThroughAttributes.includes(attribute)){

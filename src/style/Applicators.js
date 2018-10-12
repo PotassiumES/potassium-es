@@ -1,8 +1,8 @@
 import Evaluators from './Evaluators.js'
 
 /**
-Applicator holds functions that apply a declared style property (color, font-size, etc.) to a Three.Object3D
-@type {Map<string, styleInfo>}
+Applicators holds functions that apply a declared style property (color, font-size, etc.) to a Three.Object3D
+@type {Map<string, StyleInfo>}
 */
 const Applicators = new Map()
 

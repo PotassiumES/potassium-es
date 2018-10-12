@@ -1,4 +1,4 @@
-/*
+/**
 A handy, chain oriented API for creating Three.js scenes
 */
 import AssetLoader from './AssetLoader.js'
@@ -178,6 +178,9 @@ Object.defineProperty(THREE.Object3D.prototype, 'attributes', {
 	}
 })
 
+/**
+Logs to the console info about this node
+*/
 THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
 	let tabs = ""
 	for (let i = 0; i < depth; i++) {
@@ -201,6 +204,10 @@ THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
 	}
 }
 
+/**
+Looks in this node and up the ancestors until it finds a {Component} attribute
+@return {Component|null}
+*/
 THREE.Object3D.prototype.getComponent = function() {
 	let obj = this
 	while (true) {
@@ -210,8 +217,9 @@ THREE.Object3D.prototype.getComponent = function() {
 	}
 }
 
-/*
-	if the first elements in `params` is an array, the values of the array will be passed as separate parameters into the constructor of the instance
+/**
+The behind the scene function that generates an enhanced Object3D when you call graph.foo(...)
+if the first elements in `params` is an array, the values of the array will be passed as separate parameters into the constructor of the instance
 */
 graph.nodeFunction = function(clazz, ...params) {
 	let instance = null
@@ -293,6 +301,9 @@ function loadText(resultGroup, text, material, font, options) {
 	}
 }
 
+/**
+Creates a THREE.Group that manages a chunk of text
+*/
 graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 	const font = fontPath || "/static/potassium-es/fonts/helvetiker_regular.typeface.json"
 	options = Object.assign(
@@ -347,6 +358,10 @@ graph.text = (text = "", material = null, fontPath = null, options = {}) => {
 	return resultGroup
 }
 
+/**
+Load an OBJ file
+@return {THREE.Group}
+*/
 graph.obj = (objPath, successCallback = null, failureCallback = null) => {
 	const group = graph.group()
 	loadObj(objPath)
@@ -360,6 +375,10 @@ graph.obj = (objPath, successCallback = null, failureCallback = null) => {
 	return group
 }
 
+/**
+Load a glTF file
+@return {THREE.Group}
+*/
 graph.gltf = path => {
 	let group = graph.group()
 	loadGLTF(path)
@@ -372,7 +391,7 @@ graph.gltf = path => {
 	return group
 }
 
-/*
+/**
 The methods created from these info just pass through any params to the class constructor.
 For example, creating a MeshBasicMaterial will be graph.meshBasicMaterial(...params).
 */
@@ -392,7 +411,9 @@ for (let classInfo of graph.SUPPORT_CLASSES) {
 	}
 }
 
-// The methods created from these classes use the graph.nodeFuction (see below)
+/**
+The methods created from these classes use the graph.nodeFuction (see below)
+*/
 graph.GRAPH_CLASSES = [
 	{ class: "Scene", name: "scene" },
 	{ class: "Group", name: "group" },

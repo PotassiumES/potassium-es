@@ -4,8 +4,12 @@ let Singleton = null
 let MonthNames = null // [locale, [names]]
 /**
 Localizer provides the functionality necessary to:
+
 - pick a string translation based on language
 - format dates based on locale and time zone
+
+@todo detect language, locale, and timezone
+@todo load translations
 */
 const Localizer = class extends EventHandler {
 	constructor(defaultLanguage='en', defaultLocale='en-US', defaultTimeZone='America/Los_Angeles'){
@@ -74,15 +78,15 @@ const Localizer = class extends EventHandler {
 
 	static get Singleton(){
 		if(Singleton === null){
-			/** @todo detect language, locale, and timezone */
-			/** @todo load translations */
 			Singleton = new Localizer()
-
 		}
 		return Singleton
 	}
 }
 
+/**
+Translation holds a map of source phrases to translated phrases in a given language
+*/
 const Translation = class {
 	constructor(language){
 		this._language = language
@@ -96,12 +100,43 @@ const Translation = class {
 	}
 }
 
+/**
+A shorthand function for getting a translation
+
+@param {string} key the source phrase, like 'Hello!'
+@param {string} [defaultValue=null] the value to return if there is no translation
+@return {string} a translation, like '¡Hola!'
+*/
 function lt(key, defaultValue){ return Localizer.Singleton.translate(key, defaultValue) }
 
+/**
+A shorthand function for getting a localized date
+
+@param {Date} date
+@param {bool} [long=true]
+@param {options} [options=null]
+@return {string} a localized string representing the date
+*/
 function ld(date, long=true, options=null){ return Localizer.Singleton.formatDate(date, long, options) }
 
+/**
+A shorthand function for getting a localized date and time
+
+@param {Date} date
+@param {bool} [long=true]
+@param {options} [options=null]
+@return {string} a localized string representing the date and time
+*/
 function ldt(date, long=true, options=null){ return Localizer.Singleton.formatDateTime(date, long, options) }
 
+/**
+A shorthand function for getting a localized date or time string using your own options
+@see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString
+
+@param {Date} date
+@param {options} [options=null]
+@return {string} a localized string representing the date
+*/
 function ldo(date, options=null){ return Localizer.Singleton.formatDateObject(date, options) }
 
 export {Localizer, Translation, lt, ld, ldt, ldo}

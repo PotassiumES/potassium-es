@@ -6,7 +6,8 @@ Evaluators match and parse declaration values like `rgb(124, 23, 99)` or `1cm`
 */
 class Evaluators extends Set {
 	/**
-	@param {string} the value element of a KSS {Declaration}
+	@param {string} value the value element of a KSS {Declaration}
+	@return {Evaluator}
 	*/
 	getEvaluator(value){
 		for(let evaluator of this){
@@ -14,6 +15,11 @@ class Evaluators extends Set {
 		}
 		return null
 	}
+	/**
+	@param {string} value
+	@param {THREE.Object3D} node
+	@return {Array<> | undefined} the evaluated value of the specific value type, like [r, g, b] for 'color' or [x, y, z] for 'centroid'
+	*/
 	parse(value, node){
 		const evaluator = this.getEvaluator(value)
 		if(evaluator === null) return undefined
