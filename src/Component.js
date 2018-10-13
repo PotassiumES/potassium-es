@@ -69,14 +69,17 @@ const Component = class extends EventHandler {
 		// Flat display mode elements for page controls
 		this._flatEl = this.options.flatEl || el.div()
 		this._flatEl.component = this
+		this._flatEl.addClass('flat-el')
 
 		// Portal display mode 3D graph for spatial controls
 		this._portalGraph = this.options.portalGraph || graph.group()
 		this._portalGraph.component = this
+		this._portalGraph.addClass('portal-graph')
 
 		// Portal display mode elements for overlay controls
 		this._portalEl = this.options.portalEl || el.div()
 		this._portalEl.component = this
+		this._portalEl.addClass('portal-el')
 
 		if (this.options.portalOverlay === false) {
 			this._portalEl.addClass('hidden')
@@ -88,6 +91,7 @@ const Component = class extends EventHandler {
 		// Immersive display mode 3D graph for spatial controls
 		this._immersiveGraph = this.options.immersiveGraph || graph.group()
 		this._immersiveGraph.component = this
+		this._immersiveGraph.addClass('immersive-graph')
 
 		// All Components are selectable by the 'component' class
 		this.addClass('component')
@@ -207,6 +211,7 @@ const Component = class extends EventHandler {
 		this._portalEl.appendChild(childComponent.portalEl)
 		this._portalGraph.add(childComponent.portalGraph)
 		this._immersiveGraph.add(childComponent.immersiveGraph)
+		return this
 	}
 	/**
 	removeComponent removes the childComponent's flatEl, portalEl, portalGraph, and immersiveGraph from this Component's equivalent attributes.
@@ -217,6 +222,7 @@ const Component = class extends EventHandler {
 		this._portalEl.removeChild(childComponent.portalEl)
 		this._portalGraph.remove(childComponent.portalGraph)
 		this._immersiveGraph.remove(childComponent.immersiveGraph)
+		return this
 	}
 
 	/**

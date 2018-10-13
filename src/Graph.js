@@ -75,7 +75,7 @@ Sets this node layoutIsDirty to true and if it has a parent it calls parent.setL
 */
 THREE.Object3D.prototype.setLayoutDirty = function() {
 	this.layoutIsDirty = true
-	if (this.parent) this.parent.setLayoutDirty()
+	if (this.parent && this.parent.layoutIsDirty === false) this.parent.setLayoutDirty()
 }
 
 /**
@@ -108,6 +108,45 @@ THREE.Object3D.prototype.getObjectsBySelector = function(selector) {
 		}
 	})
 	return results
+}
+
+/**
+logs to the console the computed styles for a node and its descendents
+@param {THREE.Object3D} node
+@param {int} [tabDepth=0]
+@param {bool} [showVars=false] if true, log the CSS variables of the form `--name`
+@param {bool} [localsOnly=false] if true, show the local instead of the computed styles
+*/
+THREE.Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
+	const tabs = _generateTabs(tabDepth)
+	console.log(
+		tabs + '>',
+		(node.name || 'unnamed') + ':',
+		node
+			.getClasses()
+			.map(clazz => `.${clazz}`)
+			.join(''),
+		node.layoutIsDirty ? '\tdirty' : ''
+	)
+	if (localsOnly) {
+		for (const styleInfo of node.localStyles) {
+			if (showVars === false && styleInfo.property.startsWith('--')) continue
+			console.log(tabs + '\t' + styleInfo.property + ':', styleInfo.value, styleInfo.important ? '!important' : '')
+		}
+	} else {
+		for (const styleInfo of node.computedStyles) {
+			if (showVars === false && styleInfo.property.startsWith('--')) continue
+			console.log(tabs + '\t' + styleInfo.property + ':', styleInfo.value, styleInfo.important ? '!important' : '')
+		}
+	}
+	for (const child of node.children) this.logStyles(child, tabDepth + 1, showVars, localsOnly)
+}
+
+const _generateTabs = function(depth) {
+	if (depth === 0) return ''
+	const result = []
+	result[depth - 1] = null
+	return result.fill('\t').join('')
 }
 
 /**

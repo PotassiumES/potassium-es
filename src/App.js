@@ -46,7 +46,6 @@ const App = class extends EventHandler {
 
 		this._stylist = new Stylist()
 		this._stylist.addListener((eventName, stylist) => {
-			console.log('Styles loaded', stylist.stylesheets)
 			this._stylist.calculateStyles(this._portalScene)
 			this._stylist.applyStyles(this._portalScene)
 			this._stylist.calculateStyles(this._immersiveScene)
@@ -54,12 +53,10 @@ const App = class extends EventHandler {
 			setInterval(() => {
 				switch (this.displayMode) {
 					case App.IMMERSIVE:
-						console.log('styling immersive')
 						this._stylist.calculateStyles(this._immersiveScene)
 						this._stylist.applyStyles(this._immersiveScene)
 						break
 					case App.PORTAL:
-						console.log('styling portal')
 						this._stylist.calculateStyles(this._portalScene)
 						this._stylist.applyStyles(this._portalScene)
 						break
