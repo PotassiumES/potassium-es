@@ -30,11 +30,18 @@ class Declaration {
 	get property() {
 		return this._property
 	}
+	set property(val){ this._property = val }
+
 	get value() {
 		return this._value
 	}
+	set value(val){ this._value = val }
+
 	get important() {
 		return this._important
+	}
+	set important(val){
+		this._important = !!val
 	}
 
 	reset(property, value, important = false) {

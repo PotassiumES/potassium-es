@@ -199,7 +199,7 @@ Object.defineProperty(THREE.Object3D.prototype, 'assignedStyles', {
 	@type {AssignedStyles}
 	*/
 	get: function() {
-		if (typeof this._assignedStyles === 'undefined') this._assignedStyles = new AssignedStyles()
+		if (typeof this._assignedStyles === 'undefined') this._assignedStyles = new AssignedStyles(this)
 		return this._assignedStyles
 	}
 })
@@ -225,19 +225,10 @@ THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
 	for (let i = 0; i < depth; i++) {
 		tabs += '  '
 	}
-	console.log(
-		tabs,
-		this.name || '-',
-		this.position.x,
-		this.position.y,
-		this.position.z,
-		'[',
-		this.quaternion.x,
-		this.quaternion.y,
-		this.quaternion.z,
-		this.quaternion.w,
-		']'
-	)
+	console.log(tabs, this.name + ':' || 'unnamed:')
+	console.log(tabs + '\tscale:', ...this.scale.toArray())
+	console.log(tabs + '\tposition:', ...this.position.toArray())
+	console.log(tabs + '\tquaternion:', ...this.quaternion.toArray())
 	for (let i = 0; i < this.children.length; i++) {
 		this.children[i].prettyPrint(depth + 1)
 	}
@@ -256,6 +247,29 @@ THREE.Object3D.prototype.getComponent = function() {
 	}
 }
 
+/** A convenience function to allow chaining like `let group = graph.group().appendTo(scene)` */
+THREE.Object3D.prototype.appendTo = function(parent) {
+	parent.add(this)
+	return this
+}
+
+/** A convenience function to allow appending dictionaries of attributes, arrays of subchildren, or children */
+THREE.Object3D.prototype.append = function(child = null) {
+	if (child === null) {
+		return
+	}
+	if (typeof child === 'object' && typeof child.matrixWorld === 'undefined') {
+		// If it's an object but not an Object3D, consider it a dictionary of attributes
+		for (const key in child) {
+			if (child.hasOwnProperty(key) == false) continue
+			this[key] = child[key]
+		}
+	} else {
+		this.add(child)
+	}
+	return this
+}
+
 /**
 The behind the scene function that generates an enhanced Object3D when you call graph.foo(...)
 if the first elements in `params` is an array, the values of the array will be passed as separate parameters into the constructor of the instance
@@ -268,29 +282,6 @@ graph.nodeFunction = function(clazz, ...params) {
 		instance = new THREE[clazz](...params[0])
 	} else {
 		instance = new THREE[clazz]()
-	}
-
-	// A convenience function to allow chaining like `let group = graph.group().appendTo(scene)`
-	instance.appendTo = function(parent) {
-		parent.add(this)
-		return this
-	}
-
-	// A convenience function to allow appending dictionaries of attributes, arrays of subchildren, or children
-	instance.append = function(child = null) {
-		if (child === null) {
-			return
-		}
-		if (typeof child === 'object' && typeof child.matrixWorld === 'undefined') {
-			// If it's an object but not an Object3D, consider it a dictionary of attributes
-			for (const key in child) {
-				if (child.hasOwnProperty(key) == false) continue
-				this[key] = child[key]
-			}
-		} else {
-			this.add(child)
-		}
-		return this
 	}
 
 	// Append the children parameters
@@ -394,6 +385,21 @@ graph.text = (text = '', material = null, fontPath = null, options = {}) => {
 
 	resultGroup.setText(currentText)
 	return resultGroup
+}
+
+/**
+Creates a THREE.Mesh containing a THREE.BoxBufferGeometry
+*/
+graph.cube = (size=[1,1,1], color=0xAAAAAA) => {
+	const result = new THREE.Mesh(
+		new THREE.BoxBufferGeometry(...size),
+		new THREE.MeshLambertMaterial({ color: color })
+	)
+
+	// set up for kss element selection, like `cube {}` or `node[name=Cube] {}`
+	result.name = 'Cube'
+	result.isCube = true
+	return result
 }
 
 /**

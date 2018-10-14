@@ -7,6 +7,14 @@ Applicators holds functions that apply a declared style property (color, font-si
 */
 const Applicators = new Map()
 
+/** set Object3D.scale */
+Applicators.set('scale', (node, styleInfo) => {
+	if(typeof node.scale === 'undefined') return
+	const parsedValue = Evaluators.parse(styleInfo.value, node)
+	if (typeof parsedValue === 'undefined') return
+	node.scale.set(...parsedValue)
+})
+
 /** display */
 Applicators.set('display', (node, styleInfo) => {
 	switch (styleInfo.value) {
@@ -14,7 +22,13 @@ Applicators.set('display', (node, styleInfo) => {
 			if (!node.layout || node.layout.isGrid === false) {
 				node.layout = new GridLayout(node)
 			}
-			// The other grid style types like 'grid-template' are handled in GridLayout
+			// The other grid declarations like 'grid-template' are handled in GridLayout
+			return
+		case 'none':
+			node.visible = false
+			return
+		case 'inherit':
+			node.visible = true
 			return
 		default:
 			console.log('unknown display mode', styleInfo)

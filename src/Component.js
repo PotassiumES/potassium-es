@@ -236,6 +236,14 @@ const Component = class extends EventHandler {
 	}
 
 	/**
+	Sets the name attribute on the portal and immersive graphs for easier debugging
+	*/
+	setName(name){
+		this._portalGraph.name = name
+		this._immersiveGraph.name = name
+	}
+
+	/**
 	add class attributes to both flat and portal DOM elements
 	@param {string[]} classNames
 	*/

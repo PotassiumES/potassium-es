@@ -6,7 +6,8 @@ AssignedStyles tracks programmatically (not via KSS) assigned styles for a node
 Assigned styles are never overwritten by local (KSS defined) or inherited styles
 */
 class AssignedStyles {
-	constructor() {
+	constructor(node) {
+		this._node = node
 		/** @type Map<string, StyleInfo> property -> style info */
 		this._map = new Map()
 	}
@@ -41,16 +42,12 @@ class AssignedStyles {
 	@param {bool} important
 	*/
 	set(property, value, important = false) {
-		if (this._map.has(property)) {
-			this._map.get(property).reset(property, value, important)
-		} else {
-			const declaration = new Declaration({
-				value: value,
-				property: property,
-				important: important
-			})
-			this._map.set(property, new StyleInfo(declaration))
-		}
+		const declaration = new Declaration({
+			value: value,
+			property: property,
+			important: important
+		})
+		this._map.set(property, new StyleInfo(declaration))
 	}
 
 	/** Iterate over the {StyleInfo}s */
