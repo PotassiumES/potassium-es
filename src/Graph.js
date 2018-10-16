@@ -390,12 +390,14 @@ graph.text = (text = '', material = null, fontPath = null, options = {}) => {
 /**
 Creates a THREE.Mesh containing a THREE.BoxBufferGeometry
 */
-graph.cube = (size=[1,1,1], color=0xAAAAAA) => {
-	const result = new THREE.Mesh(
-		new THREE.BoxBufferGeometry(...size),
-		new THREE.MeshLambertMaterial({ color: color })
-	)
-
+graph.cube = (size=[1,1,1], options={}) => {
+	let material = null
+	if(options.color){
+		material = new THREE.MeshLambertMaterial({ color: color })
+	} else if(options.material){
+		material = options.material
+	}
+	const result = new THREE.Mesh(new THREE.BoxBufferGeometry(...size), material)
 	// set up for kss element selection, like `cube {}` or `node[name=Cube] {}`
 	result.name = 'Cube'
 	result.isCube = true

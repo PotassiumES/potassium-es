@@ -45,10 +45,10 @@ const Stylist = class extends EventHandler {
 	/**
 	Apply the styles previously calculated in `calculateStyles` to the scene
 	*/
-	applyStyles(scene) {
+	applyStyles(scene, renderer) {
 		// Apply per-element styles
 		scene.traverse(node => {
-			this._updateNodeStyles(node)
+			this._updateNodeStyles(node, renderer)
 		})
 
 		// Perform layout
@@ -61,9 +61,9 @@ const Stylist = class extends EventHandler {
 		/** @todo Apply animations */
 	}
 
-	_calculateAndApplyStyles(scene) {
+	_calculateAndApplyStyles(scene, renderer) {
 		this.calculateStyles(scene)
-		this.applyStyles(scene)
+		this.applyStyles(scene, renderer)
 	}
 
 	/**
@@ -97,13 +97,13 @@ const Stylist = class extends EventHandler {
 		this.trigger(Stylist.KSS_LOADED_EVENT, this, stylesheet)
 	}
 
-	_updateNodeStyles(node) {
+	_updateNodeStyles(node, renderer) {
 		for (const changedProperty of node.computedStyles.changes) {
 			if (changedProperty.startsWith('--')) continue
 			// @todo merge properties like `border` and `border-top`
 			const applicatorFunction = Applicators.get(changedProperty) || null
 			if (applicatorFunction === null) continue
-			applicatorFunction(node, node.computedStyles.get(changedProperty))
+			applicatorFunction(node, node.computedStyles.get(changedProperty), renderer)
 		}
 	}
 

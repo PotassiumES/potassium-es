@@ -62,18 +62,6 @@ Applicators.set('material-emissive', (node, styleInfo) => {
 	node.material.emissive.setRGB(...parsedValue)
 })
 
-/** the background color of the entire scene */
-
-Applicators.set('background-color', (node, styleInfo) => {
-	if (!node.isScene) return
-	const parsedValue = Evaluators.parse(styleInfo.value, node)
-	if (typeof parsedValue === 'undefined') return
-	if (node.background === null) {
-		node.background = new THREE.Color()
-	}
-	node.background.setRGB(...parsedValue)
-})
-
 /** the node.position */
 Applicators.set('centroid', (node, styleInfo) => {
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
