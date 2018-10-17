@@ -36,7 +36,8 @@ body					{ z-index: 2; }
 	right: 0;
 }
 
-.webxr-sessions, .portal-root {
+.webxr-sessions,
+.portal-root {
 	position: absolute;
 	top: 0; left: 0;
 	width: 100%;

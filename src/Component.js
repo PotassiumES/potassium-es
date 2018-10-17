@@ -69,17 +69,26 @@ const Component = class extends EventHandler {
 		// Flat display mode elements for page controls
 		this._flatEl = this.options.flatEl || el.div()
 		this._flatEl.component = this
-		this._flatEl.addClass('flat-el')
+		this._flatEl.addClass(
+			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
+			'flat-el'
+		)
 
 		// Portal display mode 3D graph for spatial controls
 		this._portalGraph = this.options.portalGraph || graph.group()
 		this._portalGraph.component = this
-		this._portalGraph.addClass('portal-graph')
+		this._portalGraph.addClass(
+			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
+			'portal-graph'
+		)
 
 		// Portal display mode elements for overlay controls
 		this._portalEl = this.options.portalEl || el.div()
 		this._portalEl.component = this
-		this._portalEl.addClass('portal-el')
+		this._portalEl.addClass(
+			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
+			'portal-el'
+		)
 
 		if (this.options.portalOverlay === false) {
 			this._portalEl.addClass('hidden')
@@ -91,7 +100,10 @@ const Component = class extends EventHandler {
 		// Immersive display mode 3D graph for spatial controls
 		this._immersiveGraph = this.options.immersiveGraph || graph.group()
 		this._immersiveGraph.component = this
-		this._immersiveGraph.addClass('immersive-graph')
+		this._immersiveGraph.addClass(
+			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
+			'immersive-graph'
+		)
 
 		// All Components are selectable by the 'component' class
 		this.addClass('component')
