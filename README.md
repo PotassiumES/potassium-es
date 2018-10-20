@@ -8,7 +8,7 @@
 
 The "wider web" adds augmented and virtual reality to the existing flat web. It incorporates the essential harassment management tools required for healthy social systems.
 
-See [What Is The Wider Web](https://github.com/PotassiumES/potassium-es/blob/master/WHAT%20IS%20THE%20WIDER%20WEB.md) for more details.
+See [What Is The Wider Web](https://potassiumes.org/wider-web/) for more details.
 
 **Goal 2**: Explore new design, art, and social capabilities
 
