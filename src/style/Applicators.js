@@ -9,7 +9,7 @@ const Applicators = new Map()
 
 /** set Object3D.scale */
 Applicators.set('scale', (node, styleInfo) => {
-	if(typeof node.scale === 'undefined') return
+	if (typeof node.scale === 'undefined') return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
 	if (typeof parsedValue === 'undefined') return
 	node.scale.set(...parsedValue)

@@ -240,7 +240,7 @@ class Grid {
 	}
 
 	apply() {
-		if(this._node.children.length === 0) return
+		if (this._node.children.length === 0) return
 		let childIndex = 0
 		this._positions(this._node.children.length).forEach(position => {
 			this._node.children[childIndex].position.set(...position, 0)

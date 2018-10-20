@@ -1,6 +1,6 @@
 import el from './El.js'
 import graph from './Graph.js'
-import {Engine, FlatDisplay} from './Engine.js'
+import { Engine, FlatDisplay } from './Engine.js'
 import Router from './Router.js'
 import Component from './Component.js'
 import AssetLoader from './AssetLoader.js'
@@ -62,7 +62,7 @@ const App = class extends EventHandler {
 						this._stylist.applyStyles(this._portalScene)
 						break
 					case App.FLAT:
-						if(this._flatDisplay !== null){
+						if (this._flatDisplay !== null) {
 							this._stylist.calculateStyles(this._immersiveScene)
 							this._stylist.applyStyles(this._immersiveScene)
 						}
@@ -183,7 +183,8 @@ const App = class extends EventHandler {
 				console.error('Error setting engine displays', err)
 			})
 
-		/* _flatDisplay is populated if you you call App.toggleFlatDisplay(true)*/ 
+		/* _flatDisplay is populated if you you call App.toggleFlatDisplay(true)*/
+
 		this._flatDisplay = null
 
 		/* Set up hands and pointers */
@@ -338,9 +339,9 @@ const App = class extends EventHandler {
 	This is handy for coding and styling spatial controls when a headset is not available or you are having a good hair day and don't want to mess with success.
 	@param {bool} show - if true, create and show the display, otherwise tear it down
 	*/
-	toggleFlatDisplay(show){
-		if(show){
-			if(this._flatDisplay !== null) return
+	toggleFlatDisplay(show) {
+		if (show) {
+			if (this._flatDisplay !== null) return
 			this._flatCamera = graph.perspectiveCamera([45, 1, 0.5, 10000])
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
@@ -348,7 +349,7 @@ const App = class extends EventHandler {
 			document.body.appendChild(this._flatDisplay.el)
 			this._flatDisplay.start()
 		} else {
-			if(this._flatDisplay === null) return
+			if (this._flatDisplay === null) return
 			document.body.remove(this._flatDisplay.el)
 			this._flatDisplay.stop()
 			this._flatDisplay = null

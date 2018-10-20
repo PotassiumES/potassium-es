@@ -54,16 +54,16 @@ const Component = class extends EventHandler {
 		this.options = Object.assign(
 			{
 				usesFlat: true,
-				flatEl: el.div(),
+				flatEl: null,
 
 				usesPortalOverlay: true,
-				portalEl: el.div(),
+				portalEl: null,
 
 				usesPortalSpatial: true,
-				portalGraph: graph.group(),
+				portalGraph: null,
 
 				usesImmersive: true,
-				immersiveGraph: graph.group(),
+				immersiveGraph: null,
 
 				activationAnchor: null
 			},
@@ -80,46 +80,46 @@ const Component = class extends EventHandler {
 		// Set up the DOM hierarchies and Three.js scene graphs for the three display modes:
 
 		// Flat display mode elements for page controls
-		this._flatEl = this.options.flatEl
+		this._flatEl = this.options.flatEl || el.div()
 		this._flatEl.component = this
 		this._flatEl.addClass(
 			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
 			'flat-el'
 		)
-		if(this.options.usesFlat === false){
+		if (this.options.usesFlat === false) {
 			this._flatEl.addClass('hidden')
 		}
 
 		// Portal display mode elements for overlay controls
-		this._portalEl = this.options.portalEl
+		this._portalEl = this.options.portalEl || el.div()
 		this._portalEl.component = this
 		this._portalEl.addClass(
 			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
 			'portal-el'
 		)
-		if(this.options.usesPortalOverlay === false){
+		if (this.options.usesPortalOverlay === false) {
 			this._portalEl.addClass('hidden')
 		}
 
 		// Portal display mode 3D graph for spatial controls
-		this._portalGraph = this.options.portalGraph
+		this._portalGraph = this.options.portalGraph || graph.group()
 		this._portalGraph.component = this
 		this._portalGraph.addClass(
 			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
 			'portal-graph'
 		)
-		if(this.options.usesPortalSpatial === false) {
+		if (this.options.usesPortalSpatial === false) {
 			this._portalGraph.visible = false
 		}
 
 		// Immersive display mode 3D graph for spatial controls
-		this._immersiveGraph = this.options.immersiveGraph
+		this._immersiveGraph = this.options.immersiveGraph || graph.group()
 		this._immersiveGraph.component = this
 		this._immersiveGraph.addClass(
 			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
 			'immersive-graph'
 		)
-		if(this.options.usesImmersive === false){
+		if (this.options.usesImmersive === false) {
 			this._immersiveGraph.visible = false
 		}
 
@@ -198,13 +198,25 @@ const Component = class extends EventHandler {
 	}
 
 	// helper methods to eliminate boilerplate when testing various mode usages
-	get usesFlat(){ return this.options.usesFlat }
-	get usesPortal(){ return this.options.usesPortalOverlay || this.options.usesPortalSpatial }
-	get usesPortalOverlay(){ return this.options.usesPortalOverlay }
-	get usesPortalSpatial(){ return this.options.usesPortalSpatial }
-	get usesImmersive(){ return this.options.usesImmersive }
-	get usesSpatial(){ return this.options.usesPortalSpatial || this.options.usesImmersive }
-	get usesValues(){
+	get usesFlat() {
+		return this.options.usesFlat
+	}
+	get usesPortal() {
+		return this.options.usesPortalOverlay || this.options.usesPortalSpatial
+	}
+	get usesPortalOverlay() {
+		return this.options.usesPortalOverlay
+	}
+	get usesPortalSpatial() {
+		return this.options.usesPortalSpatial
+	}
+	get usesImmersive() {
+		return this.options.usesImmersive
+	}
+	get usesSpatial() {
+		return this.options.usesPortalSpatial || this.options.usesImmersive
+	}
+	get usesValues() {
 		return {
 			usesFlat: this.options.usesFlat,
 			usesPortalOverlay: this.options.usesPortalOverlay,
@@ -212,7 +224,6 @@ const Component = class extends EventHandler {
 			usesImmersive: this.options.usesImmersive
 		}
 	}
-
 
 	/**
 	True if action-input text actions are accepted by this Component 
@@ -285,7 +296,7 @@ const Component = class extends EventHandler {
 	/**
 	Sets the name attribute on the portal and immersive graphs for easier debugging
 	*/
-	setName(name){
+	setName(name) {
 		this._portalGraph.name = name
 		this._immersiveGraph.name = name
 	}

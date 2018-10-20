@@ -298,13 +298,10 @@ const _shapeCurveSegments = 4
 
 function loadText(resultGroup, text, material, font, options) {
 	text = String(text)
-	if(!text || text.trim().length === 0) return
+	if (!text || text.trim().length === 0) return
 	if (graph.fonts.has(font)) {
 		const shapes = graph.fonts.get(font).generateShapes(text, options.size)
-		const textGeometry = new THREE.ShapeGeometry(
-			shapes,
-			_shapeCurveSegments
-		)
+		const textGeometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
 
 		const mesh = new THREE.Mesh(textGeometry, material)
 		mesh.name = 'TextMesh'
@@ -321,10 +318,7 @@ function loadText(resultGroup, text, material, font, options) {
 				loadedFont => {
 					graph.fonts.set(font, loadedFont)
 					const shapes = loadedFont.generateShapes(text, options.size)
-					const textGeometry = new THREE.ShapeGeometry(
-						shapes,
-						_shapeCurveSegments
-					)
+					const textGeometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
 					textGeometry.name = 'TextGeometry'
 					const mesh = new THREE.Mesh(textGeometry, material)
 					mesh.name = 'TextMesh'
@@ -399,11 +393,11 @@ graph.text = (text = '', material = null, fontPath = null, options = {}) => {
 /**
 Creates a THREE.Mesh containing a THREE.BoxBufferGeometry
 */
-graph.cube = (size=[1,1,1], options={}) => {
+graph.cube = (size = [1, 1, 1], options = {}) => {
 	let material = null
-	if(options.color){
+	if (options.color) {
 		material = new THREE.MeshLambertMaterial({ color: color })
-	} else if(options.material){
+	} else if (options.material) {
 		material = options.material
 	}
 	const result = new THREE.Mesh(new THREE.BoxBufferGeometry(...size), material)
