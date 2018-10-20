@@ -225,7 +225,7 @@ THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
 	for (let i = 0; i < depth; i++) {
 		tabs += '  '
 	}
-	console.log(tabs, this.name + ':' || 'unnamed:')
+	console.log(tabs, (this.name || 'unnamed') + ':')
 	console.log(tabs + '\tscale:', ...this.scale.toArray())
 	console.log(tabs + '\tposition:', ...this.position.toArray())
 	console.log(tabs + '\tquaternion:', ...this.quaternion.toArray())
@@ -294,10 +294,18 @@ graph.nodeFunction = function(clazz, ...params) {
 
 graph.fonts = new Map() // url => THREE.Font
 
+const _shapeCurveSegments = 4
+
 function loadText(resultGroup, text, material, font, options) {
+	text = String(text)
+	if(!text || text.trim().length === 0) return
 	if (graph.fonts.has(font)) {
-		const textGeometry = new THREE.TextGeometry(text, Object.assign({ font: graph.fonts.get(font) }, options))
-		textGeometry.name = 'TextGeometry'
+		const shapes = graph.fonts.get(font).generateShapes(text, options.size)
+		const textGeometry = new THREE.ShapeGeometry(
+			shapes,
+			_shapeCurveSegments
+		)
+
 		const mesh = new THREE.Mesh(textGeometry, material)
 		mesh.name = 'TextMesh'
 		resultGroup.add(mesh)
@@ -312,7 +320,11 @@ function loadText(resultGroup, text, material, font, options) {
 				blobURL,
 				loadedFont => {
 					graph.fonts.set(font, loadedFont)
-					const textGeometry = new THREE.TextGeometry(text, Object.assign({ font: loadedFont }, options))
+					const shapes = loadedFont.generateShapes(text, options.size)
+					const textGeometry = new THREE.ShapeGeometry(
+						shapes,
+						_shapeCurveSegments
+					)
 					textGeometry.name = 'TextGeometry'
 					const mesh = new THREE.Mesh(textGeometry, material)
 					mesh.name = 'TextMesh'
@@ -339,10 +351,7 @@ graph.text = (text = '', material = null, fontPath = null, options = {}) => {
 			size: 0.25,
 			height: 0.05,
 			curveSegments: 4,
-			bevelEnabled: false,
-			bevelThickness: 1,
-			bevelSize: 0.8,
-			bevelSegments: 5
+			bevelEnabled: false
 		},
 		options || {}
 	)

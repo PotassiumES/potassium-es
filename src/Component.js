@@ -42,17 +42,30 @@ const Component = class extends EventHandler {
 	@param {Element} [options.portalEl]
 	@param {THREE.Object3D} [options.portalGraph]
 	@param {THREE.Object3D} [options.immersiveGraph]
-	@param {boolean} [options.portalOverlay] true if this Component provides overlay controls for portal mode
-	@param {boolean} [options.portalSpatial] true if this Component provides spatial controls for portal mode
-	@param {string} [options.activationAnchor] if defined, activating this Component will change the document.href.location to this URL
+	@param {boolean} [options.usesFlat=true] - if set to false the flatEl will be hidden
+	@param {boolean} [options.usesPortalOverlay=true] - if set to false the portalEl will be hidden
+	@param {boolean} [options.usesPortalSpatial=true] - if set to false the portalGraph will be hidden
+	@param {boolean} [options.usesImmersive=true] - if set to false the immersiveGraph is hidden
+	@param {string} [options.activationAnchor=null] if defined, activating this Component will change the document.href.location to this URL
 	*/
 	constructor(dataObject = null, options = {}) {
 		super()
 		this.dataObject = dataObject // a DataModel or DataCollection
 		this.options = Object.assign(
 			{
-				portalOverlay: true,
-				portalSpatial: true
+				usesFlat: true,
+				flatEl: el.div(),
+
+				usesPortalOverlay: true,
+				portalEl: el.div(),
+
+				usesPortalSpatial: true,
+				portalGraph: graph.group(),
+
+				usesImmersive: true,
+				immersiveGraph: graph.group(),
+
+				activationAnchor: null
 			},
 			options
 		)
@@ -67,43 +80,48 @@ const Component = class extends EventHandler {
 		// Set up the DOM hierarchies and Three.js scene graphs for the three display modes:
 
 		// Flat display mode elements for page controls
-		this._flatEl = this.options.flatEl || el.div()
+		this._flatEl = this.options.flatEl
 		this._flatEl.component = this
 		this._flatEl.addClass(
 			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
 			'flat-el'
 		)
-
-		// Portal display mode 3D graph for spatial controls
-		this._portalGraph = this.options.portalGraph || graph.group()
-		this._portalGraph.component = this
-		this._portalGraph.addClass(
-			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
-			'portal-graph'
-		)
+		if(this.options.usesFlat === false){
+			this._flatEl.addClass('hidden')
+		}
 
 		// Portal display mode elements for overlay controls
-		this._portalEl = this.options.portalEl || el.div()
+		this._portalEl = this.options.portalEl
 		this._portalEl.component = this
 		this._portalEl.addClass(
 			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
 			'portal-el'
 		)
-
-		if (this.options.portalOverlay === false) {
+		if(this.options.usesPortalOverlay === false){
 			this._portalEl.addClass('hidden')
 		}
-		if (this.options.portalSpatial === false) {
+
+		// Portal display mode 3D graph for spatial controls
+		this._portalGraph = this.options.portalGraph
+		this._portalGraph.component = this
+		this._portalGraph.addClass(
+			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
+			'portal-graph'
+		)
+		if(this.options.usesPortalSpatial === false) {
 			this._portalGraph.visible = false
 		}
 
 		// Immersive display mode 3D graph for spatial controls
-		this._immersiveGraph = this.options.immersiveGraph || graph.group()
+		this._immersiveGraph = this.options.immersiveGraph
 		this._immersiveGraph.component = this
 		this._immersiveGraph.addClass(
 			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
 			'immersive-graph'
 		)
+		if(this.options.usesImmersive === false){
+			this._immersiveGraph.visible = false
+		}
 
 		// All Components are selectable by the 'component' class
 		this.addClass('component')
@@ -178,6 +196,23 @@ const Component = class extends EventHandler {
 	get immersiveGraph() {
 		return this._immersiveGraph
 	}
+
+	// helper methods to eliminate boilerplate when testing various mode usages
+	get usesFlat(){ return this.options.usesFlat }
+	get usesPortal(){ return this.options.usesPortalOverlay || this.options.usesPortalSpatial }
+	get usesPortalOverlay(){ return this.options.usesPortalOverlay }
+	get usesPortalSpatial(){ return this.options.usesPortalSpatial }
+	get usesImmersive(){ return this.options.usesImmersive }
+	get usesSpatial(){ return this.options.usesPortalSpatial || this.options.usesImmersive }
+	get usesValues(){
+		return {
+			usesFlat: this.options.usesFlat,
+			usesPortalOverlay: this.options.usesPortalOverlay,
+			usesPortalSpatial: this.options.usesPortalSpatial,
+			usesImmersive: this.options.usesImmersive
+		}
+	}
+
 
 	/**
 	True if action-input text actions are accepted by this Component 
@@ -282,25 +317,23 @@ const Component = class extends EventHandler {
 	}
 
 	/**
-	hides the flatEl and immersiveGraph
-	optionally hides portalEl and portalGraph if portalOverlay and portalSpatial (respectively) are set to true
+	hides the flatEl, portalEl, portalGraph, and immersiveGraph if their `uses*` option was true
 	*/
 	hide() {
-		this.flatEl.addClass('hidden')
-		if (this.options.portalOverlay) this.portalEl.addClass('hidden')
-		if (this.options.portalSpatial) this.portalGraph.visible = false
-		this.immersiveGraph.visible = false
+		if (this.options.usesFlat) this.flatEl.addClass('hidden')
+		if (this.options.usesPortalOverlay) this.portalEl.addClass('hidden')
+		if (this.options.usesPortalSpatial) this.portalGraph.visible = false
+		if (this.options.usesImmersive) this.immersiveGraph.visible = false
 	}
 
 	/**
-	shows the flatEl and immersiveGraph
-	optionally shows portalEl and portalGraph if portalOverlay and portalSpatial (respectively) are set to true
+	shows the flatEl, portalEl, portalGraph, and immersiveGraph if their `uses*` option was true
 	*/
 	show() {
-		this.flatEl.removeClass('hidden')
-		if (this.options.portalOverlay) this.portalEl.removeClass('hidden')
-		if (this.options.portalSpatial) this.portalGraph.visible = true
-		this.immersiveGraph.visible = true
+		if (this.options.usesFlat) this.flatEl.removeClass('hidden')
+		if (this.options.usesPortalOverlay) this.portalEl.removeClass('hidden')
+		if (this.options.usesPortalSpatial) this.portalGraph.visible = true
+		if (this.options.usesImmersive) this.immersiveGraph.visible = true
 	}
 
 	/**

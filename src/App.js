@@ -1,6 +1,6 @@
 import el from './El.js'
 import graph from './Graph.js'
-import Engine from './Engine.js'
+import {Engine, FlatDisplay} from './Engine.js'
 import Router from './Router.js'
 import Component from './Component.js'
 import AssetLoader from './AssetLoader.js'
@@ -60,6 +60,12 @@ const App = class extends EventHandler {
 					case App.PORTAL:
 						this._stylist.calculateStyles(this._portalScene)
 						this._stylist.applyStyles(this._portalScene)
+						break
+					case App.FLAT:
+						if(this._flatDisplay !== null){
+							this._stylist.calculateStyles(this._immersiveScene)
+							this._stylist.applyStyles(this._immersiveScene)
+						}
 						break
 				}
 			}, 500)
@@ -176,6 +182,9 @@ const App = class extends EventHandler {
 			.catch(err => {
 				console.error('Error setting engine displays', err)
 			})
+
+		/* _flatDisplay is populated if you you call App.toggleFlatDisplay(true)*/ 
+		this._flatDisplay = null
 
 		/* Set up hands and pointers */
 		this._leftHand = graph.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
@@ -322,6 +331,29 @@ const App = class extends EventHandler {
 			})
 		}
 		throw new Error('Unhandled display mode', value)
+	}
+
+	/**
+	toggleFlatDisplay enables creators to see a debugging view into the immersive scene on their flat screens.
+	This is handy for coding and styling spatial controls when a headset is not available or you are having a good hair day and don't want to mess with success.
+	@param {bool} show - if true, create and show the display, otherwise tear it down
+	*/
+	toggleFlatDisplay(show){
+		if(show){
+			if(this._flatDisplay !== null) return
+			this._flatCamera = graph.perspectiveCamera([45, 1, 0.5, 10000])
+			this._flatCamera.name = 'flat-camera'
+			this._flatCamera.matrixAutoUpdate = true
+			this._flatDisplay = new FlatDisplay(this._flatCamera, this._immersiveScene)
+			document.body.appendChild(this._flatDisplay.el)
+			this._flatDisplay.start()
+		} else {
+			if(this._flatDisplay === null) return
+			document.body.remove(this._flatDisplay.el)
+			this._flatDisplay.stop()
+			this._flatDisplay = null
+			this._flatCamera = null
+		}
 	}
 
 	_makeHand(color) {
