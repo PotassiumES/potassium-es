@@ -386,7 +386,7 @@ const App = class extends EventHandler {
 			this._flatDisplay.stop()
 			this._flatDisplay = null
 			this._flatCamera = null
-			this._actionManager.dectivateActionMaps('flat-dev')
+			this._actionManager.deactivateActionMaps('flat-dev')
 		}
 	}
 
