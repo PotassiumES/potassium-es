@@ -294,9 +294,11 @@ const Component = class extends EventHandler {
 	}
 
 	/**
-	Sets the name attribute on the portal and immersive graphs for easier debugging
+	Sets the name attribute on portal and immersive graphs as well as the data-name attribute on flatEl and portalEl
 	*/
 	setName(name) {
+		this._flatEl.setAttribute('data-name', name)
+		this._portalEl.setAttribute('data-name', name)
 		this._portalGraph.name = name
 		this._immersiveGraph.name = name
 	}

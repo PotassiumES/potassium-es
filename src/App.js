@@ -174,10 +174,18 @@ const App = class extends EventHandler {
 		this._el = el.div({ class: 'app' })
 
 		/** Flat display mode DOM elements */
-		this._flatEl = el.div({ class: 'flat-root' }).appendTo(this._el)
+		this._flatEl = el.div({
+			class: 'flat-root',
+		}).appendTo(this._el)
+		this._flatEl.setAttribute('data-name', 'FlatRoot')
 
-		/** Portal display mode overlay DOM and 3D scene */
-		this._portalEl = el.div({ class: 'portal-root' }).appendTo(this._el)
+		/** Portal display mode overlay DOM */
+		this._portalEl = el.div({
+			class: 'portal-root'
+		}).appendTo(this._el)
+		this._portalEl.setAttribute('data-name', 'PortalRoot')
+
+		/** Portal display mode 3D scene */
 		this._portalScene = graph.scene()
 		this._portalScene.addClass('portal-scene')
 		this._portalScene.name = 'PortalScene'
