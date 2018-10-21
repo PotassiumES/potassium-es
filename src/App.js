@@ -145,7 +145,7 @@ const App = class extends EventHandler {
 		})
 
 		// Route flat-dev actions for moving around the camera
-		this._actionManager.addActionListener('/action/transform-camera', (actionName, active, transformation) => {
+		this._actionManager.addActionListener('/action/transform-scene', (actionName, active, transformation) => {
 			if(this._flatCamera === null) return
 			if(active === false){
 				this._flatTransformation = null

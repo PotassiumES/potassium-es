@@ -10,7 +10,7 @@
       },
       "actionParameters": {},
       "source": "/input/gamepad/0/axis/0",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "actionParameters": { "translation": [-1, 0, 0] }
     },
     {
@@ -22,7 +22,7 @@
       },
       "actionParameters": {},
       "source": "/input/gamepad/0/axis/0",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "actionParameters": { "translation": [1, 0, 0] }
     },
     {
@@ -34,7 +34,7 @@
       },
       "actionParameters": {},
       "source": "/input/gamepad/0/axis/1",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "actionParameters": { "translation": [0, 0, -1] }
     },
     {
@@ -46,7 +46,7 @@
       },
       "actionParameters": {},
       "source": "/input/gamepad/0/axis/1",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "actionParameters": { "translation": [0, 0, 1] }
     }
   ],
@@ -54,32 +54,97 @@
     {
       "comment": "X moves up",
       "source": "/input/gamepad/0/button/2/pressed",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "parameters": { "translation": [0, -1, 0] }
     },
     {
       "comment": "Y moves down",
       "source": "/input/gamepad/0/button/3/pressed",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "parameters": { "translation": [0, 1, 0] }
     },
     {
       "comment": "Left bumper rotates counter-clockwise",
       "source": "/input/gamepad/0/button/4/pressed",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "parameters": { "rotation": [0, 0.02, 0] }
     },
     {
       "comment": "Right bumper rotates clockwise",
       "source": "/input/gamepad/0/button/5/pressed",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "parameters": { "rotation": [0, -0.02, 0] }
     },
     {
       "comment": "Start resets to no rotation and no translation",
       "source": "/input/gamepad/0/button/7/pressed",
-      "destination": "/action/transform-camera",
+      "destination": "/action/transform-scene",
       "parameters": { "reset": true }
+    },
+
+    {
+      "comment": "Move forward (w)",
+      "source": "/input/keyboard/0/key/87",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "translation": [0, 0, 1]
+      }
+    },
+    {
+      "comment": "Move backward (s)",
+      "source": "/input/keyboard/0/key/83",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "translation": [0, 0, -1]
+      }
+    },
+    {
+      "comment": "Strafe right (e)",
+      "source": "/input/keyboard/0/key/69",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "translation": [-1, 0, 0]
+      }
+    },
+    {
+      "comment": "Strafe left (q)",
+      "source": "/input/keyboard/0/key/81",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "translation": [1, 0, 0]
+      }
+    },
+    {
+      "comment": "Move up (r)",
+      "source": "/input/keyboard/0/key/82",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "translation": [0, -1, 0]
+      }
+    },
+    {
+      "comment": "Move down (f)",
+      "source": "/input/keyboard/0/key/70",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "translation": [0, 1, 0]
+      }
+    },
+    {
+      "comment": "Rotate left (a)",
+      "source": "/input/keyboard/0/key/65",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "rotation": [0, 0.02, 0]
+      }
+    },
+    {
+      "comment": "Rotate right (d)",
+      "source": "/input/keyboard/0/key/68",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "rotation": [0, -0.02, 0]
+      }
     }
   ],
   "aliases": []
