@@ -21,6 +21,9 @@ export default class PickingInputSource extends InputSource {
 		this._right = null
 	}
 
+	/** @return {string} a human readable name */
+	get name(){ return 'PickingInputSource' }
+
 	clearIntersectObjects() {
 		this._mouse = this._touch = this._gaze = this._left = this._right = null
 	}

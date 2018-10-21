@@ -43,6 +43,7 @@ const App = class extends EventHandler {
 		super()
 		this._handlePortalTick = this._handlePortalTick.bind(this)
 		this._handleImmersiveTick = this._handleImmersiveTick.bind(this)
+		this._handleFlatDisplayTick = this._handleFlatDisplayTick.bind(this)
 
 		this._stylist = new Stylist()
 		this._stylist.addListener((eventName, stylist) => {
@@ -110,6 +111,11 @@ const App = class extends EventHandler {
 			'immersive',
 			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/immersive-action-map.json')
 		)
+		/** the 'flat-dev' action map is used during dev when App.toggleFlatDisplay is used */
+		this._actionManager.addActionMap(
+			'flat-dev',
+			new ActionMap([...this._actionManager.filters], '/static/actions/flat-dev-action-map.json')
+		)
 		this._actionManager.switchToActionMaps('flat')
 
 		// Route activate actions to the target Component
@@ -135,6 +141,26 @@ const App = class extends EventHandler {
 		this._actionManager.addActionListener('/action/text-input', (actionName, value, actionParameters) => {
 			if (Component.TextInputFocus !== null) {
 				Component.TextInputFocus.handleAction(actionName, value, actionParameters)
+			}
+		})
+
+		// Route flat-dev actions for moving around the camera
+		this._actionManager.addActionListener('/action/transform-camera', (actionName, active, transformation) => {
+			if(active === false){
+				this._flatTransformation = null
+				return
+			}
+
+			this._flatTransformation = {
+				reset: transformation.reset === true,
+				translation: null,
+				rotation: null
+			}
+			if(transformation.translation){
+				this._flatTransformation.translation = new THREE.Vector3(...transformation.translation)
+			}
+			if(transformation.rotation){
+				this._flatTransformation.rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(...transformation.rotation))
 			}
 		})
 
@@ -184,8 +210,10 @@ const App = class extends EventHandler {
 			})
 
 		/* _flatDisplay is populated if you you call App.toggleFlatDisplay(true)*/
-
 		this._flatDisplay = null
+		this._flatCamera = null
+		/* _flatTransformation is used to transform the camera during dev based on input triggered actions */
+		this._flatTransformation = null
 
 		/* Set up hands and pointers */
 		this._leftHand = graph.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
@@ -337,23 +365,43 @@ const App = class extends EventHandler {
 	/**
 	toggleFlatDisplay enables creators to see a debugging view into the immersive scene on their flat screens.
 	This is handy for coding and styling spatial controls when a headset is not available or you are having a good hair day and don't want to mess with success.
-	@param {bool} show - if true, create and show the display, otherwise tear it down
+	@param {bool} [show=null] - if true, create and show the display, otherwise tear it down
 	*/
-	toggleFlatDisplay(show) {
+	toggleFlatDisplay(show=null) {
+		if(show === null){
+			show = this._flatDisplay === null ? true : false
+		}
 		if (show) {
 			if (this._flatDisplay !== null) return
 			this._flatCamera = graph.perspectiveCamera([45, 1, 0.5, 10000])
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
-			this._flatDisplay = new FlatDisplay(this._flatCamera, this._immersiveScene)
+			this._flatDisplay = new FlatDisplay(this._flatCamera, this._immersiveScene, this._handleFlatDisplayTick)
 			document.body.appendChild(this._flatDisplay.el)
 			this._flatDisplay.start()
+			this._actionManager.activateActionMaps('flat-dev')
 		} else {
 			if (this._flatDisplay === null) return
 			document.body.removeChild(this._flatDisplay.el)
 			this._flatDisplay.stop()
 			this._flatDisplay = null
 			this._flatCamera = null
+			this._actionManager.dectivateActionMaps('flat-dev')
+		}
+	}
+
+	_handleFlatDisplayTick(){
+		if(this._flatCamera === null || this._flatTransformation === null) return
+		if(this._flatTransformation.reset){
+			this._flatCamera.position.set(0, 0, 0)
+			this._flatCamera.quaternion.set(0, 0, 0, 1)
+			return
+		}
+		if(this._flatTransformation.translation){
+			this._flatCamera.position.add(this._flatTransformation.translation)
+		}
+		if(this._flatTransformation.rotation){
+			this._flatCamera.quaternion.multiply(this._flatTransformation.rotation)
 		}
 	}
 

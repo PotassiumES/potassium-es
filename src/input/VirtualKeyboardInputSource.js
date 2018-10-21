@@ -22,6 +22,9 @@ export default class VirtualKeyboardInputSource extends InputSource {
 		this.keyboardGroup.name = 'virtual-keyboard'
 	}
 
+	/** @return {string} a human readable name */
+	get name(){ return 'VirtualKeyboardInputSource' }
+
 	handleLeftActivate() {
 		if (
 			this._leftIntersect &&

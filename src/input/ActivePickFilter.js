@@ -15,6 +15,9 @@ export default class ActivePickFilter extends Filter {
 		this._queryInputPath = queryInputPath
 	}
 
+	/** @return {string} a human readable name */
+	get name(){ return 'ActivePickFilter' }
+
 	/**
 	 * @param {string} inputPath
 	 * @param inputValue
