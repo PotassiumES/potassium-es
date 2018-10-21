@@ -350,7 +350,7 @@ const App = class extends EventHandler {
 			this._flatDisplay.start()
 		} else {
 			if (this._flatDisplay === null) return
-			document.body.remove(this._flatDisplay.el)
+			document.body.removeChild(this._flatDisplay.el)
 			this._flatDisplay.stop()
 			this._flatDisplay = null
 			this._flatCamera = null
