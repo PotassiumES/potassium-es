@@ -1,30 +1,79 @@
 {
   "comment": "Flat dev",
-  "filters": [],
+  "filters": [
+    {
+      "comment": "Joypad strafe",
+      "filter": "/filter/min-max",
+      "filterParameters": {
+        "minimum": 0.5,
+        "maximum": 1
+      },
+      "actionParameters": {},
+      "source": "/input/gamepad/0/axis/0",
+      "destination": "/action/transform-camera",
+      "actionParameters": { "translation": [-1, 0, 0] }
+    },
+    {
+      "comment": "Joypad strafe",
+      "filter": "/filter/min-max",
+      "filterParameters": {
+        "minimum": -1,
+        "maximum": -0.5
+      },
+      "actionParameters": {},
+      "source": "/input/gamepad/0/axis/0",
+      "destination": "/action/transform-camera",
+      "actionParameters": { "translation": [1, 0, 0] }
+    },
+    {
+      "comment": "Joypad back",
+      "filter": "/filter/min-max",
+      "filterParameters": {
+        "minimum": 0.5,
+        "maximum": 1
+      },
+      "actionParameters": {},
+      "source": "/input/gamepad/0/axis/1",
+      "destination": "/action/transform-camera",
+      "actionParameters": { "translation": [0, 0, -1] }
+    },
+    {
+      "comment": "Joypad forward",
+      "filter": "/filter/min-max",
+      "filterParameters": {
+        "minimum": -1,
+        "maximum": -0.5
+      },
+      "actionParameters": {},
+      "source": "/input/gamepad/0/axis/1",
+      "destination": "/action/transform-camera",
+      "actionParameters": { "translation": [0, 0, 1] }
+    }
+  ],
   "inputs": [
     {
       "comment": "X moves up",
       "source": "/input/gamepad/0/button/2/pressed",
       "destination": "/action/transform-camera",
-      "parameters": { "translation": [0, 0.1, 0] }
+      "parameters": { "translation": [0, -1, 0] }
     },
     {
       "comment": "Y moves down",
       "source": "/input/gamepad/0/button/3/pressed",
       "destination": "/action/transform-camera",
-      "parameters": { "translation": [0, -0.1, 0] }
+      "parameters": { "translation": [0, 1, 0] }
     },
     {
       "comment": "Left bumper rotates counter-clockwise",
       "source": "/input/gamepad/0/button/4/pressed",
       "destination": "/action/transform-camera",
-      "parameters": { "rotation": [0, -0.02, 0] }
+      "parameters": { "rotation": [0, 0.02, 0] }
     },
     {
       "comment": "Right bumper rotates clockwise",
       "source": "/input/gamepad/0/button/5/pressed",
       "destination": "/action/transform-camera",
-      "parameters": { "rotation": [0, 0.02, 0] }
+      "parameters": { "rotation": [0, -0.02, 0] }
     },
     {
       "comment": "Start resets to no rotation and no translation",

@@ -146,18 +146,20 @@ const App = class extends EventHandler {
 
 		// Route flat-dev actions for moving around the camera
 		this._actionManager.addActionListener('/action/transform-camera', (actionName, active, transformation) => {
+			if(this._flatCamera === null) return
 			if(active === false){
 				this._flatTransformation = null
+				this._flatClock.stop()
 				return
 			}
-
+			this._flatClock.start() // resets delta to zero
 			this._flatTransformation = {
 				reset: transformation.reset === true,
 				translation: null,
 				rotation: null
 			}
 			if(transformation.translation){
-				this._flatTransformation.translation = new THREE.Vector3(...transformation.translation)
+				this._flatTransformation.translation = _calculateTranslation(transformation.translation, this._flatCamera.quaternion)
 			}
 			if(transformation.rotation){
 				this._flatTransformation.rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(...transformation.rotation))
@@ -220,6 +222,7 @@ const App = class extends EventHandler {
 		/* _flatDisplay is populated if you you call App.toggleFlatDisplay(true)*/
 		this._flatDisplay = null
 		this._flatCamera = null
+		this._flatClock = null
 		/* _flatTransformation is used to transform the camera during dev based on input triggered actions */
 		this._flatTransformation = null
 
@@ -382,6 +385,7 @@ const App = class extends EventHandler {
 		if (show) {
 			if (this._flatDisplay !== null) return
 			this._flatCamera = graph.perspectiveCamera([45, 1, 0.5, 10000])
+			this._flatClock = new THREE.Clock(false)
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
 			this._flatDisplay = new FlatDisplay(this._flatCamera, this._immersiveScene, this._handleFlatDisplayTick)
@@ -394,22 +398,29 @@ const App = class extends EventHandler {
 			this._flatDisplay.stop()
 			this._flatDisplay = null
 			this._flatCamera = null
+			this._flatClock = null
 			this._actionManager.deactivateActionMaps('flat-dev')
 		}
 	}
 
+	/** Called while showing the debug flat display */
 	_handleFlatDisplayTick(){
 		if(this._flatCamera === null || this._flatTransformation === null) return
 		if(this._flatTransformation.reset){
-			this._flatCamera.position.set(0, 0, 0)
-			this._flatCamera.quaternion.set(0, 0, 0, 1)
+			this._immersiveScene.position.set(0, 0, 0)
+			this._immersiveScene.quaternion.set(0, 0, 0, 1)
 			return
 		}
-		if(this._flatTransformation.translation){
-			this._flatCamera.position.add(this._flatTransformation.translation)
-		}
+		const delta = this._flatClock.getDelta()
 		if(this._flatTransformation.rotation){
-			this._flatCamera.quaternion.multiply(this._flatTransformation.rotation)
+			this._immersiveScene.quaternion.multiply(this._flatTransformation.rotation)
+		}
+		if(this._flatTransformation.translation){
+			this._immersiveScene.position.set(
+				this._immersiveScene.position.x + (this._flatTransformation.translation[0] * delta),
+				this._immersiveScene.position.y + (this._flatTransformation.translation[1] * delta),
+				this._immersiveScene.position.z + (this._flatTransformation.translation[2] * delta)
+			)
 		}
 	}
 
@@ -532,3 +543,34 @@ App.DisplayModeChangedEvent = 'display-mode-changed'
 App.DisplayModeFailedEvent = 'display-mode-failed'
 
 export default App
+
+const _yAxis = new THREE.Vector3(0, 1, 0)
+const _zeroVector3 = new THREE.Vector3(0, 0, 0)
+const _workingVector3_1 = new THREE.Vector3()
+const _workingVector3_2 = new THREE.Vector3()
+const _workingMatrix4_1 = new THREE.Matrix4()
+
+/**
+@param {number[]} inputTranslation [x, y, z]
+@param {THREE.Quaternion} orientation
+@return {number[]?} the orientated output translation
+*/
+const _calculateTranslation = function(inputTranslation, orientation){
+	// set up the input vector
+	_workingVector3_1.set(...inputTranslation)
+	_workingVector3_1.x *= -1
+	if(_workingVector3_1.length() <= 0) return null
+
+	// Get the orientation vector
+	_workingVector3_2.set(0,0,1)
+	_workingVector3_2.applyQuaternion(orientation)
+
+	// Get the rotation matrix from origin to the orientation
+	_workingMatrix4_1.lookAt(_zeroVector3, _workingVector3_2, _yAxis)
+
+	// Apply the rotation matrix to the input vector
+	_workingVector3_1.applyMatrix4(_workingMatrix4_1)
+	_workingVector3_1.x *= -1
+	_workingVector3_1.y *= -1
+	return _workingVector3_1.toArray()
+}
