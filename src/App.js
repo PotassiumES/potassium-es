@@ -114,7 +114,7 @@ const App = class extends EventHandler {
 		/** the 'flat-dev' action map is used during dev when App.toggleFlatDisplay is used */
 		this._actionManager.addActionMap(
 			'flat-dev',
-			new ActionMap([...this._actionManager.filters], '/static/actions/flat-dev-action-map.json')
+			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/flat-dev-action-map.json')
 		)
 		this._actionManager.switchToActionMaps('flat')
 
