@@ -161,4 +161,5 @@ function ldo(date, options = null) {
 	return Localizer.Singleton.formatDateObject(date, options)
 }
 
+export default Localizer
 export { Localizer, Translation, lt, ld, ldt, ldo }

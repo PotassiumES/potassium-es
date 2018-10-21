@@ -4,8 +4,7 @@
   "description": "A browser-side framework for wider web applications",
   "main": "src/App.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cross-env NODE_ENV=production rollup -c rollup.config.js",
+    "build": "rollup -c rollup.config.js",
     "docs": "./node_modules/.bin/esdoc",
     "precommit": "pretty-quick --staged",
     "lint": "eslint src",
@@ -53,7 +52,7 @@
     }
   },
   "dependencies": {
-    "action-input": "git+https@github.com:mozilla/action-input.git"
+    "action-input": "git+https@github.com:PotassiumES/action-input.git"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",

@@ -5,9 +5,9 @@ import resolve from 'rollup-plugin-node-resolve'
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-  input: './hello-world/app.js',
+  input: './src/module.js',
   output: {
-    file: './hello-world/build.js',
+    file: './dist/potassium-es.js',
     format: 'es'
   },
   plugins: [
