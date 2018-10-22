@@ -145,6 +145,12 @@
       "parameters": {
         "rotation": [0, -0.02, 0]
       }
+    },
+    {
+      "comment": "1 resets to no rotation and no translation",
+      "source": "/input/keyboard/0/key/49",
+      "destination": "/action/transform-scene",
+      "parameters": { "reset": true }
     }
   ],
   "aliases": []

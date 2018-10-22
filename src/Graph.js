@@ -270,6 +270,10 @@ THREE.Object3D.prototype.append = function(child = null) {
 	return this
 }
 
+const _textureLoader = new THREE.TextureLoader()
+
+graph.textureLoader = function(){ return _textureLoader }
+
 /**
 The behind the scene function that generates an enhanced Object3D when you call graph.foo(...)
 if the first elements in `params` is an array, the values of the array will be passed as separate parameters into the constructor of the instance
@@ -305,6 +309,7 @@ function loadText(resultGroup, text, material, font, options) {
 
 		const mesh = new THREE.Mesh(textGeometry, material)
 		mesh.name = 'TextMesh'
+		mesh.addClass('text-mesh')
 		resultGroup.add(mesh)
 	} else {
 		assetLoader.get(font).then(blob => {
@@ -322,6 +327,7 @@ function loadText(resultGroup, text, material, font, options) {
 					textGeometry.name = 'TextGeometry'
 					const mesh = new THREE.Mesh(textGeometry, material)
 					mesh.name = 'TextMesh'
+					mesh.addClass('text-mesh')
 					resultGroup.add(mesh)
 					URL.revokeObjectURL(blobURL)
 				},
@@ -356,6 +362,7 @@ graph.text = (text = '', material = null, fontPath = null, options = {}) => {
 
 	const resultGroup = new THREE.Group()
 	resultGroup.name = 'Text'
+	resultGroup.addClass('text')
 	resultGroup.isText = true
 
 	resultGroup.setRGB = (red, green, blue) => {
@@ -381,6 +388,7 @@ graph.text = (text = '', material = null, fontPath = null, options = {}) => {
 		resultGroup.remove(...resultGroup.children)
 		const textGroup = new THREE.Group()
 		textGroup.name = 'SubText'
+		textGroup.addClass('sub-text')
 		resultGroup.add(textGroup)
 		currentText = newText
 		loadText(textGroup, currentText, material, font, options)
@@ -445,10 +453,12 @@ The methods created from these info just pass through any params to the class co
 For example, creating a MeshBasicMaterial will be graph.meshBasicMaterial(...params).
 */
 graph.SUPPORT_CLASSES = [
+	{ class: 'Mesh', name: 'mesh' },
 	{ class: 'Line', name: 'line' },
 	{ class: 'Euler', name: 'euler' },
 	{ class: 'Vector3', name: 'vector3' },
 	{ class: 'Geometry', name: 'geometry' },
+	{ class: 'SphereBufferGeometry', name: 'sphereBufferGeometry' },
 	{ class: 'MeshBasicMaterial', name: 'meshBasicMaterial' },
 	{ class: 'LineBasicMaterial', name: 'lineBasicMaterial' },
 	{ class: 'MeshLambertMaterial', name: 'meshLambertMaterial' }
@@ -467,10 +477,9 @@ graph.GRAPH_CLASSES = [
 	{ class: 'Scene', name: 'scene' },
 	{ class: 'Group', name: 'group' },
 	{ class: 'AmbientLight', name: 'ambientLight' },
-	{ class: 'PerspectiveCamera', name: 'perspectiveCamera' },
 	{ class: 'HemisphereLight', name: 'hemisphereLight' },
 	{ class: 'DirectionalLight', name: 'directionalLight' },
-	{ class: 'AmbientLight', name: 'ambientLight' }
+	{ class: 'PerspectiveCamera', name: 'perspectiveCamera' }
 ]
 
 // This loop generates the element generating functions like graph.group(...)

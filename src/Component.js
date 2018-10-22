@@ -265,10 +265,10 @@ const Component = class extends EventHandler {
 	@param {Component} childComponent
 	*/
 	appendComponent(childComponent) {
-		this._flatEl.appendChild(childComponent.flatEl)
-		this._portalEl.appendChild(childComponent.portalEl)
-		this._portalGraph.add(childComponent.portalGraph)
-		this._immersiveGraph.add(childComponent.immersiveGraph)
+		if(this.options.usesFlat) this._flatEl.appendChild(childComponent.flatEl)
+		if(this.options.usesPortalOverlay) this._portalEl.appendChild(childComponent.portalEl)
+		if(this.options.usesPortalSpatial) this._portalGraph.add(childComponent.portalGraph)
+		if(this.options.usesImmersive) this._immersiveGraph.add(childComponent.immersiveGraph)
 		return this
 	}
 	/**
@@ -276,10 +276,10 @@ const Component = class extends EventHandler {
 	@param {Component} childComponent
 	*/
 	removeComponent(childComponent) {
-		this._flatEl.removeChild(childComponent.flatEl)
-		this._portalEl.removeChild(childComponent.portalEl)
-		this._portalGraph.remove(childComponent.portalGraph)
-		this._immersiveGraph.remove(childComponent.immersiveGraph)
+		if(this.options.usesFlat) this._flatEl.removeChild(childComponent.flatEl)
+		if(this.options.usesPortalOverlay) this._portalEl.removeChild(childComponent.portalEl)
+		if(this.options.usesPortalSpatial) this._portalGraph.remove(childComponent.portalGraph)
+		if(this.options.usesImmersive) this._immersiveGraph.remove(childComponent.immersiveGraph)
 		return this
 	}
 

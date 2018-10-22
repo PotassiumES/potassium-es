@@ -63,9 +63,9 @@ const App = class extends EventHandler {
 						this._stylist.applyStyles(this._portalScene)
 						break
 					case App.FLAT:
-						if (this._flatDisplay !== null) {
-							this._stylist.calculateStyles(this._immersiveScene)
-							this._stylist.applyStyles(this._immersiveScene)
+						if (this._debugScene !== null) {
+							this._stylist.calculateStyles(this._debugScene)
+							this._stylist.applyStyles(this._debugScene)
 						}
 						break
 				}
@@ -221,6 +221,7 @@ const App = class extends EventHandler {
 
 		/* _flatDisplay is populated if you you call App.toggleFlatDisplay(true)*/
 		this._flatDisplay = null
+		this._debugScene = null
 		this._flatCamera = null
 		this._flatClock = null
 		/* _flatTransformation is used to transform the camera during dev based on input triggered actions */
@@ -377,18 +378,20 @@ const App = class extends EventHandler {
 	toggleFlatDisplay enables creators to see a debugging view into the immersive scene on their flat screens.
 	This is handy for coding and styling spatial controls when a headset is not available or you are having a good hair day and don't want to mess with success.
 	@param {bool} [show=null] - if true, create and show the display, otherwise tear it down
+	@param {bool} [immersive=true] - if true then show the immersive scene, otherwise show the portal scene
 	*/
-	toggleFlatDisplay(show=null) {
+	toggleFlatDisplay(show=null, immersive=true) {
 		if(show === null){
 			show = this._flatDisplay === null ? true : false
 		}
 		if (show) {
 			if (this._flatDisplay !== null) return
+			this._debugScene = immersive ? this._immersiveScene : this._portalScene
 			this._flatCamera = graph.perspectiveCamera([45, 1, 0.5, 10000])
 			this._flatClock = new THREE.Clock(false)
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
-			this._flatDisplay = new FlatDisplay(this._flatCamera, this._immersiveScene, this._handleFlatDisplayTick)
+			this._flatDisplay = new FlatDisplay(this._flatCamera, this._debugScene, this._handleFlatDisplayTick)
 			document.body.appendChild(this._flatDisplay.el)
 			this._flatDisplay.start()
 			this._actionManager.activateActionMaps('flat-dev')
@@ -399,6 +402,7 @@ const App = class extends EventHandler {
 			this._flatDisplay = null
 			this._flatCamera = null
 			this._flatClock = null
+			this._debugScene = null
 			this._actionManager.deactivateActionMaps('flat-dev')
 		}
 	}
@@ -407,19 +411,19 @@ const App = class extends EventHandler {
 	_handleFlatDisplayTick(){
 		if(this._flatCamera === null || this._flatTransformation === null) return
 		if(this._flatTransformation.reset){
-			this._immersiveScene.position.set(0, 0, 0)
-			this._immersiveScene.quaternion.set(0, 0, 0, 1)
+			this._debugScene.position.set(0, 0, 0)
+			this._debugScene.quaternion.set(0, 0, 0, 1)
 			return
 		}
 		const delta = this._flatClock.getDelta()
 		if(this._flatTransformation.rotation){
-			this._immersiveScene.quaternion.multiply(this._flatTransformation.rotation)
+			this._debugScene.quaternion.multiply(this._flatTransformation.rotation)
 		}
 		if(this._flatTransformation.translation){
-			this._immersiveScene.position.set(
-				this._immersiveScene.position.x + (this._flatTransformation.translation[0] * delta),
-				this._immersiveScene.position.y + (this._flatTransformation.translation[1] * delta),
-				this._immersiveScene.position.z + (this._flatTransformation.translation[2] * delta)
+			this._debugScene.position.set(
+				this._debugScene.position.x + (this._flatTransformation.translation[0] * delta),
+				this._debugScene.position.y + (this._flatTransformation.translation[1] * delta),
+				this._debugScene.position.z + (this._flatTransformation.translation[2] * delta)
 			)
 		}
 	}
