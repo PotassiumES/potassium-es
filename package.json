@@ -1,12 +1,11 @@
 {
   "name": "potassium-es",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha1",
   "description": "A browser-side framework for wider web applications",
   "main": "src/App.js",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "docs": "./node_modules/.bin/esdoc",
-    "precommit": "pretty-quick --staged",
     "lint": "eslint src",
     "prettier": "prettier --write src/*.js src/**/*.js"
   },
