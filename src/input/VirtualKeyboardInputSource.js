@@ -23,7 +23,9 @@ export default class VirtualKeyboardInputSource extends InputSource {
 	}
 
 	/** @return {string} a human readable name */
-	get name(){ return 'VirtualKeyboardInputSource' }
+	get name() {
+		return 'VirtualKeyboardInputSource'
+	}
 
 	handleLeftActivate() {
 		if (

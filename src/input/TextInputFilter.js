@@ -9,7 +9,9 @@ export default class TextInputFilter extends Filter {
 	}
 
 	/** @return {string} a human readable name */
-	get name(){ return 'TextInputFilter' }
+	get name() {
+		return 'TextInputFilter'
+	}
 
 	/**
 	 * @param {string} inputPath

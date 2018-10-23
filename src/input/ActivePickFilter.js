@@ -16,7 +16,9 @@ export default class ActivePickFilter extends Filter {
 	}
 
 	/** @return {string} a human readable name */
-	get name(){ return 'ActivePickFilter' }
+	get name() {
+		return 'ActivePickFilter'
+	}
 
 	/**
 	 * @param {string} inputPath

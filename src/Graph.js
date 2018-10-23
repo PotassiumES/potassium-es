@@ -272,7 +272,9 @@ THREE.Object3D.prototype.append = function(child = null) {
 
 const _textureLoader = new THREE.TextureLoader()
 
-graph.textureLoader = function(){ return _textureLoader }
+graph.textureLoader = function() {
+	return _textureLoader
+}
 
 /**
 The behind the scene function that generates an enhanced Object3D when you call graph.foo(...)

@@ -146,8 +146,8 @@ const App = class extends EventHandler {
 
 		// Route flat-dev actions for moving around the camera
 		this._actionManager.addActionListener('/action/transform-scene', (actionName, active, transformation) => {
-			if(this._flatCamera === null) return
-			if(active === false){
+			if (this._flatCamera === null) return
+			if (active === false) {
 				this._flatTransformation = null
 				this._flatClock.stop()
 				return
@@ -158,11 +158,16 @@ const App = class extends EventHandler {
 				translation: null,
 				rotation: null
 			}
-			if(transformation.translation){
-				this._flatTransformation.translation = _calculateTranslation(transformation.translation, this._flatCamera.quaternion)
+			if (transformation.translation) {
+				this._flatTransformation.translation = _calculateTranslation(
+					transformation.translation,
+					this._flatCamera.quaternion
+				)
 			}
-			if(transformation.rotation){
-				this._flatTransformation.rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(...transformation.rotation))
+			if (transformation.rotation) {
+				this._flatTransformation.rotation = new THREE.Quaternion().setFromEuler(
+					new THREE.Euler(...transformation.rotation)
+				)
 			}
 		})
 
@@ -176,15 +181,19 @@ const App = class extends EventHandler {
 		this._el = el.div({ class: 'app' })
 
 		/** Flat display mode DOM elements */
-		this._flatEl = el.div({
-			class: 'flat-root',
-		}).appendTo(this._el)
+		this._flatEl = el
+			.div({
+				class: 'flat-root'
+			})
+			.appendTo(this._el)
 		this._flatEl.setAttribute('data-name', 'FlatRoot')
 
 		/** Portal display mode overlay DOM */
-		this._portalEl = el.div({
-			class: 'portal-root'
-		}).appendTo(this._el)
+		this._portalEl = el
+			.div({
+				class: 'portal-root'
+			})
+			.appendTo(this._el)
 		this._portalEl.setAttribute('data-name', 'PortalRoot')
 
 		/** Portal display mode 3D scene */
@@ -380,8 +389,8 @@ const App = class extends EventHandler {
 	@param {bool} [show=null] - if true, create and show the display, otherwise tear it down
 	@param {bool} [immersive=true] - if true then show the immersive scene, otherwise show the portal scene
 	*/
-	toggleFlatDisplay(show=null, immersive=true) {
-		if(show === null){
+	toggleFlatDisplay(show = null, immersive = true) {
+		if (show === null) {
 			show = this._flatDisplay === null ? true : false
 		}
 		if (show) {
@@ -408,22 +417,22 @@ const App = class extends EventHandler {
 	}
 
 	/** Called while showing the debug flat display */
-	_handleFlatDisplayTick(){
-		if(this._flatCamera === null || this._flatTransformation === null) return
-		if(this._flatTransformation.reset){
+	_handleFlatDisplayTick() {
+		if (this._flatCamera === null || this._flatTransformation === null) return
+		if (this._flatTransformation.reset) {
 			this._debugScene.position.set(0, 0, 0)
 			this._debugScene.quaternion.set(0, 0, 0, 1)
 			return
 		}
 		const delta = this._flatClock.getDelta()
-		if(this._flatTransformation.rotation){
+		if (this._flatTransformation.rotation) {
 			this._debugScene.quaternion.multiply(this._flatTransformation.rotation)
 		}
-		if(this._flatTransformation.translation){
+		if (this._flatTransformation.translation) {
 			this._debugScene.position.set(
-				this._debugScene.position.x + (this._flatTransformation.translation[0] * delta),
-				this._debugScene.position.y + (this._flatTransformation.translation[1] * delta),
-				this._debugScene.position.z + (this._flatTransformation.translation[2] * delta)
+				this._debugScene.position.x + this._flatTransformation.translation[0] * delta,
+				this._debugScene.position.y + this._flatTransformation.translation[1] * delta,
+				this._debugScene.position.z + this._flatTransformation.translation[2] * delta
 			)
 		}
 	}
@@ -559,14 +568,14 @@ const _workingMatrix4_1 = new THREE.Matrix4()
 @param {THREE.Quaternion} orientation
 @return {number[]?} the orientated output translation
 */
-const _calculateTranslation = function(inputTranslation, orientation){
+const _calculateTranslation = function(inputTranslation, orientation) {
 	// set up the input vector
 	_workingVector3_1.set(...inputTranslation)
 	_workingVector3_1.x *= -1
-	if(_workingVector3_1.length() <= 0) return null
+	if (_workingVector3_1.length() <= 0) return null
 
 	// Get the orientation vector
-	_workingVector3_2.set(0,0,1)
+	_workingVector3_2.set(0, 0, 1)
 	_workingVector3_2.applyQuaternion(orientation)
 
 	// Get the rotation matrix from origin to the orientation
