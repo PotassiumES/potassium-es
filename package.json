@@ -7,7 +7,8 @@
     "build": "rollup -c rollup.config.js",
     "docs": "./node_modules/.bin/esdoc",
     "lint": "eslint src",
-    "prettier": "prettier --write src/*.js src/**/*.js"
+    "prettier": "prettier --write src/*.js src/**/*.js tests/**/*.js",
+    "host-tests": "http-server ./"
   },
   "repository": {
     "type": "git",
@@ -55,6 +56,7 @@
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
+    "http-server": "^0.11.1",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^5.0.1",
@@ -65,6 +67,7 @@
     "rollup-plugin-cleanup": "^3.0.0",
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-replace": "^2.0.0"
+    "rollup-plugin-replace": "^2.0.0",
+    "potassium-test": "git+https@github.com:PotassiumES/potassium-test.git"
   }
 }

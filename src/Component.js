@@ -382,7 +382,7 @@ const Component = class extends EventHandler {
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindTextEl(fieldName, targetElement, formatter = null, dataModel = this.dataModel) {
+	bindTextEl(fieldName, targetElement, formatter = null, dataModel = this.dataObject) {
 		if (formatter === null) {
 			formatter = value => {
 				if (value === null) return ''
@@ -411,7 +411,7 @@ const Component = class extends EventHandler {
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindAttributeEl(fieldName, targetElement, attributeName, formatter = null, dataModel = this.dataModel) {
+	bindAttributeEl(fieldName, targetElement, attributeName, formatter = null, dataModel = this.dataObject) {
 		if (formatter === null) {
 			formatter = value => {
 				if (value === null) return ''
