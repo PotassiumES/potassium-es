@@ -238,11 +238,19 @@ const App = class extends EventHandler {
 
 		/* Set up hands and pointers */
 		this._leftHand = graph.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
+		this._leftHand.addClass('left-hand')
+		this._leftHand.setName('LeftHand')
 		this._leftPointer = this._makePointer(0x99ff99)
+		this._leftPointer.addClass('left-pointer')
+		this._leftPointer.setName('LeftPointer')
 		this._leftPointer.visible = false
 		this._leftHand.add(this._leftPointer)
 		this._rightHand = graph.group(this._makeHand(0xff9999)).appendTo(this._immersiveScene)
+		this._rightHand.addClass('right-hand')
+		this._rightHand.setName('RightHand')
 		this._rightPointer = this._makePointer(0x99ff99)
+		this._rightPointer.addClass('right-pointer')
+		this._rightPointer.setName('RightPointer')
 		this._rightPointer.visible = false
 		this._rightHand.add(this._rightPointer)
 		/* Set up the virtual keyboard */
