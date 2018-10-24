@@ -1,0 +1,115 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+
+		<script src="./three/three.js"></script>
+		<script src="./three/three-mtl-loader.js"></script>
+		<script src="./three/three-obj-loader.js"></script>
+
+		<title>Potassium Tests</title>
+		<style>
+			:root {
+				--dark-yellow:	rgb(252, 228, 101);
+				--yellow:		rgb(255, 236, 148);
+				--light-yellow:	rgb(255, 240, 170);
+
+				--dark-green:	rgb(36, 186, 136);
+				--green:		rgb(86, 236, 186);
+				--light-green:	rgb(180, 231, 216);
+
+				--dark-red:		rgb(200, 0, 0);
+				--red:			rgb(255, 0, 0);
+				--light-red:	rgb(255, 200, 200);
+
+				--action-color: var(--dark-yellow);
+				--success-color: var(--dark-green);
+				--failure-color: var(--red);
+
+				--major-space: 35px;
+				--medium-space: 25px;
+				--minor-space: 10px;
+			}
+
+			html {
+				font-family: sans-serif;
+				font-size: 22px;
+			}
+			body {
+				padding: var(--major-space);
+			}
+
+			.test-results-runner {
+				padding-left: 0;
+				list-style: none;
+			}
+
+			.started-only,
+			.passed-only,
+			.failed-only { display: none; }
+
+			.test-result[data-status=started] .started-only,
+			.test-result[data-status=passed] .passed-only,
+			.test-result[data-status=failed] .failed-only { display: inherit; }
+
+			.test-result {
+				margin-bottom: var(--medium-space);
+			}
+
+			.test-result > .name {
+				margin: 0;
+				font-size: 1.1rem;
+			}
+
+			.test-result[data-status=passed] > .status:before {
+				content: "🌸 ";
+			}
+
+			.test-result[data-status=failed] > .status:before {
+				content: "⚡️ ";
+			}
+
+			.test-result[data-status=started] > .name {
+				color: var(--action-color);
+			}
+
+			.test-result[data-status=passed] > .name {
+				color: var(--success-color);
+			}
+
+			.test-result[data-status=failed] > .name {
+				color: var(--failure-color);
+			}
+
+			.test-result > p {
+				margin: 0 0 var(--minor-space) 0;
+			}
+
+			.test-result > .context th {
+				vertical-align: top;
+				padding-right: var(--minor-space);
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Tests</h1>
+		<div id="results"></div>
+
+		<script type="module">
+			import {tests, Runner, Renderer} from './tests.js'
+
+			let resultsEl = document.getElementById('results')
+			let resultsRenderer = null
+
+			function init(){
+				const runner = new Runner()
+				resultsRenderer = new Renderer(runner)
+				resultsEl.appendChild(resultsRenderer.el)
+				runner.run(tests).catch(err => {
+					console.error('Error', err)
+				})
+			}
+			window.addEventListener('DOMContentLoaded', init)
+		</script>
+
+	</body>
+</html>
