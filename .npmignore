@@ -1,0 +1,9 @@
+art/*
+dist/*
+docs/*
+node_modules/*
+tests/*
+.esdoc.json
+.prettierignore
+.gitignore
+*.md
