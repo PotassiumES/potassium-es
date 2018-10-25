@@ -1,18 +1,18 @@
 /**
-Functions that generate DOM elements like el.div(...) will live in el
+Functions that generate Document Object Model (DOM) elements like dom.div(...) will live in el
 */
-const el = {}
-export default el
+const dom = {}
+export default dom
 
 /**
-domElementFunction is the behind the scenes logic for the functions like el.div(...)
+domElementFunction is the behind the scenes logic for the functions like dom.div(...)
 Below you will find the loop that uses domElementFunction
 */
-el.domElementFunction = function(tagName, ...params) {
+dom.domElementFunction = function(tagName, ...params) {
 	// Create a boring DOM element
 	const element = document.createElement(tagName)
 
-	// A convenience function to allow chaining like `let fooDiv = el.div().appendTo(document.body)`
+	// A convenience function to allow chaining like `let fooDiv = dom.div().appendTo(document.body)`
 	element.appendTo = function(parent) {
 		parent.appendChild(this)
 		return this
@@ -52,14 +52,14 @@ el.domElementFunction = function(tagName, ...params) {
 	}
 
 	element.documentPosition = function() {
-		return el.documentOffset(this)
+		return dom.documentOffset(this)
 	}
 
 	/*
 	Sort element.children *in place* using the comparator function
 	See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort for an explanation of the comparator function
 	*/
-	element.sort = function(comparator = el.defaultComparator) {
+	element.sort = function(comparator = dom.defaultComparator) {
 		// Populate the holding array while removing children from the DOM
 		const holdingArray = []
 		while (this.children.length > 0) {
@@ -73,7 +73,7 @@ el.domElementFunction = function(tagName, ...params) {
 	}
 
 	// Sort element.children *in place* using child[attributeName] and the comparator function
-	element.sortByAttribute = function(attributeName, comparator = el.defaultComparator) {
+	element.sortByAttribute = function(attributeName, comparator = dom.defaultComparator) {
 		this.sort((el1, el2) => {
 			return comparator(el1.getAttribute(attributeName), el2.getAttribute(attributeName))
 		})
@@ -117,7 +117,7 @@ el.domElementFunction = function(tagName, ...params) {
 }
 
 // This comparator stringifies the passed values and returns the comparison of those values
-el.defaultComparator = function(el1, el2) {
+dom.defaultComparator = function(el1, el2) {
 	if (el1 === el2) return 0
 	const str1 = '' + el1
 	const str2 = '' + el2
@@ -127,7 +127,7 @@ el.defaultComparator = function(el1, el2) {
 }
 
 // Traverse the document tree to calculate the offset in the entire document of this element
-el.documentOffset = function(element) {
+dom.documentOffset = function(element) {
 	let left = 0
 	let top = 0
 	const findPos = function(obj) {
@@ -142,11 +142,11 @@ el.documentOffset = function(element) {
 }
 
 /** 
-The tag names that will be used to generate all of the element generating functions like el.div(...) and el.button(...)
+The tag names that will be used to generate all of the element generating functions like dom.div(...) and dom.button(...)
 These names were ovingly copied from the excellent Laconic.js 
 @see https://github.com/joestelmach/laconic/blob/master/laconic.js
 */
-el.TAGS = [
+dom.TAGS = [
 	'a',
 	'abbr',
 	'address',
@@ -255,10 +255,10 @@ el.TAGS = [
 	'wbr'
 ]
 
-// This loop generates the element generating functions like el.div(...)
-for (const tag of el.TAGS) {
+// This loop generates the element generating functions like dom.div(...)
+for (const tag of dom.TAGS) {
 	const innerTag = tag
-	el[innerTag] = function(...params) {
-		return el.domElementFunction(innerTag, ...params)
+	dom[innerTag] = function(...params) {
+		return dom.domElementFunction(innerTag, ...params)
 	}
 }

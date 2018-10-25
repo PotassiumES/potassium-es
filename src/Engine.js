@@ -1,5 +1,5 @@
-import el from './El.js'
-import graph from './Graph.js'
+import dom from './DOM.js'
+import som from './SOM.js'
 import EventHandler from './EventHandler.js'
 import { throttledConsoleLog } from './throttle.js'
 
@@ -23,10 +23,10 @@ const Engine = class extends EventHandler {
 		this._displayMode = mode
 		this._tickCallback = tickCallback
 
-		this._el = el.div({ class: 'engine' }) // This will contain a canvas for portal mode
-		this._el.addClass(this._displayMode + '-engine')
+		this._dom = dom.div({ class: 'engine' }) // This will contain a canvas for portal mode
+		this._dom.addClass(this._displayMode + '-engine')
 
-		this._camera = graph.perspectiveCamera([45, 1, 0.5, 10000])
+		this._camera = som.perspectiveCamera([45, 1, 0.5, 10000])
 		this._camera.name = mode + '-camera'
 		this._camera.matrixAutoUpdate = false
 
@@ -48,8 +48,8 @@ const Engine = class extends EventHandler {
 		this._sceneDisplay = sceneDisplay
 	}
 
-	get el() {
-		return this._el
+	get dom() {
+		return this._dom
 	}
 
 	get scene() {
@@ -109,7 +109,7 @@ const Engine = class extends EventHandler {
 				const xrDevice = await navigator.xr.requestDevice()
 				// If WebXR can do exclusive AR sessions
 				try {
-					const xrContext = el.canvas().getContext('xrpresent')
+					const xrContext = dom.canvas().getContext('xrpresent')
 					if (!xrContext) {
 						throw new Error('Could not create an xr context')
 					}
@@ -120,7 +120,7 @@ const Engine = class extends EventHandler {
 					portalEngine.sceneDisplay = new WebXRDisplay(
 						xrDevice,
 						Engine.PORTAL,
-						portalEngine.el,
+						portalEngine.dom,
 						portalEngine.camera,
 						portalEngine.scene,
 						portalEngine.tickCallback
@@ -138,7 +138,7 @@ const Engine = class extends EventHandler {
 					immersiveEngine.sceneDisplay = new WebXRDisplay(
 						xrDevice,
 						Engine.PORTAL,
-						portalEngine.el,
+						portalEngine.dom,
 						portalEngine.camera,
 						portalEngine.scene,
 						portalEngine.tickCallback
@@ -264,7 +264,7 @@ const FlatDisplay = class extends SceneDisplay {
 		this._renderer.shadowMap.type = THREE.PCFShadowMap
 	}
 
-	get el() {
+	get dom() {
 		return this._renderer.domElement
 	}
 
@@ -305,8 +305,8 @@ const FlatDisplay = class extends SceneDisplay {
 	}
 
 	_updateSize() {
-		this._width = this.el.clientWidth
-		this._height = this.el.clientHeight
+		this._width = this.dom.clientWidth
+		this._height = this.dom.clientHeight
 		this._renderer.setPixelRatio(window.devicePixelRatio)
 		this._camera.aspect = this._width / this._height
 		this._camera.updateProjectionMatrix()
@@ -339,7 +339,6 @@ const WebVRDisplay = class extends SceneDisplay {
 			antialias: true
 		})
 		this._renderer.domElement.setAttribute('class', 'webvr-display')
-		//this._renderer.domElement.style.display = 'none'
 		this._renderer.setClearColor(defaultBackgroundColor)
 		this._renderer.autoClear = false
 		this._renderer.shadowMap.enabled = true
@@ -445,11 +444,11 @@ const WebVRDisplay = class extends SceneDisplay {
 WebXRDisplay uses the WebXR Device API to render a scene
 */
 const WebXRDisplay = class extends SceneDisplay {
-	constructor(xrDevice, displayMode, domEl, camera, scene, tickCallback = null) {
+	constructor(xrDevice, displayMode, domElement, camera, scene, tickCallback = null) {
 		super(displayMode, camera, scene, tickCallback)
 		this._render = this._render.bind(this)
 		this._xrDevice = xrDevice
-		this._el = domEl
+		this._dom = domElement
 
 		this._session = null // XRSession
 		this._eyeLevelFrameOfReference = null
@@ -462,7 +461,7 @@ const WebXRDisplay = class extends SceneDisplay {
 
 		if (this._displayMode === Engine.PORTAL) {
 			// Create the output context for the composited session render
-			this._xrCanvas = el.canvas({ class: 'xr-canvas' })
+			this._xrCanvas = dom.canvas({ class: 'xr-canvas' })
 			this._xrContext = this._xrCanvas.getContext('xrpresent')
 			if (this._xrContext === null) {
 				throw new Error('Could not create the XR context')
@@ -495,7 +494,7 @@ const WebXRDisplay = class extends SceneDisplay {
 				this._session = null
 			}
 
-			this._glCanvas = el.canvas({ class: 'gl-canvas' })
+			this._glCanvas = dom.canvas({ class: 'gl-canvas' })
 			this._glContext = this._glCanvas.getContext('webgl', {
 				compatibleXRDevice: this._xrDevice
 			})
@@ -519,7 +518,7 @@ const WebXRDisplay = class extends SceneDisplay {
 					this._session.baseLayer = new XRWebGLLayer(this._session, this._glContext)
 
 					if (this._displayMode === Engine.PORTAL) {
-						this._el.appendChild(this._xrCanvas)
+						this._dom.appendChild(this._xrCanvas)
 					}
 
 					this._session
@@ -548,7 +547,7 @@ const WebXRDisplay = class extends SceneDisplay {
 				this._session.end()
 				this._session = null
 				if (this._displayMode === Engine.PORTAL) {
-					this._el.removeChild(this._xrCanvas)
+					this._dom.removeChild(this._xrCanvas)
 				}
 			}
 			document.body.style['background-color'] = this._bodyBackgroundColor

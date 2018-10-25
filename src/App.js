@@ -1,5 +1,5 @@
-import el from './El.js'
-import graph from './Graph.js'
+import dom from './DOM.js'
+import som from './SOM.js'
 import { Engine, FlatDisplay } from './Engine.js'
 import Router from './Router.js'
 import Component from './Component.js'
@@ -80,7 +80,7 @@ const App = class extends EventHandler {
 		this._displayMode = App.FLAT
 
 		this._virtualKeyboardInputSource = new VirtualKeyboardInputSource()
-		this._virtualKeyboardInputSource.keyboardGroup.quaternion.setFromEuler(graph.euler(0, -45, 0))
+		this._virtualKeyboardInputSource.keyboardGroup.quaternion.setFromEuler(som.euler(0, -45, 0))
 		this._virtualKeyboardInputSource.keyboardGroup.position.set(0.8, 0, -0.8)
 		this._virtualKeyboardInputSource.keyboardGroup.visible = false
 
@@ -178,26 +178,26 @@ const App = class extends EventHandler {
 		The root DOM elmenent that will contain everything for every display mode
 		Add this to your app's DOM
 		*/
-		this._el = el.div({ class: 'app' })
+		this._dom = dom.div({ class: 'app' })
 
 		/** Flat display mode DOM elements */
-		this._flatEl = el
+		this._flatDOM = dom
 			.div({
 				class: 'flat-root'
 			})
-			.appendTo(this._el)
-		this._flatEl.setAttribute('data-name', 'FlatRoot')
+			.appendTo(this._dom)
+		this._flatDOM.setAttribute('data-name', 'FlatRoot')
 
 		/** Portal display mode overlay DOM */
-		this._portalEl = el
+		this._portalDOM = dom
 			.div({
 				class: 'portal-root'
 			})
-			.appendTo(this._el)
-		this._portalEl.setAttribute('data-name', 'PortalRoot')
+			.appendTo(this._dom)
+		this._portalDOM.setAttribute('data-name', 'PortalRoot')
 
 		/** Portal display mode 3D scene */
-		this._portalScene = graph.scene()
+		this._portalScene = som.scene()
 		this._portalScene.addClass('portal-scene')
 		this._portalScene.name = 'PortalScene'
 		this._portalEngine = new Engine(this._portalScene, Engine.PORTAL, this._handlePortalTick)
@@ -208,8 +208,7 @@ const App = class extends EventHandler {
 		})
 
 		/** Immersive display mode 3D scene */
-		this._immersiveEl = el.div({ class: 'immersive-root' }).appendTo(this._el)
-		this._immersiveScene = graph.scene()
+		this._immersiveScene = som.scene()
 		this._immersiveScene.addClass('immersive-scene')
 		this._immersiveScene.name = 'ImmersiveScene'
 		this._immersiveEngine = new Engine(this._immersiveScene, Engine.IMMERSIVE, this._handleImmersiveTick)
@@ -237,20 +236,20 @@ const App = class extends EventHandler {
 		this._flatTransformation = null
 
 		/* Set up hands and pointers */
-		this._leftHand = graph.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
+		this._leftHand = som.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
 		this._leftHand.addClass('left-hand')
-		this._leftHand.setName('LeftHand')
+		this._leftHand.name = 'LeftHand'
 		this._leftPointer = this._makePointer(0x99ff99)
 		this._leftPointer.addClass('left-pointer')
-		this._leftPointer.setName('LeftPointer')
+		this._leftPointer.name = 'LeftPointer'
 		this._leftPointer.visible = false
 		this._leftHand.add(this._leftPointer)
-		this._rightHand = graph.group(this._makeHand(0xff9999)).appendTo(this._immersiveScene)
+		this._rightHand = som.group(this._makeHand(0xff9999)).appendTo(this._immersiveScene)
 		this._rightHand.addClass('right-hand')
-		this._rightHand.setName('RightHand')
+		this._rightHand.name = 'RightHand'
 		this._rightPointer = this._makePointer(0x99ff99)
 		this._rightPointer.addClass('right-pointer')
-		this._rightPointer.setName('RightPointer')
+		this._rightPointer.name = 'RightPointer'
 		this._rightPointer.visible = false
 		this._rightHand.add(this._rightPointer)
 		/* Set up the virtual keyboard */
@@ -260,7 +259,7 @@ const App = class extends EventHandler {
 		this.addListener((eventName, mode) => {
 			this._actionManager.switchToActionMaps(mode)
 
-			/** @todo use a better method than flatEl traversal */
+			/** @todo use a better method than flatDOM traversal */
 			const dive = node => {
 				if (typeof node.component !== 'undefined' && typeof node.component.handleDisplayModeChange === 'function') {
 					node.component.handleDisplayModeChange(mode)
@@ -269,7 +268,7 @@ const App = class extends EventHandler {
 					dive(node.children[i])
 				}
 			}
-			dive(this._flatEl)
+			dive(this._flatDOM)
 		}, App.DisplayModeChangedEvent)
 
 		this._updateClasses()
@@ -285,16 +284,16 @@ const App = class extends EventHandler {
 		return this._assetLoader
 	}
 	/** @value {HTMLElement} */
-	get el() {
-		return this._el
+	get dom() {
+		return this._dom
 	}
 	/** @value {HTMLElement} */
-	get flatEl() {
-		return this._flatEl
+	get flatDOM() {
+		return this._flatDOM
 	}
 	/** @value {HTMLElement} */
-	get portalEl() {
-		return this._portalEl
+	get portalDOM() {
+		return this._portalDOM
 	}
 	/** @value {THREE.Group} */
 	get portalScene() {
@@ -310,24 +309,24 @@ const App = class extends EventHandler {
 	}
 
 	/**
-	appendComponent adds the childComponent's flatEl, portalEl, portalGraph, and immersiveGraph to this Component's equivalent attributes.
+	appendComponent adds the childComponent's flatDOM, portalDOM, portalSOM, and immersiveSOM to this Component's equivalent attributes.
 	@param {Component} childComponent
 	*/
 	appendComponent(childComponent) {
-		this._flatEl.appendChild(childComponent.flatEl)
-		this._portalEl.appendChild(childComponent.portalEl)
-		this._portalScene.add(childComponent.portalGraph)
-		this._immersiveScene.add(childComponent.immersiveGraph)
+		this._flatDOM.appendChild(childComponent.flatDOM)
+		this._portalDOM.appendChild(childComponent.portalDOM)
+		this._portalScene.add(childComponent.portalSOM)
+		this._immersiveScene.add(childComponent.immersiveSOM)
 	}
 	/*
-	removeComponent removes the childComponent's flatEl, portalEl, portalGraph, and immersiveGraph from this Component's equivalent attributes.
+	removeComponent removes the childComponent's flatDOM, portalDOM, portalSOM, and immersiveSOM from this Component's equivalent attributes.
 	@param {Component} childComponent
 	*/
 	removeComponent(childComponent) {
-		this._flatEl.removeChild(childComponent.flatEl)
-		this._portalEl.removeChild(childComponent.portalEl)
-		this._portalScene.remove(childComponent.portalGraph)
-		this._immersiveScene.remove(childComponent.immersiveGraph)
+		this._flatDOM.removeChild(childComponent.flatDOM)
+		this._portalDOM.removeChild(childComponent.portalDOM)
+		this._portalScene.remove(childComponent.portalSOM)
+		this._immersiveScene.remove(childComponent.immersiveSOM)
 	}
 
 	/** @value {string} flat|portal|immersive */
@@ -404,17 +403,17 @@ const App = class extends EventHandler {
 		if (show) {
 			if (this._flatDisplay !== null) return
 			this._debugScene = immersive ? this._immersiveScene : this._portalScene
-			this._flatCamera = graph.perspectiveCamera([45, 1, 0.5, 10000])
+			this._flatCamera = som.perspectiveCamera([45, 1, 0.5, 10000])
 			this._flatClock = new THREE.Clock(false)
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
 			this._flatDisplay = new FlatDisplay(this._flatCamera, this._debugScene, this._handleFlatDisplayTick)
-			document.body.appendChild(this._flatDisplay.el)
+			document.body.appendChild(this._flatDisplay.dom)
 			this._flatDisplay.start()
 			this._actionManager.activateActionMaps('flat-dev')
 		} else {
 			if (this._flatDisplay === null) return
-			document.body.removeChild(this._flatDisplay.el)
+			document.body.removeChild(this._flatDisplay.dom)
 			this._flatDisplay.stop()
 			this._flatDisplay = null
 			this._flatCamera = null
@@ -447,7 +446,7 @@ const App = class extends EventHandler {
 
 	_makeHand(color) {
 		/** @todo make this a portable resource, perhaps by embedding it in an ES module */
-		return graph.obj(
+		return som.obj(
 			'/static/potassium-es/models/Controller.obj',
 			(group, obj) => {
 				const body = group.getObjectByName('Body_Cylinder') // Magic string for temp OBJ
@@ -464,10 +463,10 @@ const App = class extends EventHandler {
 	}
 
 	_makePointer(color) {
-		const material = graph.lineBasicMaterial({ color: color })
-		const geometry = graph.geometry()
-		geometry.vertices.push(graph.vector3(0, 0, 0), graph.vector3(0, 0, -1000))
-		const pointer = graph.line(geometry, material)
+		const material = som.lineBasicMaterial({ color: color })
+		const geometry = som.geometry()
+		geometry.vertices.push(som.vector3(0, 0, 0), som.vector3(0, 0, -1000))
+		const pointer = som.line(geometry, material)
 		pointer.name = 'pointer'
 		return pointer
 	}
@@ -545,10 +544,10 @@ const App = class extends EventHandler {
 	}
 
 	_updateClasses() {
-		this._el.removeClass('flat-mode')
-		this._el.removeClass('portal-mode')
-		this._el.removeClass('immersive-mode')
-		this._el.addClass(this._displayMode + '-mode')
+		this._dom.removeClass('flat-mode')
+		this._dom.removeClass('portal-mode')
+		this._dom.removeClass('immersive-mode')
+		this._dom.addClass(this._displayMode + '-mode')
 	}
 }
 

@@ -1,6 +1,6 @@
-import el from './El.js'
+import dom from './DOM.js'
 import App from './App.js'
-import graph from './Graph.js'
+import som from './SOM.js'
 import Engine from './Engine.js'
 import Router from './Router.js'
 import Component from './Component.js'
@@ -20,9 +20,9 @@ import DisplayModeTracker from './DisplayModeTracker.js'
  */
 
 export {
-	el,
+	dom,
 	App,
-	graph,
+	som,
 	Engine,
 	Router,
 	throttle,
