@@ -1,4 +1,4 @@
-import graph from '../Graph.js'
+import som from '../SOM.js'
 import InputSource from 'action-input/src/input/InputSource'
 
 /**
@@ -16,7 +16,7 @@ export default class VirtualKeyboardInputSource extends InputSource {
 		this._command = null
 
 		// TODO make this a portable asset, perhaps by embedding it in an ES module
-		this.keyboardGroup = graph.obj('/static/potassium-es/models/Keyboard.obj', null, (...params) => {
+		this.keyboardGroup = som.obj('/static/potassium-es/models/Keyboard.obj', null, (...params) => {
 			console.error('Could not load virtual keyboard OBJ', ...params)
 		})
 		this.keyboardGroup.name = 'virtual-keyboard'

@@ -3,7 +3,7 @@ import Runner from '/node_modules/potassium-test/src/Runner.js'
 import SynchronousFetchMap from '/node_modules/potassium-test/src/SynchronousFetchMap.js'
 import TestResultsRenderer from '/node_modules/potassium-test/src/TestResultsRenderer.js'
 
-import el from '/src/El.js'
+import dom from '/src/DOM.js'
 import Router from '/src/Router.js'
 import Component from '/src/Component.js'
 import DataModel from '/src/DataModel.js'
@@ -255,7 +255,7 @@ tests.push(
 
 tests.push(
 	new Test('DOM manipulation', test => {
-		let el1 = el.div()
+		let el1 = dom.div()
 
 		// Add and remove classes
 		test.assertType(el1.removeClass, 'function')
@@ -275,11 +275,11 @@ tests.push(
 		el1.removeClass('batz')
 		test.assertEqual(el1.getAttribute('class'), 'blinz')
 
-		let el2 = el.span().appendTo(el1)
+		let el2 = dom.span().appendTo(el1)
 		test.assertEqual(el1.children.length, 1)
 		test.assertEqual(el1.children[0], el2)
 
-		let el3 = el.div({ foo: 'bar' }, 'Howdy', el.span('Moo'))
+		let el3 = dom.div({ foo: 'bar' }, 'Howdy', dom.span('Moo'))
 		test.assertEqual(el3.childNodes[0].text, 'Howdy')
 		test.assertEqual(el3.getAttribute('foo'), 'bar')
 		test.assertEqual(el3.children[0].innerText, 'Moo')
@@ -288,14 +288,14 @@ tests.push(
 
 tests.push(
 	new Test('DOM sorting', test => {
-		let el1 = el.div()
+		let el1 = dom.div()
 		test.assertEqual(el1.sort(), el1) // sort is in-place and returns the element for chaining
-		el1.appendChild(el.div({ id: 3 }))
-		el1.appendChild(el.div({ id: 5 }))
-		el1.appendChild(el.div({ id: 1 }))
-		el1.appendChild(el.div({ id: 2 }))
-		el1.appendChild(el.div({ id: 5 })) // Note, there are two fives
-		el1.appendChild(el.div({ id: 4 }))
+		el1.appendChild(dom.div({ id: 3 }))
+		el1.appendChild(dom.div({ id: 5 }))
+		el1.appendChild(dom.div({ id: 1 }))
+		el1.appendChild(dom.div({ id: 2 }))
+		el1.appendChild(dom.div({ id: 5 })) // Note, there are two fives
+		el1.appendChild(dom.div({ id: 4 }))
 		el1.sortByAttribute('id')
 		test.assertEqual(el1.children.length, 6)
 		for (var i = 0; i < el1.children.length - 1; i++) {
@@ -308,15 +308,15 @@ tests.push(
 tests.push(
 	new Test('Component', test => {
 		let component1 = new Component()
-		component1.el = document.createElement('bogus')
-		test.assertEqual(component1.el.tagName.toLowerCase(), 'bogus')
+		component1.dom = document.createElement('bogus')
+		test.assertEqual(component1.dom.tagName.toLowerCase(), 'bogus')
 
-		let fooSpan = el.span('Mooo', { foo: 'bar' }, el.p({ blatz: 'biz' }, 'flowers')).appendTo(component1.el)
-		component1.el.appendChild(fooSpan)
+		let fooSpan = dom.span('Mooo', { foo: 'bar' }, dom.p({ blatz: 'biz' }, 'flowers')).appendTo(component1.dom)
+		component1.dom.appendChild(fooSpan)
 		test.assertEqual(fooSpan.getAttribute('foo'), 'bar')
 		test.assertNotEqual(fooSpan.innerHTML.indexOf('blatz="biz"'))
 
-		component1 = el.div()
+		component1 = dom.div()
 		component1.append('Foo')
 		test.assertEqual(component1.innerHTML, 'Foo')
 		component1.append({ bling: 'ring' })
@@ -325,34 +325,34 @@ tests.push(
 		class C1 extends Component {
 			constructor(dataObject, options) {
 				super(dataObject, options)
-				this.fooEl = el.div().appendTo(this.flatEl)
-				this.bindTextEl('foo', this.fooEl)
-				this.burfEl = el.div().appendTo(this.flatEl)
-				this.bindTextEl('burf', this.burfEl, value => {
+				this.fooDOM = dom.div().appendTo(this.flatDOM)
+				this.bindTextDOM('foo', this.fooDOM)
+				this.burfDOM = dom.div().appendTo(this.flatDOM)
+				this.bindTextDOM('burf', this.burfDOM, value => {
 					return (value ? value : 'nothing') + ' and more!'
 				})
-				this.bindAttributeEl('blart', this.flatEl, 'bluez')
+				this.bindAttributeDOM('blart', this.flatDOM, 'bluez')
 			}
 		}
 
 		let model1 = new DataModel({ foo: 'bar', blart: 'binz' })
 		let c2 = new C1(model1, { bibim: 'bap' })
-		test.assertEqual(c2.fooEl.innerHTML, 'bar')
-		test.assertEqual(c2.burfEl.innerHTML, 'nothing and more!')
-		test.assertEqual(c2.flatEl.getAttribute('bluez'), 'binz')
+		test.assertEqual(c2.fooDOM.innerHTML, 'bar')
+		test.assertEqual(c2.burfDOM.innerHTML, 'nothing and more!')
+		test.assertEqual(c2.flatDOM.getAttribute('bluez'), 'binz')
 
 		model1.set('foo', 'biz')
-		test.assertEqual(c2.fooEl.innerHTML, 'biz')
+		test.assertEqual(c2.fooDOM.innerHTML, 'biz')
 		model1.set('foo', null)
-		test.assertEqual(c2.fooEl.innerHTML, '')
+		test.assertEqual(c2.fooDOM.innerHTML, '')
 		model1.set('foo', 23)
-		test.assertEqual(c2.fooEl.innerHTML, '23')
+		test.assertEqual(c2.fooDOM.innerHTML, '23')
 
 		model1.set('burf', 'sugar')
-		test.assertEqual(c2.burfEl.innerHTML, 'sugar and more!')
+		test.assertEqual(c2.burfDOM.innerHTML, 'sugar and more!')
 
 		model1.set('blart', 'floop')
-		test.assertEqual(c2.flatEl.getAttribute('bluez'), 'floop')
+		test.assertEqual(c2.flatDOM.getAttribute('bluez'), 'floop')
 		c2.cleanup()
 	})
 )

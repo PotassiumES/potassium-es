@@ -1,5 +1,5 @@
-import el from './El.js'
-import graph from './Graph.js'
+import dom from './DOM.js'
+import som from './SOM.js'
 import EventHandler from './EventHandler.js'
 import AudioManager from './AudioManager.js'
 
@@ -38,14 +38,14 @@ const Component = class extends EventHandler {
 	/**
 	@param {DataObject} [dataObject]
 	@param {Object} [options]
-	@param {Element} [options.flatEl]
-	@param {Element} [options.portalEl]
-	@param {THREE.Object3D} [options.portalGraph]
-	@param {THREE.Object3D} [options.immersiveGraph]
-	@param {boolean} [options.usesFlat=true] - if set to false the flatEl will be hidden
-	@param {boolean} [options.usesPortalOverlay=true] - if set to false the portalEl will be hidden
-	@param {boolean} [options.usesPortalSpatial=true] - if set to false the portalGraph will be hidden
-	@param {boolean} [options.usesImmersive=true] - if set to false the immersiveGraph is hidden
+	@param {HTMLElement} [options.flatDOM]
+	@param {HTMLElement} [options.portalDOM]
+	@param {THREE.Object3D} [options.portalSOM]
+	@param {THREE.Object3D} [options.immersiveSOM]
+	@param {boolean} [options.usesFlat=true] - if set to false the flatDOM will be hidden
+	@param {boolean} [options.usesPortalOverlay=true] - if set to false the portalDOM will be hidden
+	@param {boolean} [options.usesPortalSpatial=true] - if set to false the portalSOM will be hidden
+	@param {boolean} [options.usesImmersive=true] - if set to false the immersiveSOM is hidden
 	@param {string} [options.activationAnchor=null] if defined, activating this Component will change the document.href.location to this URL
 	*/
 	constructor(dataObject = null, options = {}) {
@@ -54,16 +54,16 @@ const Component = class extends EventHandler {
 		this.options = Object.assign(
 			{
 				usesFlat: true,
-				flatEl: null,
+				flatDOM: null,
 
 				usesPortalOverlay: true,
-				portalEl: null,
+				portalDOM: null,
 
 				usesPortalSpatial: true,
-				portalGraph: null,
+				portalSOM: null,
 
 				usesImmersive: true,
-				immersiveGraph: null,
+				immersiveSOM: null,
 
 				activationAnchor: null
 			},
@@ -80,61 +80,61 @@ const Component = class extends EventHandler {
 		// Set up the DOM hierarchies and Three.js scene graphs for the three display modes:
 
 		// Flat display mode elements for page controls
-		this._flatEl = this.options.flatEl || el.div()
-		this._flatEl.component = this
-		this._flatEl.addClass(
+		this._flatDOM = this.options.flatDOM || dom.div()
+		this._flatDOM.component = this
+		this._flatDOM.addClass(
 			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
 			'flat-el'
 		)
 		if (this.options.usesFlat === false) {
-			this._flatEl.addClass('hidden')
+			this._flatDOM.addClass('hidden')
 		}
 
 		// Portal display mode elements for overlay controls
-		this._portalEl = this.options.portalEl || el.div()
-		this._portalEl.component = this
-		this._portalEl.addClass(
+		this._portalDOM = this.options.portalDOM || dom.div()
+		this._portalDOM.component = this
+		this._portalDOM.addClass(
 			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
 			'portal-el'
 		)
 		if (this.options.usesPortalOverlay === false) {
-			this._portalEl.addClass('hidden')
+			this._portalDOM.addClass('hidden')
 		}
 
 		// Portal display mode 3D graph for spatial controls
-		this._portalGraph = this.options.portalGraph || graph.group()
-		this._portalGraph.component = this
-		this._portalGraph.addClass(
-			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
-			'portal-graph'
+		this._portalSOM = this.options.portalSOM || som.group()
+		this._portalSOM.component = this
+		this._portalSOM.addClass(
+			'som', // som (Spatial Object Model) is set on both portal-dom and immersive-som
+			'portal-som'
 		)
 		if (this.options.usesPortalSpatial === false) {
-			this._portalGraph.visible = false
+			this._portalSOM.visible = false
 		}
 
 		// Immersive display mode 3D graph for spatial controls
-		this._immersiveGraph = this.options.immersiveGraph || graph.group()
-		this._immersiveGraph.component = this
-		this._immersiveGraph.addClass(
-			'som', // som (Spatial Object Model) is set on both portal-graph and immersive-graph
-			'immersive-graph'
+		this._immersiveSOM = this.options.immersiveSOM || som.group()
+		this._immersiveSOM.component = this
+		this._immersiveSOM.addClass(
+			'som', // som (Spatial Object Model) is set on both portal-som and immersive-som
+			'immersive-som'
 		)
 		if (this.options.usesImmersive === false) {
-			this._immersiveGraph.visible = false
+			this._immersiveSOM.visible = false
 		}
 
 		// All Components are selectable by the 'component' class
 		this.addClass('component')
 
 		this.boundCallbacks = [] // { callback, dataObject } to be unbound during cleanup
-		this.domEventCallbacks = [] // { callback, eventName, targetEl } to be unregistered during cleanup
+		this.domEventCallbacks = [] // { callback, eventName, targetDOM } to be unregistered during cleanup
 
 		this._updateClasses()
 
-		this.listenToEl('focus', this._flatEl, this.focus)
-		this.listenToEl('blur', this._flatEl, this.blur)
-		this.listenToEl('focus', this._portalEl, this.focus)
-		this.listenToEl('blur', this._portalEl, this.blur)
+		this.listenToDOM('focus', this._flatDOM, this.focus)
+		this.listenToDOM('blur', this._flatDOM, this.blur)
+		this.listenToDOM('focus', this._portalDOM, this.focus)
+		this.listenToDOM('blur', this._portalDOM, this.blur)
 	}
 
 	cleanup() {
@@ -145,7 +145,7 @@ const Component = class extends EventHandler {
 			bindInfo.dataObject.removeListener(bindInfo.callback)
 		}
 		for (const domInfo of this.domEventCallbacks) {
-			domInfo.targetEl.removeEventListener(domInfo.eventName, domInfo.callback)
+			domInfo.targetDOM.removeEventListener(domInfo.eventName, domInfo.callback)
 		}
 	}
 
@@ -180,21 +180,21 @@ const Component = class extends EventHandler {
 		}
 	}
 
-	/** @type {Element} */
-	get flatEl() {
-		return this._flatEl
+	/** @type {HTMLElement} */
+	get flatDOM() {
+		return this._flatDOM
 	}
-	/** @type {Element} */
-	get portalEl() {
-		return this._portalEl
-	}
-	/** @type {THREE.Object3D} */
-	get portalGraph() {
-		return this._portalGraph
+	/** @type {HTMLElement} */
+	get portalDOM() {
+		return this._portalDOM
 	}
 	/** @type {THREE.Object3D} */
-	get immersiveGraph() {
-		return this._immersiveGraph
+	get portalSOM() {
+		return this._portalSOM
+	}
+	/** @type {THREE.Object3D} */
+	get immersiveSOM() {
+		return this._immersiveSOM
 	}
 
 	// helper methods to eliminate boilerplate when testing various mode usages
@@ -261,25 +261,25 @@ const Component = class extends EventHandler {
 	}
 
 	/**
-	appendComponent adds the childComponent's flatEl, portalEl, portalGraph, and immersiveGraph to this Component's equivalent attributes.
+	appendComponent adds the childComponent's flatDOM, portalDOM, portalSOM, and immersiveSOM to this Component's equivalent attributes.
 	@param {Component} childComponent
 	*/
 	appendComponent(childComponent) {
-		if (this.options.usesFlat) this._flatEl.appendChild(childComponent.flatEl)
-		if (this.options.usesPortalOverlay) this._portalEl.appendChild(childComponent.portalEl)
-		if (this.options.usesPortalSpatial) this._portalGraph.add(childComponent.portalGraph)
-		if (this.options.usesImmersive) this._immersiveGraph.add(childComponent.immersiveGraph)
+		if (this.options.usesFlat) this._flatDOM.appendChild(childComponent.flatDOM)
+		if (this.options.usesPortalOverlay) this._portalDOM.appendChild(childComponent.portalDOM)
+		if (this.options.usesPortalSpatial) this._portalSOM.add(childComponent.portalSOM)
+		if (this.options.usesImmersive) this._immersiveSOM.add(childComponent.immersiveSOM)
 		return this
 	}
 	/**
-	removeComponent removes the childComponent's flatEl, portalEl, portalGraph, and immersiveGraph from this Component's equivalent attributes.
+	removeComponent removes the childComponent's flatDOM, portalDOM, portalSOM, and immersiveSOM from this Component's equivalent attributes.
 	@param {Component} childComponent
 	*/
 	removeComponent(childComponent) {
-		if (this.options.usesFlat) this._flatEl.removeChild(childComponent.flatEl)
-		if (this.options.usesPortalOverlay) this._portalEl.removeChild(childComponent.portalEl)
-		if (this.options.usesPortalSpatial) this._portalGraph.remove(childComponent.portalGraph)
-		if (this.options.usesImmersive) this._immersiveGraph.remove(childComponent.immersiveGraph)
+		if (this.options.usesFlat) this._flatDOM.removeChild(childComponent.flatDOM)
+		if (this.options.usesPortalOverlay) this._portalDOM.removeChild(childComponent.portalDOM)
+		if (this.options.usesPortalSpatial) this._portalSOM.remove(childComponent.portalSOM)
+		if (this.options.usesImmersive) this._immersiveSOM.remove(childComponent.immersiveSOM)
 		return this
 	}
 
@@ -294,13 +294,13 @@ const Component = class extends EventHandler {
 	}
 
 	/**
-	Sets the name attribute on portal and immersive graphs as well as the data-name attribute on flatEl and portalEl
+	Sets the name attribute on portal and immersive graphs as well as the data-name attribute on flatDOM and portalDOM
 	*/
 	setName(name) {
-		this._flatEl.setAttribute('data-name', name)
-		this._portalEl.setAttribute('data-name', name)
-		this._portalGraph.name = name
-		this._immersiveGraph.name = name
+		this._flatDOM.setAttribute('data-name', name)
+		this._portalDOM.setAttribute('data-name', name)
+		this._portalSOM.name = name
+		this._immersiveSOM.name = name
 	}
 
 	/**
@@ -309,10 +309,10 @@ const Component = class extends EventHandler {
 	*/
 	addClass(...classNames) {
 		classNames.forEach(className => {
-			this._flatEl.addClass(className)
-			this._portalEl.addClass(className)
-			this._portalGraph.addClass(className)
-			this._immersiveGraph.addClass(className)
+			this._flatDOM.addClass(className)
+			this._portalDOM.addClass(className)
+			this._portalSOM.addClass(className)
+			this._immersiveSOM.addClass(className)
 		})
 	}
 
@@ -322,67 +322,67 @@ const Component = class extends EventHandler {
 	*/
 	removeClass(...classNames) {
 		classNames.forEach(className => {
-			this._flatEl.removeClass(className)
-			this._portalEl.removeClass(className)
-			this._portalGraph.removeClass(className)
-			this._immersiveGraph.removeClass(className)
+			this._flatDOM.removeClass(className)
+			this._portalDOM.removeClass(className)
+			this._portalSOM.removeClass(className)
+			this._immersiveSOM.removeClass(className)
 		})
 	}
 
 	/**
-	hides the flatEl, portalEl, portalGraph, and immersiveGraph if their `uses*` option was true
+	hides the flatDOM, portalDOM, portalSOM, and immersiveSOM if their `uses*` option was true
 	*/
 	hide() {
-		if (this.options.usesFlat) this.flatEl.addClass('hidden')
-		if (this.options.usesPortalOverlay) this.portalEl.addClass('hidden')
-		if (this.options.usesPortalSpatial) this.portalGraph.visible = false
-		if (this.options.usesImmersive) this.immersiveGraph.visible = false
+		if (this.options.usesFlat) this.flatDOM.addClass('hidden')
+		if (this.options.usesPortalOverlay) this.portalDOM.addClass('hidden')
+		if (this.options.usesPortalSpatial) this.portalSOM.visible = false
+		if (this.options.usesImmersive) this.immersiveSOM.visible = false
 	}
 
 	/**
-	shows the flatEl, portalEl, portalGraph, and immersiveGraph if their `uses*` option was true
+	shows the flatDOM, portalDOM, portalSOM, and immersiveSOM if their `uses*` option was true
 	*/
 	show() {
-		if (this.options.usesFlat) this.flatEl.removeClass('hidden')
-		if (this.options.usesPortalOverlay) this.portalEl.removeClass('hidden')
-		if (this.options.usesPortalSpatial) this.portalGraph.visible = true
-		if (this.options.usesImmersive) this.immersiveGraph.visible = true
+		if (this.options.usesFlat) this.flatDOM.removeClass('hidden')
+		if (this.options.usesPortalOverlay) this.portalDOM.removeClass('hidden')
+		if (this.options.usesPortalSpatial) this.portalSOM.visible = true
+		if (this.options.usesImmersive) this.immersiveSOM.visible = true
 	}
 
 	/**
 	Listen to a DOM event.
 	For example:
-		this.buttonEl = el.button()
-		this.listenToEl('click', this.buttonEl, this.handleClick)
+		this.buttonDOM = dom.button()
+		this.listenToDOM('click', this.buttonDOM, this.handleClick)
 
 	@param {string} eventName
-	@param {Element} targetEl
+	@param {HTMLElement} targetDOM
 	@param {function} callback
 	@param {function} context
 	*/
-	listenToEl(eventName, targetEl, callback, context = this) {
+	listenToDOM(eventName, targetDOM, callback, context = this) {
 		const boundCallback = context === null ? callback : callback.bind(context)
 		const info = {
 			eventName: eventName,
-			targetEl: targetEl,
+			targetDOM: targetDOM,
 			originalCallback: callback,
 			context: context,
 			callback: boundCallback
 		}
-		targetEl.addEventListener(eventName, info.callback)
+		targetDOM.addEventListener(eventName, info.callback)
 		this.domEventCallbacks.push(info)
 	}
 	/**
-	Set the targetElement.innerText to the value of dataObject.get(fieldName) as it changes
+	Set the targetDOM.innerText to the value of dataObject.get(fieldName) as it changes
 	dataObject defaults to this.dataObject but can be any DataModel or DataCollection
 	formatter defaults to the identity function but can be any function that accepts the value and returns a string
 
 	@param {string} fieldName
-	@param {Element} targetElement
+	@param {HTMLElement} targetDOM
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindTextEl(fieldName, targetElement, formatter = null, dataModel = this.dataObject) {
+	bindTextDOM(fieldName, targetDOM, formatter = null, dataModel = this.dataObject) {
 		if (formatter === null) {
 			formatter = value => {
 				if (value === null) return ''
@@ -392,7 +392,7 @@ const Component = class extends EventHandler {
 		}
 		const callback = () => {
 			const result = formatter(dataModel.get(fieldName))
-			targetElement.innerText = typeof result === 'string' ? result : ''
+			targetDOM.innerText = typeof result === 'string' ? result : ''
 		}
 		dataModel.addListener(callback, `changed:${fieldName}`)
 		callback()
@@ -402,16 +402,16 @@ const Component = class extends EventHandler {
 		})
 	}
 	/*
-	Set the attributeName attribute of targetElement to the value of dataModel.get(fieldName) as it changes
+	Set the attributeName attribute of targetDOM to the value of dataModel.get(fieldName) as it changes
 	formatter defaults to the identity function but can be any function that accepts the value and returns a string
 
 	@param {string} fieldName
-	@param {Element} targetElement
+	@param {HTMLElement} targetDOM
 	@param {string} attributeName
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindAttributeEl(fieldName, targetElement, attributeName, formatter = null, dataModel = this.dataObject) {
+	bindAttributeDOM(fieldName, targetDOM, attributeName, formatter = null, dataModel = this.dataObject) {
 		if (formatter === null) {
 			formatter = value => {
 				if (value === null) return ''
@@ -420,7 +420,7 @@ const Component = class extends EventHandler {
 			}
 		}
 		const callback = () => {
-			targetElement.setAttribute(attributeName, formatter(dataModel.get(fieldName)))
+			targetDOM.setAttribute(attributeName, formatter(dataModel.get(fieldName)))
 		}
 		dataModel.addListener(callback, `changed:${fieldName}`)
 		callback()

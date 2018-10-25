@@ -97,13 +97,13 @@
 		<script type="module">
 			import {tests, Runner, Renderer} from './tests.js'
 
-			let resultsEl = document.getElementById('results')
+			let resultsDOM = document.getElementById('results')
 			let resultsRenderer = null
 
 			function init(){
 				const runner = new Runner()
 				resultsRenderer = new Renderer(runner)
-				resultsEl.appendChild(resultsRenderer.el)
+				resultsDOM.appendChild(resultsRenderer.el)
 				runner.run(tests).catch(err => {
 					console.error('Error', err)
 				})
