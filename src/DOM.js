@@ -81,30 +81,30 @@ dom.domElementFunction = function(tagName, ...params) {
 	}
 
 	// Convenience functions to add and remove classes from this element without duplication
-	element.addClass = function(className) {
+	element.addClass = function(...classNames) {
 		const classAttribute = this.getAttribute('class') || ''
-		const classes = classAttribute.split(/\s+/)
-		if (classes.indexOf(className) != -1) {
-			// Already has that class
-			return this
+		const classes = classAttribute === '' ? [] : classAttribute.split(/\s+/)
+		for(const className of classNames){
+			if (classes.indexOf(className) === -1) {
+				classes.push(className)
+			}
 		}
-		this.setAttribute('class', (classAttribute + ' ' + className).trim())
+		this.setAttribute('class', classes.join(' '))
 		return this
 	}
-	element.removeClass = function(className) {
-		let classAttribute = this.getAttribute('class') || ''
-		const classes = classAttribute.split(/\s+/)
-		const index = classes.indexOf(className)
-		if (index == -1) {
-			// Already does not have that class
-			return this
+	element.removeClass = function(...classNames) {
+		const classAttribute = this.getAttribute('class') || ''
+		const classes = classAttribute === '' ? [] : classAttribute.split(/\s+/)
+		for(const className of classNames){
+			const index = classes.indexOf(className)
+			if (index !== -1) {
+				classes.splice(index, 1)
+			}
 		}
-		classes.splice(index, 1)
-		classAttribute = classes.join(' ').trim()
-		if (classAttribute.length == 0) {
+		if (classes.length === 0) {
 			this.removeAttribute('class')
 		} else {
-			this.setAttribute('class', classes.join(' ').trim())
+			this.setAttribute('class', classes.join(' '))
 		}
 		return this
 	}

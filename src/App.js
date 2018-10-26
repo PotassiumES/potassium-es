@@ -177,7 +177,7 @@ const App = class extends EventHandler {
 
 		/**
 		The root DOM elmenent that will contain everything for every display mode
-		Add this to your app's DOM
+		Add this to your page's DOM
 		*/
 		this._dom = dom.div({ class: 'app' })
 
@@ -202,11 +202,11 @@ const App = class extends EventHandler {
 		this._portalScene.addClass('portal-scene')
 		this._portalScene.name = 'PortalScene'
 		this._portalEngine = new Engine(this._portalScene, Engine.PORTAL, this._handlePortalTick)
-		this._portalEngine.addListener(Engine.STOPPED, (eventName, engine) => {
+		this._portalEngine.addListener((eventName, engine) => {
 			if (this._displayMode === App.PORTAL) {
 				this.setDisplayMode(App.FLAT)
 			}
-		})
+		}, Engine.STOPPED)
 
 		/** Immersive display mode 3D scene */
 		this._immersiveScene = som.scene()
@@ -228,11 +228,14 @@ const App = class extends EventHandler {
 				console.error('Error setting engine displays', err)
 			})
 
-		/* _flatDisplay is populated if you you call App.toggleFlatDisplay(true)*/
+		/*
+		_flatDisplay is populated if you you call App.toggleFlatDisplay(...)
+		@type {Engine.SceneDisplay}
+		*/
 		this._flatDisplay = null
-		this._debugScene = null
-		this._flatCamera = null
-		this._flatClock = null
+		this._debugScene = null // either _portalScene or _immersiveScene
+		this._flatCamera = null // a THREE.Camera
+		this._flatClock = null  // a THREE.Clock
 		/* _flatTransformation is used to transform the camera during dev based on input triggered actions */
 		this._flatTransformation = null
 
@@ -253,6 +256,7 @@ const App = class extends EventHandler {
 		this._rightPointer.name = 'RightPointer'
 		this._rightPointer.visible = false
 		this._rightHand.add(this._rightPointer)
+
 		/* Set up the virtual keyboard */
 		this._immersiveScene.add(this._virtualKeyboardInputSource.keyboardGroup)
 
@@ -279,35 +283,35 @@ const App = class extends EventHandler {
 		window.addEventListener("message", this._handleWindowMessage)
 	}
 
-	/** @value {Router} */
+	/** @type {Router} */
 	get router() {
 		return this._router
 	}
-	/** @value {AssetLoader} */
+	/** @type {AssetLoader} */
 	get assetLoader() {
 		return this._assetLoader
 	}
-	/** @value {HTMLElement} */
+	/** @type {HTMLElement} */
 	get dom() {
 		return this._dom
 	}
-	/** @value {HTMLElement} */
+	/** @type {HTMLElement} */
 	get flatDOM() {
 		return this._flatDOM
 	}
-	/** @value {HTMLElement} */
+	/** @type {HTMLElement} */
 	get portalDOM() {
 		return this._portalDOM
 	}
-	/** @value {THREE.Group} */
+	/** @type {THREE.Group} */
 	get portalScene() {
 		return this._portalScene
 	}
-	/** @value {THREE.Group} */
+	/** @type {THREE.Group} */
 	get immersiveScene() {
 		return this._immersiveScene
 	}
-	/** @value {ActionManager} */
+	/** @type {ActionManager} */
 	get actionManager() {
 		return this._actionManager
 	}
@@ -333,7 +337,7 @@ const App = class extends EventHandler {
 		this._immersiveScene.remove(childComponent.immersiveSOM)
 	}
 
-	/** @value {string} flat|portal|immersive */
+	/** @type {string} flat|portal|immersive */
 	get displayMode() {
 		return this._displayMode
 	}
@@ -414,17 +418,19 @@ const App = class extends EventHandler {
 				document.body.removeChild(this._flatDisplay.dom)
 				this._flatDisplay.stop()
 			}
+			this._dom.removeClass('flat-mode', 'immersive-mode', 'portal-mode').addClass(immersive ? 'immersive-mode' : 'portal-mode')
 			this._debugScene = immersive ? this._immersiveScene : this._portalScene
 			this._flatCamera = som.perspectiveCamera([45, 1, 0.5, 10000])
 			this._flatClock = new THREE.Clock(false)
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
 			this._flatDisplay = new FlatDisplay(this._flatCamera, this._debugScene, this._handleFlatDisplayTick)
-			document.body.appendChild(this._flatDisplay.dom)
+			document.body.prepend(this._flatDisplay.dom)
 			this._flatDisplay.start()
 			this._actionManager.activateActionMaps('flat-dev')
 		} else {
 			if (this._flatDisplay === null) return
+			this._dom.removeClass('immersive-mode', 'portal-mode').addClass('flat-mode')
 			document.body.removeChild(this._flatDisplay.dom)
 			this._flatDisplay.stop()
 			this._flatDisplay = null
