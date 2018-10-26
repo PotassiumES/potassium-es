@@ -27,6 +27,11 @@ class Declaration {
 		this._important = rawDeclaration.important === true
 	}
 
+	/** @return {string} */
+	get raw(){
+		return `${this.property}: ${this.value};`
+	}
+
 	get property() {
 		return this._property
 	}

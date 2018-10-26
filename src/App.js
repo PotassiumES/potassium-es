@@ -44,6 +44,7 @@ const App = class extends EventHandler {
 		this._handlePortalTick = this._handlePortalTick.bind(this)
 		this._handleImmersiveTick = this._handleImmersiveTick.bind(this)
 		this._handleFlatDisplayTick = this._handleFlatDisplayTick.bind(this)
+		this._handleWindowMessage = this._handleWindowMessage.bind(this)
 
 		this._stylist = new Stylist()
 		this._stylist.addListener((eventName, stylist) => {
@@ -273,6 +274,9 @@ const App = class extends EventHandler {
 
 		this._updateClasses()
 		window.requestAnimationFrame(this._handleWindowAnimationFrame)
+
+		// Listen for messages from the potassium-inspector WebExtension
+		window.addEventListener("message", this._handleWindowMessage)
 	}
 
 	/** @value {Router} */
@@ -423,6 +427,27 @@ const App = class extends EventHandler {
 		}
 	}
 
+	/**
+	The potassium-inspector sends messages using window.postMessage this method watches for them
+	*/
+	_handleWindowMessage(event){
+		switch(event.data.action){
+			case App.GetKSSAction:
+				window.postMessage({
+					action: App.PutKSSAction,
+					kss: this._stylist.stylesheets[0] ? this._stylist.stylesheets[0].raw : ''
+				}, '*')
+				break
+			case App.GetStyleTreeAction:
+				const styleTree = event.data.scene === 'portal' ? this._portalScene.getStyleTree() : this._immersiveScene.getStyleTree()
+				window.postMessage({
+					tree: styleTree,
+					action: App.PutStyleTreeAction
+				}, '*')
+				break
+		}
+	}
+
 	/** Called while showing the debug flat display */
 	_handleFlatDisplayTick() {
 		if (this._flatCamera === null || this._flatTransformation === null) return
@@ -550,6 +575,12 @@ const App = class extends EventHandler {
 		this._dom.addClass(this._displayMode + '-mode')
 	}
 }
+
+/** Actions for messages between the page and the potassium-inspector WebExtension */ 
+App.GetKSSAction = 'getKSS'
+App.PutKSSAction = 'putKSS'
+App.GetStyleTreeAction = 'getStyleTree'
+App.PutStyleTreeAction = 'putStyleTree'
 
 App.DefaultLeftHandPosition = [-0.1, -0.4, -0.2]
 App.DefaultRightHandPosition = [0.1, -0.4, -0.2]
