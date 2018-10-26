@@ -29,6 +29,18 @@ class SelectorFragmentList {
 		return this._specificity
 	}
 
+	*[Symbol.iterator]() {
+		const forwardFragments = this._reversedFragments.slice(0, this._reversedFragments.length)
+		forwardFragments.reverse()
+		for (const frag of forwardFragments) {
+			yield frag
+		}
+	}
+
+	get raw(){
+		return Array.from(this).filter(frag => frag.type !== Combinator.DESCENDANT).map(frag => frag.raw).join(' ')
+	}
+
 	/**
 	Go through the list of selectors and combinators and check whether this node matches
 	@param {THREE.Object3D} node
@@ -530,7 +542,7 @@ class Combinator extends SelectorFragment {
 	}
 
 	get raw() {
-		return this.raw
+		return this._raw
 	}
 	get type() {
 		return this._type

@@ -34,6 +34,17 @@ class Stylesheet {
 		return this._data
 	}
 
+	get raw(){
+		return this._data.rules.map(rule => this.rawRule(rule)).join('\n\n')
+	}
+
+	/**
+	Log to console a human readable dump of this stylesheet
+	*/
+	prettyPrint(){
+		this._data.rules.forEach(rule => console.log(this.rawRule(rule)))
+	}
+
 	updateLocalStyles(node, traverseChildren = true) {
 		// Get a list of this node and all descendents
 		const nodes = []
@@ -80,6 +91,13 @@ class Stylesheet {
 	_parseDeclarations(rawDeclarations) {
 		const declarations = rawDeclarations.map(rawDeclaration => new Declaration(rawDeclaration))
 		return new DeclarationList(declarations)
+	}
+
+	/** @return {string} the raw KSS for a rule */
+	rawRule(rule){
+		const selector = Array.from(rule.selectors).map(selector => selector.raw).join(',\n')
+		const declarations = Array.from(rule.declarations).map(declaration => `\t${declaration.raw}`).join('\n')
+		return `${selector} \{\n${declarations}\n\}`
 	}
 }
 

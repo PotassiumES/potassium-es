@@ -109,28 +109,31 @@ logs to the console the computed styles for a node and its descendents
 @param {bool} [localsOnly=false] if true, show the local instead of the computed styles
 */
 THREE.Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
+	this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).forEach(line => console.log(line))
+}
+
+THREE.Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, showVars = false, localsOnly = false){
+	return this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).join('\n')
+}
+
+THREE.Object3D.prototype._getStyleTreeLines = function(node = this, results = [], tabDepth = 0, showVars = false, localsOnly = false){
 	const tabs = _generateTabs(tabDepth)
-	console.log(
-		tabs + '>',
-		(node.name || 'unnamed') + ':',
-		node
-			.getClasses()
-			.map(clazz => `.${clazz}`)
-			.join(''),
-		node.layoutIsDirty ? '\tdirty' : ''
-	)
+	results.push(tabs + '> ' + (node.name || 'unnamed') + ': ' + node.getClasses().map(clazz => `.${clazz}`).join('') + (node.layoutIsDirty ? '\tdirty' : ''))
 	if (localsOnly) {
 		for (const styleInfo of node.localStyles) {
 			if (showVars === false && styleInfo.property.startsWith('--')) continue
-			console.log(tabs + '\t' + styleInfo.property + ':', styleInfo.value, styleInfo.important ? '!important' : '')
+			reults.push(tabs + '\t' + styleInfo.property + ': ' + styleInfo.value + (styleInfo.important ? ' !important' : ''))
 		}
 	} else {
 		for (const styleInfo of node.computedStyles) {
 			if (showVars === false && styleInfo.property.startsWith('--')) continue
-			console.log(tabs + '\t' + styleInfo.property + ':', styleInfo.value, styleInfo.important ? '!important' : '')
+			results.push(tabs + '\t' + styleInfo.property + ': ' + styleInfo.value + (styleInfo.important ? ' !important' : ''))
 		}
 	}
-	for (const child of node.children) this.logStyles(child, tabDepth + 1, showVars, localsOnly)
+	for (const child of node.children){
+		this._getStyleTreeLines(child, results, tabDepth + 1, showVars, localsOnly)
+	}
+	return results
 }
 
 const _generateTabs = function(depth) {
