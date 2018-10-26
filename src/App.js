@@ -405,7 +405,15 @@ const App = class extends EventHandler {
 			show = this._flatDisplay === null ? true : false
 		}
 		if (show) {
-			if (this._flatDisplay !== null) return
+			if (this._flatDisplay !== null){
+				if(immersive){
+					if(this._debugScene === this._immersiveScene) return
+				} else {
+					if(this._debugScene === this._portalScene) return
+				}
+				document.body.removeChild(this._flatDisplay.dom)
+				this._flatDisplay.stop()
+			}
 			this._debugScene = immersive ? this._immersiveScene : this._portalScene
 			this._flatCamera = som.perspectiveCamera([45, 1, 0.5, 10000])
 			this._flatClock = new THREE.Clock(false)
@@ -433,9 +441,10 @@ const App = class extends EventHandler {
 	_handleWindowMessage(event){
 		switch(event.data.action){
 			case App.GetKSSAction:
+				const rawKSS = this._stylist.stylesheets[0] ? this._stylist.stylesheets[0].raw : ''
 				window.postMessage({
 					action: App.PutKSSAction,
-					kss: this._stylist.stylesheets[0] ? this._stylist.stylesheets[0].raw : ''
+					kss: rawKSS
 				}, '*')
 				break
 			case App.GetStyleTreeAction:
@@ -444,6 +453,12 @@ const App = class extends EventHandler {
 					tree: styleTree,
 					action: App.PutStyleTreeAction
 				}, '*')
+				break
+			case App.ShowFlatDisplayAction:
+				app.toggleFlatDisplay(true, event.data.display !== 'portal')
+				break
+			case App.HideFlatDisplayAction:
+				app.toggleFlatDisplay(false)
 				break
 		}
 	}
@@ -581,6 +596,8 @@ App.GetKSSAction = 'getKSS'
 App.PutKSSAction = 'putKSS'
 App.GetStyleTreeAction = 'getStyleTree'
 App.PutStyleTreeAction = 'putStyleTree'
+App.ShowFlatDisplayAction = 'showFlatDisplay'
+App.HideFlatDisplayAction = 'hideFlatDisplay'
 
 App.DefaultLeftHandPosition = [-0.1, -0.4, -0.2]
 App.DefaultRightHandPosition = [0.1, -0.4, -0.2]
