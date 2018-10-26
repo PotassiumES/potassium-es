@@ -86,7 +86,7 @@ const Component = class extends EventHandler {
 			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
 			'flat-el'
 		)
-		if (this.options.usesFlat === false) {
+		if (this.usesFlat === false) {
 			this._flatDOM.addClass('hidden')
 		}
 
