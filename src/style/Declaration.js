@@ -28,7 +28,7 @@ class Declaration {
 	}
 
 	/** @return {string} */
-	get raw(){
+	get raw() {
 		return `${this.property}: ${this.value};`
 	}
 

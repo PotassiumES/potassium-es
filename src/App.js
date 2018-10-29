@@ -235,7 +235,7 @@ const App = class extends EventHandler {
 		this._flatDisplay = null
 		this._debugScene = null // either _portalScene or _immersiveScene
 		this._flatCamera = null // a THREE.Camera
-		this._flatClock = null  // a THREE.Clock
+		this._flatClock = null // a THREE.Clock
 		/* _flatTransformation is used to transform the camera during dev based on input triggered actions */
 		this._flatTransformation = null
 
@@ -280,7 +280,7 @@ const App = class extends EventHandler {
 		window.requestAnimationFrame(this._handleWindowAnimationFrame)
 
 		// Listen for messages from the potassium-inspector WebExtension
-		window.addEventListener("message", this._handleWindowMessage)
+		window.addEventListener('message', this._handleWindowMessage)
 	}
 
 	/** @type {Router} */
@@ -409,16 +409,18 @@ const App = class extends EventHandler {
 			show = this._flatDisplay === null ? true : false
 		}
 		if (show) {
-			if (this._flatDisplay !== null){
-				if(immersive){
-					if(this._debugScene === this._immersiveScene) return
+			if (this._flatDisplay !== null) {
+				if (immersive) {
+					if (this._debugScene === this._immersiveScene) return
 				} else {
-					if(this._debugScene === this._portalScene) return
+					if (this._debugScene === this._portalScene) return
 				}
 				document.body.removeChild(this._flatDisplay.dom)
 				this._flatDisplay.stop()
 			}
-			this._dom.removeClass('flat-mode', 'immersive-mode', 'portal-mode').addClass(immersive ? 'immersive-mode' : 'portal-mode')
+			this._dom
+				.removeClass('flat-mode', 'immersive-mode', 'portal-mode')
+				.addClass(immersive ? 'immersive-mode' : 'portal-mode')
 			this._debugScene = immersive ? this._immersiveScene : this._portalScene
 			this._flatCamera = som.perspectiveCamera([45, 1, 0.5, 10000])
 			this._flatClock = new THREE.Clock(false)
@@ -444,21 +446,28 @@ const App = class extends EventHandler {
 	/**
 	The potassium-inspector sends messages using window.postMessage this method watches for them
 	*/
-	_handleWindowMessage(event){
-		switch(event.data.action){
+	_handleWindowMessage(event) {
+		switch (event.data.action) {
 			case App.GetKSSAction:
 				const rawKSS = this._stylist.stylesheets[0] ? this._stylist.stylesheets[0].raw : ''
-				window.postMessage({
-					action: App.PutKSSAction,
-					kss: rawKSS
-				}, '*')
+				window.postMessage(
+					{
+						action: App.PutKSSAction,
+						kss: rawKSS
+					},
+					'*'
+				)
 				break
 			case App.GetStyleTreeAction:
-				const styleTree = event.data.scene === 'portal' ? this._portalScene.getStyleTree() : this._immersiveScene.getStyleTree()
-				window.postMessage({
-					tree: styleTree,
-					action: App.PutStyleTreeAction
-				}, '*')
+				const styleTree =
+					event.data.scene === 'portal' ? this._portalScene.getStyleTree() : this._immersiveScene.getStyleTree()
+				window.postMessage(
+					{
+						tree: styleTree,
+						action: App.PutStyleTreeAction
+					},
+					'*'
+				)
 				break
 			case App.ShowFlatDisplayAction:
 				app.toggleFlatDisplay(true, event.data.display !== 'portal')
@@ -597,7 +606,8 @@ const App = class extends EventHandler {
 	}
 }
 
-/** Actions for messages between the page and the potassium-inspector WebExtension */ 
+/** Actions for messages between the page and the potassium-inspector WebExtension */
+
 App.GetKSSAction = 'getKSS'
 App.PutKSSAction = 'putKSS'
 App.GetStyleTreeAction = 'getStyleTree'

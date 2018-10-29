@@ -34,14 +34,14 @@ class Stylesheet {
 		return this._data
 	}
 
-	get raw(){
+	get raw() {
 		return this._data.rules.map(rule => this.rawRule(rule)).join('\n\n')
 	}
 
 	/**
 	Log to console a human readable dump of this stylesheet
 	*/
-	prettyPrint(){
+	prettyPrint() {
 		this._data.rules.forEach(rule => console.log(this.rawRule(rule)))
 	}
 
@@ -94,9 +94,13 @@ class Stylesheet {
 	}
 
 	/** @return {string} the raw KSS for a rule */
-	rawRule(rule){
-		const selector = Array.from(rule.selectors).map(selector => selector.raw).join(',\n')
-		const declarations = Array.from(rule.declarations).map(declaration => `\t${declaration.raw}`).join('\n')
+	rawRule(rule) {
+		const selector = Array.from(rule.selectors)
+			.map(selector => selector.raw)
+			.join(',\n')
+		const declarations = Array.from(rule.declarations)
+			.map(declaration => `\t${declaration.raw}`)
+			.join('\n')
 		return `${selector} \{\n${declarations}\n\}`
 	}
 }

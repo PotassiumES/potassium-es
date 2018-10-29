@@ -51,40 +51,32 @@ som.fonts = new Map() // url => THREE.Font
 
 const _shapeCurveSegments = 4
 
-function loadText(resultGroup, text, material, font, options) {
+function loadText(resultGroup, text, material, fontURL, options) {
 	text = String(text)
 	if (!text || text.trim().length === 0) return
-	if (som.fonts.has(font)) {
-		const shapes = som.fonts.get(font).generateShapes(text, options.size)
-		const textGeometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
-
-		const mesh = new THREE.Mesh(textGeometry, material)
-		mesh.name = 'TextMesh'
-		mesh.addClass('text-mesh')
-		resultGroup.add(mesh)
+	if (som.fonts.has(fontURL)) {
+		const shapes = som.fonts.get(fontURL).generateShapes(text, options.size)
+		resultGroup.geometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
+		resultGroup.needsUpdate = true
 	} else {
-		assetLoader.get(font).then(blob => {
+		assetLoader.get(fontURL).then(blob => {
 			if (!blob) {
-				console.error('Failed to fetch the font', font)
+				console.error('Failed to fetch the font', fontURL)
 				return
 			}
 			const blobURL = URL.createObjectURL(blob)
 			fontLoader.load(
 				blobURL,
 				loadedFont => {
-					som.fonts.set(font, loadedFont)
+					som.fonts.set(fontURL, loadedFont)
 					const shapes = loadedFont.generateShapes(text, options.size)
-					const textGeometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
-					textGeometry.name = 'TextGeometry'
-					const mesh = new THREE.Mesh(textGeometry, material)
-					mesh.name = 'TextMesh'
-					mesh.addClass('text-mesh')
-					resultGroup.add(mesh)
+					resultGroup.geometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
+					resultGroup.needsUpdate = true
 					URL.revokeObjectURL(blobURL)
 				},
 				() => {},
 				err => {
-					console.error('Could not load font', font, err)
+					console.error('Could not load font', fontURL, err)
 					URL.revokeObjectURL(blobURL)
 				}
 			)
@@ -95,54 +87,53 @@ function loadText(resultGroup, text, material, font, options) {
 /**
 Creates a THREE.Group that manages a chunk of text
 */
-som.text = (text = '', material = null, fontPath = null, options = {}) => {
-	const font = fontPath || '/static/potassium-es/fonts/helvetiker_regular.typeface.json'
+som.text = (text = '', options = {}) => {
 	options = Object.assign(
 		{
-			size: 0.25,
+			size: 0.12,
 			height: 0.05,
-			curveSegments: 4,
-			bevelEnabled: false
+			curveSegments: _shapeCurveSegments,
+			bevelEnabled: false,
+			material: null,
+			color: 0x444444,
+			fontURL: '/static/potassium-es/fonts/helvetiker_regular.typeface.json'
 		},
-		options || {}
+		options
 	)
+	if (options.material === null) {
+		options.material = new THREE.MeshLambertMaterial({ color: options.color })
+	}
+	const fontOptions = {
+		size: options.size,
+		height: options.height,
+		curveSegments: options.curveSegments,
+		bevelEnabled: options.bevelEnabled
+	}
 
-	let currentText = text
+	let currentText = null
 
-	material = material || new THREE.MeshLambertMaterial({ color: 0x999999 })
-
-	const resultGroup = new THREE.Group()
+	const resultGroup = new THREE.Mesh(undefined, options.material)
 	resultGroup.name = 'Text'
 	resultGroup.addClass('text')
 	resultGroup.isText = true
 
 	resultGroup.setRGB = (red, green, blue) => {
-		if (
-			!resultGroup.children[0] ||
-			!resultGroup.children[0].children[0] ||
-			!resultGroup.children[0].children[0].material
-		)
-			return
-		if (resultGroup.children[0].children[0].material.emissive) {
-			resultGroup.children[0].children[0].material.emissive.setRGB(red, green, blue)
-		} else {
-			resultGroup.children[0].children[0].material.color.setRGB(red, green, blue)
+		if (resultGroup.material.emissive) {
+			resultGroup.material.emissive.setRGB(red, green, blue)
+		} else if (resultGroup.material.color) {
+			resultGroup.material.color.setRGB(red, green, blue)
 		}
 	}
 
 	resultGroup.setFontOptions = newOptions => {
-		Object.assign(options, newOptions)
+		Object.assign(fontOptions, newOptions)
 		resultGroup.setText(currentText)
 	}
 
 	resultGroup.setText = newText => {
-		resultGroup.remove(...resultGroup.children)
-		const textGroup = new THREE.Group()
-		textGroup.name = 'SubText'
-		textGroup.addClass('sub-text')
-		resultGroup.add(textGroup)
+		if (newText === currentText) return
 		currentText = newText
-		loadText(textGroup, currentText, material, font, options)
+		loadText(resultGroup, currentText, options.material, options.fontURL, fontOptions)
 	}
 
 	resultGroup.setText(currentText)

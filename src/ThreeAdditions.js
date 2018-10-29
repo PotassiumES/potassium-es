@@ -102,6 +102,16 @@ THREE.Object3D.prototype.getObjectsBySelector = function(selector) {
 }
 
 /**
+@param {string} selector like 'node[name=ModeSwitcherComponent] .button-component > text'
+@return {Object3D?} the first node to match the selector or null if none were found
+*/
+THREE.Object3D.prototype.querySelector = function(selector) {
+	const results = THREE.Object3D.prototype.getObjectsBySelector(selector)
+	if (results.length > 0) return results[0]
+	return null
+}
+
+/**
 logs to the console the computed styles for a node and its descendents
 @param {THREE.Object3D} node
 @param {int} [tabDepth=0]
@@ -112,25 +122,45 @@ THREE.Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVar
 	this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).forEach(line => console.log(line))
 }
 
-THREE.Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, showVars = false, localsOnly = false){
+THREE.Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
 	return this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).join('\n')
 }
 
-THREE.Object3D.prototype._getStyleTreeLines = function(node = this, results = [], tabDepth = 0, showVars = false, localsOnly = false){
+THREE.Object3D.prototype._getStyleTreeLines = function(
+	node = this,
+	results = [],
+	tabDepth = 0,
+	showVars = false,
+	localsOnly = false
+) {
 	const tabs = _generateTabs(tabDepth)
-	results.push(tabs + '> ' + (node.name || 'unnamed') + ': ' + node.getClasses().map(clazz => `.${clazz}`).join('') + (node.layoutIsDirty ? '\tdirty' : ''))
+	results.push(
+		tabs +
+			'> ' +
+			(node.name || 'unnamed') +
+			': ' +
+			node
+				.getClasses()
+				.map(clazz => `.${clazz}`)
+				.join('') +
+			(node.layoutIsDirty ? '\tdirty' : '')
+	)
 	if (localsOnly) {
 		for (const styleInfo of node.localStyles) {
 			if (showVars === false && styleInfo.property.startsWith('--')) continue
-			reults.push(tabs + '\t' + styleInfo.property + ': ' + styleInfo.value + (styleInfo.important ? ' !important' : ''))
+			reults.push(
+				tabs + '\t' + styleInfo.property + ': ' + styleInfo.value + (styleInfo.important ? ' !important' : '')
+			)
 		}
 	} else {
 		for (const styleInfo of node.computedStyles) {
 			if (showVars === false && styleInfo.property.startsWith('--')) continue
-			results.push(tabs + '\t' + styleInfo.property + ': ' + styleInfo.value + (styleInfo.important ? ' !important' : ''))
+			results.push(
+				tabs + '\t' + styleInfo.property + ': ' + styleInfo.value + (styleInfo.important ? ' !important' : '')
+			)
 		}
 	}
-	for (const child of node.children){
+	for (const child of node.children) {
 		this._getStyleTreeLines(child, results, tabDepth + 1, showVars, localsOnly)
 	}
 	return results

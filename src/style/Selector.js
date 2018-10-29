@@ -37,8 +37,11 @@ class SelectorFragmentList {
 		}
 	}
 
-	get raw(){
-		return Array.from(this).filter(frag => frag.type !== Combinator.DESCENDANT).map(frag => frag.raw).join(' ')
+	get raw() {
+		return Array.from(this)
+			.filter(frag => frag.type !== Combinator.DESCENDANT)
+			.map(frag => frag.raw)
+			.join(' ')
 	}
 
 	/**
