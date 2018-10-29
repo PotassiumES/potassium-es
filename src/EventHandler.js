@@ -71,7 +71,7 @@ const EventHandler = class {
 		return this._listeners
 	}
 
-	clearListeners() {
+	cleanup() {
 		if (typeof this._listeners !== 'undefined') {
 			this._listeners.length = 0
 		}

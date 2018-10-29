@@ -30,7 +30,7 @@ const Router = class extends EventHandler {
 		if (this.cleanedUp) return
 		this.cleanedUp = true
 		window.removeEventListener('hashchange', this.hashListener)
-		this.clearListeners()
+		super.cleanup()
 	}
 	addRoute(regex, eventName, ...parameters) {
 		this.routes.push(new Route(regex, eventName, ...parameters))

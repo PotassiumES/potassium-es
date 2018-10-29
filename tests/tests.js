@@ -326,12 +326,12 @@ tests.push(
 			constructor(dataObject, options) {
 				super(dataObject, options)
 				this.fooDOM = dom.div().appendTo(this.flatDOM)
-				this.bindTextDOM('foo', this.fooDOM)
+				this.bindText('foo', this.fooDOM)
 				this.burfDOM = dom.div().appendTo(this.flatDOM)
-				this.bindTextDOM('burf', this.burfDOM, value => {
+				this.bindText('burf', this.burfDOM, value => {
 					return (value ? value : 'nothing') + ' and more!'
 				})
-				this.bindAttributeDOM('blart', this.flatDOM, 'bluez')
+				this.bindAttribute('blart', this.flatDOM, 'bluez')
 			}
 		}
 

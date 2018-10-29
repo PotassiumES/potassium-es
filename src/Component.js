@@ -9,7 +9,7 @@ It supports all three display modes on the wider web: flat, portal, and immersiv
 
 Flat display mode is the original web, displayed on PC screens and handheld screens.
 
-Flat display mode controls in a Component are represented by a DOM hierarchy.
+Flat controls in a Component are represented by a DOM hierarchy.
 
 Portal display mode is for "magic window" or "aquarium" setups.
 The most common portal display is a handheld screen that looks into a real or virtual space.
@@ -71,6 +71,8 @@ const Component = class extends EventHandler {
 		)
 		this.cleanedUp = false
 
+		this._binder = new Binder(this)
+
 		this.focus = this.focus.bind(this)
 		this.blur = this.blur.bind(this)
 
@@ -126,27 +128,19 @@ const Component = class extends EventHandler {
 		// All Components are selectable by the 'component' class
 		this.addClass('component')
 
-		this.boundCallbacks = [] // { callback, dataObject } to be unbound during cleanup
-		this.domEventCallbacks = [] // { callback, eventName, targetDOM } to be unregistered during cleanup
-
 		this._updateClasses()
 
-		this.listenToDOM('focus', this._flatDOM, this.focus)
-		this.listenToDOM('blur', this._flatDOM, this.blur)
-		this.listenToDOM('focus', this._portalDOM, this.focus)
-		this.listenToDOM('blur', this._portalDOM, this.blur)
+		this.listenTo('focus', this._flatDOM, this.focus)
+		this.listenTo('blur', this._flatDOM, this.blur)
+		this.listenTo('focus', this._portalDOM, this.focus)
+		this.listenTo('blur', this._portalDOM, this.blur)
 	}
 
 	cleanup() {
 		if (this.cleanedUp) return
 		this.cleanedUp = true
-		this.clearListeners()
-		for (const bindInfo of this.boundCallbacks) {
-			bindInfo.dataObject.removeListener(bindInfo.callback)
-		}
-		for (const domInfo of this.domEventCallbacks) {
-			domInfo.targetDOM.removeEventListener(domInfo.eventName, domInfo.callback)
-		}
+		super.cleanup()
+		this._binder.cleanup()
 	}
 
 	/* 
@@ -350,84 +344,45 @@ const Component = class extends EventHandler {
 	}
 
 	/**
-	Listen to a DOM event.
+	Listen to a DOM or Component event.
 	For example:
 		this.buttonDOM = dom.button()
-		this.listenToDOM('click', this.buttonDOM, this.handleClick)
+		this.listenTo('click', this.buttonDOM, this.handleClick)
+
+		this.textComponent = new TextComponent(...)
+		this.listenTo(Component.TextInputEvent, this.textComponent, (eventName, ...params) => { ... })
 
 	@param {string} eventName
-	@param {HTMLElement} targetDOM
+	@param {HTMLElement or EventHandler} target
 	@param {function} callback
 	@param {function} context
 	*/
-	listenToDOM(eventName, targetDOM, callback, context = this) {
-		const boundCallback = context === null ? callback : callback.bind(context)
-		const info = {
-			eventName: eventName,
-			targetDOM: targetDOM,
-			originalCallback: callback,
-			context: context,
-			callback: boundCallback
-		}
-		targetDOM.addEventListener(eventName, info.callback)
-		this.domEventCallbacks.push(info)
+	listenTo(eventName, target, callback, context = null) {
+		this._binder.listenTo(eventName, target, callback, context)
 	}
-	/**
-	Set the targetDOM.innerText to the value of dataObject.get(fieldName) as it changes
-	dataObject defaults to this.dataObject but can be any DataModel or DataCollection
-	formatter defaults to the identity function but can be any function that accepts the value and returns a string
 
+	/**
 	@param {string} fieldName
-	@param {HTMLElement} targetDOM
+	@param {HTMLElement or Object3D} target
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindTextDOM(fieldName, targetDOM, formatter = null, dataModel = this.dataObject) {
-		if (formatter === null) {
-			formatter = value => {
-				if (value === null) return ''
-				if (typeof value === 'string') return value
-				return '' + value
-			}
-		}
-		const callback = () => {
-			const result = formatter(dataModel.get(fieldName))
-			targetDOM.innerText = typeof result === 'string' ? result : ''
-		}
-		dataModel.addListener(callback, `changed:${fieldName}`)
-		callback()
-		this.boundCallbacks.push({
-			callback: callback,
-			dataObject: dataModel
-		})
+	bindText(fieldName, target, formatter = null, dataModel = this.dataObject) {
+		this._binder.bindText(fieldName, target, formatter, dataModel)
 	}
+
 	/*
-	Set the attributeName attribute of targetDOM to the value of dataModel.get(fieldName) as it changes
+	Set the attributeName attribute of target DOM or SOM to the value of dataModel.get(fieldName) as it changes
 	formatter defaults to the identity function but can be any function that accepts the value and returns a string
 
 	@param {string} fieldName
-	@param {HTMLElement} targetDOM
+	@param {HTMLElement or Object3D} target
 	@param {string} attributeName
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindAttributeDOM(fieldName, targetDOM, attributeName, formatter = null, dataModel = this.dataObject) {
-		if (formatter === null) {
-			formatter = value => {
-				if (value === null) return ''
-				if (typeof value === 'string') return value
-				return '' + value
-			}
-		}
-		const callback = () => {
-			targetDOM.setAttribute(attributeName, formatter(dataModel.get(fieldName)))
-		}
-		dataModel.addListener(callback, `changed:${fieldName}`)
-		callback()
-		this.boundCallbacks.push({
-			callback: callback,
-			dataObject: dataModel
-		})
+	bindAttribute(fieldName, target, attributeName, formatter = null, dataModel = this.dataObject) {
+		this._binder.bindAttribute(fieldName, target, attributeName, formatter, dataModel)
 	}
 
 	/**
@@ -481,5 +436,123 @@ Component.ActionEvent = 'component-action-event'
 Component.TextInputEvent = 'component-text-input-event'
 Component.FocusEvent = 'component-focus-event'
 Component.BlurEvent = 'component-blur-event'
+
+/**
+Binder listens for events on and changes characteristics of an HTMLElement or Component in response.
+This is part of what makes a Component "reactive".
+*/
+const Binder = class {
+	constructor(component) {
+		this._component = component
+		this._boundCallbacks = [] // { callback, dataObject } to be unbound during cleanup
+		this._eventCallbacks = [] // { callback, eventName, target } to be unregistered during cleanup
+	}
+	cleanup() {
+		for (const bindInfo of this._boundCallbacks) {
+			bindInfo.dataObject.removeListener(bindInfo.callback)
+		}
+		for (const info of this._eventCallbacks) {
+			if (info.target.isObject3D) {
+				info.target.removeListener(info.callback, info.eventName)
+			} else {
+				info.target.removeEventListener(info.eventName, info.callback)
+			}
+		}
+	}
+
+	/**
+	Listen to a DOM or EventHandler event.
+	For example:
+		this.buttonDOM = dom.button()
+		this.listenTo('click', this.buttonDOM, this.handleClick)
+
+		this.textComponent = new TextComponent(...)
+		this.listenTo(Component.TextInputEvent, this.textComponent, (eventName, ...params) => { ... })
+
+	@param {string} eventName
+	@param {HTMLElement or EventHandler} target
+	@param {function} callback
+	@param {function} context
+	*/
+	listenTo(eventName, target, callback, context = null) {
+		const boundCallback = context === null ? callback : callback.bind(context)
+		const info = {
+			eventName: eventName,
+			target: target,
+			originalCallback: callback,
+			context: context,
+			callback: boundCallback
+		}
+		if (target instanceof EventHandler) {
+			target.addListener(info.callback, eventName)
+		} else {
+			target.addEventListener(eventName, info.callback)
+		}
+		this._eventCallbacks.push(info)
+	}
+
+	/**
+	@param {string} fieldName
+	@param {HTMLElement or Object3D} target
+	@param {function} formatter
+	@param {DataModel} dataModel
+	*/
+	bindText(fieldName, target, formatter = null, dataModel = this._component.dataObject) {
+		if (formatter === null) {
+			formatter = value => {
+				if (value === null) return ''
+				if (typeof value === 'string') return value
+				return '' + value
+			}
+		}
+		const callback = () => {
+			const result = formatter(dataModel.get(fieldName))
+			if (target.isObject3D) {
+				target.text = typeof result === 'string' ? result : ''
+			} else {
+				target.innerText = typeof result === 'string' ? result : ''
+			}
+		}
+		dataModel.addListener(callback, `changed:${fieldName}`)
+		callback()
+		this._boundCallbacks.push({
+			callback: callback,
+			dataObject: dataModel
+		})
+	}
+
+	/*
+	Set the attributeName attribute of target DOM or SOM to the value of dataModel.get(fieldName) as it changes
+	formatter defaults to the identity function but can be any function that accepts the value and returns a string
+
+	@param {string} fieldName
+	@param {HTMLElement or Object3D} target
+	@param {string} attributeName
+	@param {function} formatter
+	@param {DataModel} dataModel
+	*/
+	bindAttribute(fieldName, target, attributeName, formatter = null, dataModel = this._component.dataObject) {
+		if (formatter === null) {
+			formatter = value => {
+				if (value === null) return ''
+				if (typeof value === 'string') return value
+				return '' + value
+			}
+		}
+		const callback = () => {
+			if (target.isObject3D) {
+				target.attributes.set(attributeName, formatter(dataModel.get(fieldName)))
+			} else {
+				target.setAttribute(attributeName, formatter(dataModel.get(fieldName)))
+			}
+		}
+		dataModel.addListener(callback, `changed:${fieldName}`)
+		callback()
+		this._boundCallbacks.push({
+			callback: callback,
+			dataObject: dataModel
+		})
+	}
+}
 
 export default Component

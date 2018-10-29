@@ -17,7 +17,7 @@ const DataObject = class extends EventHandler {
 	cleanup() {
 		if (this.cleanedUp) return
 		this.cleanedUp = true
-		this.clearListeners()
+		super.cleanup()
 	}
 	/** @type {bool} true until a fetch (even a failed fetch) returns */
 	get isNew() {

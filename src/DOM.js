@@ -84,7 +84,7 @@ dom.domElementFunction = function(tagName, ...params) {
 	element.addClass = function(...classNames) {
 		const classAttribute = this.getAttribute('class') || ''
 		const classes = classAttribute === '' ? [] : classAttribute.split(/\s+/)
-		for(const className of classNames){
+		for (const className of classNames) {
 			if (classes.indexOf(className) === -1) {
 				classes.push(className)
 			}
@@ -95,7 +95,7 @@ dom.domElementFunction = function(tagName, ...params) {
 	element.removeClass = function(...classNames) {
 		const classAttribute = this.getAttribute('class') || ''
 		const classes = classAttribute === '' ? [] : classAttribute.split(/\s+/)
-		for(const className of classNames){
+		for (const className of classNames) {
 			const index = classes.indexOf(className)
 			if (index !== -1) {
 				classes.splice(index, 1)
