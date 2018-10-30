@@ -175,22 +175,6 @@ som.obj = (objPath, successCallback = null, failureCallback = null) => {
 }
 
 /**
-Load a glTF file
-@return {THREE.Group}
-*/
-som.gltf = path => {
-	const group = som.group()
-	loadGLTF(path)
-		.then(gltf => {
-			group.add(gltf.scene)
-		})
-		.catch((...params) => {
-			console.error('could not load gltf', ...params)
-		})
-	return group
-}
-
-/**
 The methods created from these info just pass through any params to the class constructor.
 For example, creating a MeshBasicMaterial will be som.meshBasicMaterial(...params).
 */
@@ -230,27 +214,6 @@ for (const somClassInfo of som.GRAPH_CLASSES) {
 	som[somClassInfo.name] = function(...params) {
 		return som.nodeFunction(innerClazz, ...params)
 	}
-}
-
-function loadGLTF(url) {
-	return new Promise((resolve, reject) => {
-		const loader = new THREE.GLTFLoader()
-		loader.load(url, gltf => {
-			if (gltf === null) {
-				reject()
-			}
-			/*
-			if(gltf.animations && gltf.animations.length){
-				let mixer = new THREE.AnimationMixer(gltf.scene)
-				for(let animation of gltf.animations){
-					mixer.clipAction(animation).play()
-				}
-			}
-			*/
-			gltf.name = 'GLTF'
-			resolve(gltf)
-		})
-	})
 }
 
 function loadObj(objPath) {
