@@ -48,7 +48,7 @@ const Component = class extends EventHandler {
 	@param {boolean} [options.usesImmersive=true] - if set to false the immersiveSOM is hidden
 	@param {string} [options.activationAnchor=null] if defined, activating this Component will change the document.href.location to this URL
 	*/
-	constructor(dataObject = null, options = {}) {
+	constructor(dataObject = null, options = {}, inheritedOptions = {}) {
 		super()
 		this.dataObject = dataObject // a DataModel or DataCollection
 		this.options = Object.assign(
@@ -67,6 +67,7 @@ const Component = class extends EventHandler {
 
 				activationAnchor: null
 			},
+			inheritedOptions,
 			options
 		)
 		this.cleanedUp = false
@@ -85,8 +86,8 @@ const Component = class extends EventHandler {
 		this._flatDOM = this.options.flatDOM || dom.div()
 		this._flatDOM.component = this
 		this._flatDOM.addClass(
-			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
-			'flat-el'
+			'dom', // dom (Document Object Model) is set on both flat and portal DOM elements
+			'flat-dom'
 		)
 		if (this.usesFlat === false) {
 			this._flatDOM.addClass('hidden')
@@ -96,8 +97,8 @@ const Component = class extends EventHandler {
 		this._portalDOM = this.options.portalDOM || dom.div()
 		this._portalDOM.component = this
 		this._portalDOM.addClass(
-			'dom', // dom (Document Object Model) is set on both flat-el and portal-el
-			'portal-el'
+			'dom', // dom (Document Object Model) is set on both flat and portal DOM elements
+			'portal-dom'
 		)
 		if (this.options.usesPortalOverlay === false) {
 			this._portalDOM.addClass('hidden')
@@ -141,6 +142,30 @@ const Component = class extends EventHandler {
 		this.cleanedUp = true
 		super.cleanup()
 		this._binder.cleanup()
+		return this
+	}
+
+	/**
+	options that should be passed into children Components like so:
+
+		this._childComponent = new Component(
+			dataObject,
+			options,
+			this.inheritedOptions
+		).appendTo(this)
+
+	The main function of the inherited options is to pass down the information of whether to use each display mode.
+	This will make your application faster by giving Components the ability to save a lot of memory and processing time when entire display modes like immersive aren't wanted.
+
+	@type {Object}
+	*/
+	get inheritedOptions() {
+		return {
+			usesFlat: this.options.usesFlat,
+			usesPortalOverlay: this.options.usesPortalOverlay,
+			usesPortalSpatial: this.options.usesPortalSpatial,
+			usesImmersive: this.options.usesImmersive
+		}
 	}
 
 	/* 
@@ -207,9 +232,13 @@ const Component = class extends EventHandler {
 	get usesImmersive() {
 		return this.options.usesImmersive
 	}
-	get usesSpatial() {
+	get usesDOM() {
+		return this.usesFlat || this.usesPortalOverlay
+	}
+	get usesSOM() {
 		return this.options.usesPortalSpatial || this.options.usesImmersive
 	}
+
 	get usesValues() {
 		return {
 			usesFlat: this.options.usesFlat,
@@ -240,6 +269,7 @@ const Component = class extends EventHandler {
 		if (this._acceptsTextInputFocus === false) return false
 		Component.TextInputFocus = this
 		this._updateClasses()
+		return this
 	}
 
 	/** Call to remove this from text input focus */
@@ -247,6 +277,7 @@ const Component = class extends EventHandler {
 		if (Component.TextInputFocus !== this) return
 		Component.TextInputFocus = null
 		this._updateClasses()
+		return this
 	}
 
 	/** @type {boolean} */
@@ -295,6 +326,7 @@ const Component = class extends EventHandler {
 		this._portalDOM.setAttribute('data-name', name)
 		this._portalSOM.name = name
 		this._immersiveSOM.name = name
+		return this
 	}
 
 	/**
@@ -308,6 +340,7 @@ const Component = class extends EventHandler {
 			this._portalSOM.addClass(className)
 			this._immersiveSOM.addClass(className)
 		})
+		return this
 	}
 
 	/**
@@ -321,6 +354,7 @@ const Component = class extends EventHandler {
 			this._portalSOM.removeClass(className)
 			this._immersiveSOM.removeClass(className)
 		})
+		return this
 	}
 
 	/**
@@ -331,6 +365,7 @@ const Component = class extends EventHandler {
 		if (this.options.usesPortalOverlay) this.portalDOM.addClass('hidden')
 		if (this.options.usesPortalSpatial) this.portalSOM.visible = false
 		if (this.options.usesImmersive) this.immersiveSOM.visible = false
+		return this
 	}
 
 	/**
@@ -341,6 +376,7 @@ const Component = class extends EventHandler {
 		if (this.options.usesPortalOverlay) this.portalDOM.removeClass('hidden')
 		if (this.options.usesPortalSpatial) this.portalSOM.visible = true
 		if (this.options.usesImmersive) this.immersiveSOM.visible = true
+		return this
 	}
 
 	/**
@@ -362,27 +398,27 @@ const Component = class extends EventHandler {
 	}
 
 	/**
-	@param {string} fieldName
+	@param {string} dataField
 	@param {HTMLElement or Object3D} target
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindText(fieldName, target, formatter = null, dataModel = this.dataObject) {
-		this._binder.bindText(fieldName, target, formatter, dataModel)
+	bindText(dataField, target, formatter = null, dataModel = this.dataObject) {
+		this._binder.bindText(dataField, target, formatter, dataModel)
 	}
 
 	/*
-	Set the attributeName attribute of target DOM or SOM to the value of dataModel.get(fieldName) as it changes
+	Set the attributeName attribute of target DOM or SOM to the value of dataModel.get(dataField) as it changes
 	formatter defaults to the identity function but can be any function that accepts the value and returns a string
 
-	@param {string} fieldName
+	@param {string} dataField
 	@param {HTMLElement or Object3D} target
 	@param {string} attributeName
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindAttribute(fieldName, target, attributeName, formatter = null, dataModel = this.dataObject) {
-		this._binder.bindAttribute(fieldName, target, attributeName, formatter, dataModel)
+	bindAttribute(dataField, target, attributeName, formatter = null, dataModel = this.dataObject) {
+		this._binder.bindAttribute(dataField, target, attributeName, formatter, dataModel)
 	}
 
 	/**
@@ -492,12 +528,12 @@ const Binder = class {
 	}
 
 	/**
-	@param {string} fieldName
+	@param {string} dataField
 	@param {HTMLElement or Object3D} target
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindText(fieldName, target, formatter = null, dataModel = this._component.dataObject) {
+	bindText(dataField, target, formatter = null, dataModel = this._component.dataObject) {
 		if (formatter === null) {
 			formatter = value => {
 				if (value === null) return ''
@@ -506,14 +542,14 @@ const Binder = class {
 			}
 		}
 		const callback = () => {
-			const result = formatter(dataModel.get(fieldName))
+			const result = formatter(dataModel.get(dataField))
 			if (target.isObject3D) {
 				target.text = typeof result === 'string' ? result : ''
 			} else {
 				target.innerText = typeof result === 'string' ? result : ''
 			}
 		}
-		dataModel.addListener(callback, `changed:${fieldName}`)
+		dataModel.addListener(callback, `changed:${dataField}`)
 		callback()
 		this._boundCallbacks.push({
 			callback: callback,
@@ -522,16 +558,16 @@ const Binder = class {
 	}
 
 	/*
-	Set the attributeName attribute of target DOM or SOM to the value of dataModel.get(fieldName) as it changes
+	Set the attributeName attribute of target DOM or SOM to the value of dataModel.get(dataField) as it changes
 	formatter defaults to the identity function but can be any function that accepts the value and returns a string
 
-	@param {string} fieldName
+	@param {string} dataField
 	@param {HTMLElement or Object3D} target
 	@param {string} attributeName
 	@param {function} formatter
 	@param {DataModel} dataModel
 	*/
-	bindAttribute(fieldName, target, attributeName, formatter = null, dataModel = this._component.dataObject) {
+	bindAttribute(dataField, target, attributeName, formatter = null, dataModel = this._component.dataObject) {
 		if (formatter === null) {
 			formatter = value => {
 				if (value === null) return ''
@@ -541,12 +577,12 @@ const Binder = class {
 		}
 		const callback = () => {
 			if (target.isObject3D) {
-				target.attributes.set(attributeName, formatter(dataModel.get(fieldName)))
+				target.attributes.set(attributeName, formatter(dataModel.get(dataField)))
 			} else {
-				target.setAttribute(attributeName, formatter(dataModel.get(fieldName)))
+				target.setAttribute(attributeName, formatter(dataModel.get(dataField)))
 			}
 		}
-		dataModel.addListener(callback, `changed:${fieldName}`)
+		dataModel.addListener(callback, `changed:${dataField}`)
 		callback()
 		this._boundCallbacks.push({
 			callback: callback,

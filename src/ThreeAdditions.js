@@ -3,6 +3,8 @@ import LocalStyles from './style/LocalStyles.js'
 import AssignedStyles from './style/AssignedStyles.js'
 import ComputedStyles from './style/ComputedStyles.js'
 
+import { SelectorFragmentList } from './style/Selector.js'
+
 /**
 importing this extends THREE.Object3D with many methods and attributes useful for creating and manipulating the SOM
 */
@@ -106,7 +108,7 @@ THREE.Object3D.prototype.getObjectsBySelector = function(selector) {
 @return {Object3D?} the first node to match the selector or null if none were found
 */
 THREE.Object3D.prototype.querySelector = function(selector) {
-	const results = THREE.Object3D.prototype.getObjectsBySelector(selector)
+	const results = this.getObjectsBySelector(selector)
 	if (results.length > 0) return results[0]
 	return null
 }

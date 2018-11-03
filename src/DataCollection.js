@@ -95,9 +95,9 @@ const DataCollection = class extends DataObject {
 		}
 		return -1
 	}
-	firstByField(fieldName, value) {
+	firstByField(dataField, value) {
 		for (const model of this) {
-			if (model.get(fieldName) === value) {
+			if (model.get(dataField) === value) {
 				return model
 			}
 		}
@@ -136,15 +136,15 @@ const DataCollection = class extends DataObject {
 			return comparator(obj1.get(attributeName), obj2.get(attributeName))
 		})
 	}
-	keepSortedByField(fieldName, comparator = DataCollection.defaultComparator) {
+	keepSortedByField(dataField, comparator = DataCollection.defaultComparator) {
 		this._comparator = (obj1, obj2) => {
-			return comparator(obj1.get(fieldName), obj2.get(fieldName))
+			return comparator(obj1.get(dataField), obj2.get(dataField))
 		}
 		this.addListener(() => {
 			if (this._comparator && this._inReset == false && this._inAddBatch == false) {
 				this.sort(this._comparator)
 			}
-		}, 'changed:' + fieldName)
+		}, 'changed:' + dataField)
 	}
 	*[Symbol.iterator]() {
 		for (const obj of this.dataObjects) {

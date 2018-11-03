@@ -9,7 +9,7 @@ export default class extends DataObject {
 	/**
 	@param {Object} [data={}]
 	@param {Object} [options={}]
-	@param {Object} [fieldDataObjects=null] a map of fieldName (string) to DataObject (class), used to create sub-objects in this Model's data
+	@param {Object} [fieldDataObjects=null] a map of dataField (string) to DataObject (class), used to create sub-objects in this Model's data
 	*/
 	constructor(data = {}, options = {}) {
 		super(options)
@@ -24,25 +24,25 @@ export default class extends DataObject {
 		super.cleanup()
 		this.data = null
 	}
-	has(fieldName) {
-		return typeof this.data[fieldName] !== 'undefined'
+	has(dataField) {
+		return typeof this.data[dataField] !== 'undefined'
 	}
 	/**
 	Find a value held within this DataModel. 
 	@return may be native types or, if mapped by options.fieldDataObjects, another DataObject
 	*/
-	get(fieldName, defaultValue = null) {
-		if (typeof this.data[fieldName] === 'undefined' || this.data[fieldName] === null || this.data[fieldName] === '') {
+	get(dataField, defaultValue = null) {
+		if (typeof this.data[dataField] === 'undefined' || this.data[dataField] === null || this.data[dataField] === '') {
 			return defaultValue
 		}
-		return this.data[fieldName]
+		return this.data[dataField]
 	}
 	/**
 	Set a key/value pair
 	*/
-	set(fieldName, value) {
+	set(dataField, value) {
 		const batch = {}
-		batch[fieldName] = value
+		batch[dataField] = value
 		return this.setBatch(batch)
 	}
 
@@ -66,35 +66,35 @@ export default class extends DataObject {
 		}
 		return changes
 	}
-	increment(fieldName, amount = 1) {
-		const currentVal = fieldName in this.data ? this.data[fieldName] : 0
-		this.set(fieldName, currentVal + amount)
+	increment(dataField, amount = 1) {
+		const currentVal = dataField in this.data ? this.data[dataField] : 0
+		this.set(dataField, currentVal + amount)
 	}
-	_set(fieldName, data) {
+	_set(dataField, data) {
 		// _set does not fire any events, so you probably want to use set or setBatch
 		if (data instanceof DataObject) {
-			if (this.data[fieldName] instanceof DataObject) {
-				this.data[fieldName].reset(data.data)
+			if (this.data[dataField] instanceof DataObject) {
+				this.data[dataField].reset(data.data)
 			} else {
-				this.data[fieldName] = data
+				this.data[dataField] = data
 			}
-		} else if (this.options.fieldDataObjects[fieldName]) {
-			if (this.data[fieldName]) {
-				this.data[fieldName].reset(data)
+		} else if (this.options.fieldDataObjects[dataField]) {
+			if (this.data[dataField]) {
+				this.data[dataField].reset(data)
 			} else {
-				this.data[fieldName] = new this.options.fieldDataObjects[fieldName](data)
+				this.data[dataField] = new this.options.fieldDataObjects[dataField](data)
 			}
 		} else {
-			if (this.data[fieldName] === data) {
+			if (this.data[dataField] === data) {
 				return DataObject._NO_CHANGE
 			}
-			if (this.data[fieldName] instanceof DataObject) {
-				this.data[fieldName].reset(data)
+			if (this.data[dataField] instanceof DataObject) {
+				this.data[dataField].reset(data)
 			} else {
-				this.data[fieldName] = data
+				this.data[dataField] = data
 			}
 		}
-		return this.data[fieldName]
+		return this.data[dataField]
 	}
 	delete() {
 		return new Promise((resolve, reject) => {
