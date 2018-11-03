@@ -54,7 +54,7 @@ Singleton.add(
 )
 
 Singleton.add(
-	new Evaluator('rgb color', /rgb\((?:([\.0-9])+,[\s]?){2}([\.0-9]{1})\)/gi, (value, node) => {
+	new Evaluator('rgb color', /rgb\((?:([\.0-9])+,[\s]?){2}(([\.0-9]+){1})\)/gi, (value, node) => {
 		const result = _parseNumberArray(value.substring(4, value.length - 1))
 		if (typeof result === 'undefined') return undefined
 		return result.map(val => val / 255.0)
