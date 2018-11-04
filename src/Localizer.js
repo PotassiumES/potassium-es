@@ -2,6 +2,11 @@ import EventHandler from './EventHandler.js'
 
 let Singleton = null
 let MonthNames = null // [locale, [names]]
+let DateFieldOrder = null
+
+
+const TestDateMilliseconds = 1517385600000
+
 /**
 Localizer provides the functionality necessary to:
 
@@ -57,8 +62,38 @@ const Localizer = class extends EventHandler {
 		return MonthNames[1]
 	}
 
+	/**
+	Different locales order their dates in various ways: mm/dd/yyyy or yyyy.mm.dd or 2012년 12월 20일 목요일
+	@return {string[]} - a length 3 array of 'day', 'month', and 'year' in the order that this locale renders date fields
+	*/
+	get dateFieldOrder(){
+		if(DateFieldOrder !== null) return DateFieldOrder
+
+		const tokens = new Date(TestDateMilliseconds).toLocaleDateString(this._defaultLocale, {
+			day: 'numeric',
+			month: 'numeric',
+			year: 'numeric'
+		}).split(/[\/ \.]/).filter(token => token.trim().length > 0)
+		let monthIndex = 0
+		let yearIndex = 0
+		for(let i=1; i < 3; i++){
+			if(tokens[i].length < tokens[monthIndex].length) monthIndex = i
+			if(tokens[i].length > tokens[yearIndex].length) yearIndex = i
+		}
+		DateFieldOrder = []
+		DateFieldOrder[monthIndex] = 'month'
+		DateFieldOrder[yearIndex] =  'year'
+		for(let i=0; i < 3; i++){
+			if(!DateFieldOrder[i]){
+				DateFieldOrder[i] = 'day'
+				break
+			}
+		}
+		return DateFieldOrder
+	}
+
 	formatDateObject(date, options) {
-		return date.toLocaleString(this._defaultLocale, options)
+		return date.toLocaleDateString(this._defaultLocale, options)
 	}
 
 	formatDate(date, long = false, options = null) {
