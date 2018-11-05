@@ -184,7 +184,7 @@ const App = class extends EventHandler {
 		/** Flat display mode DOM elements */
 		this._flatDOM = dom
 			.div({
-				class: 'flat-root'
+				class: 'flat-root dom-root'
 			})
 			.appendTo(this._dom)
 		this._flatDOM.setAttribute('data-name', 'FlatRoot')
@@ -192,7 +192,7 @@ const App = class extends EventHandler {
 		/** Portal display mode overlay DOM */
 		this._portalDOM = dom
 			.div({
-				class: 'portal-root'
+				class: 'portal-root dom-root'
 			})
 			.appendTo(this._dom)
 		this._portalDOM.setAttribute('data-name', 'PortalRoot')

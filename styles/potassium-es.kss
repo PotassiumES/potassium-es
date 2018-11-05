@@ -25,8 +25,7 @@ html					{ z-index: 1; }
 body					{ z-index: 2; }
 .flat-display			{ z-index: 3; }
 .app					{ z-index: 4; }
-.flat-root,
-.portal-root,
+.dom-root,
 .immersive-root			{ z-index: 5; }
 
 .arkit-device-wrapper, .xr-canvas {
