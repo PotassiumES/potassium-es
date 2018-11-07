@@ -52,8 +52,8 @@ THREE.Object3D.prototype.traverseDepthFirst = function(func) {
 }
 
 const _traverseDepthFirst = function(node, func) {
-	for (const child of node.children) {
-		_traverseDepthFirst(child, func)
+	for (let i=0; i < node.children.length; i++) {
+		_traverseDepthFirst(node.children[i], func)
 	}
 	func(node)
 }

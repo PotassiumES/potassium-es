@@ -334,12 +334,10 @@ const Component = class extends EventHandler {
 	@param {string[]} classNames
 	*/
 	addClass(...classNames) {
-		classNames.forEach(className => {
-			this._flatDOM.addClass(className)
-			this._portalDOM.addClass(className)
-			this._portalSOM.addClass(className)
-			this._immersiveSOM.addClass(className)
-		})
+		this._flatDOM.addClass(...classNames)
+		this._portalDOM.addClass(...classNames)
+		this._portalSOM.addClass(...classNames)
+		this._immersiveSOM.addClass(...classNames)
 		return this
 	}
 
@@ -348,12 +346,10 @@ const Component = class extends EventHandler {
 	@param {string[]} classNames
 	*/
 	removeClass(...classNames) {
-		classNames.forEach(className => {
-			this._flatDOM.removeClass(className)
-			this._portalDOM.removeClass(className)
-			this._portalSOM.removeClass(className)
-			this._immersiveSOM.removeClass(className)
-		})
+		this._flatDOM.removeClass(...classNames)
+		this._portalDOM.removeClass(...classNames)
+		this._portalSOM.removeClass(...classNames)
+		this._immersiveSOM.removeClass(...classNames)
 		return this
 	}
 
@@ -361,8 +357,8 @@ const Component = class extends EventHandler {
 	hides the flatDOM, portalDOM, portalSOM, and immersiveSOM if their `uses*` option was true
 	*/
 	hide() {
-		if (this.options.usesFlat) this.flatDOM.addClass('hidden')
-		if (this.options.usesPortalOverlay) this.portalDOM.addClass('hidden')
+		this.flatDOM.addClass('hidden')
+		this.portalDOM.addClass('hidden')
 		if (this.options.usesPortalSpatial) this.portalSOM.visible = false
 		if (this.options.usesImmersive) this.immersiveSOM.visible = false
 		return this

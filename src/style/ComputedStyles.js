@@ -63,11 +63,15 @@ class ComputedStyles {
 		}
 
 		//Recalculate the changes list
-		for (const [property, styleInfo] of this._currentStyles) {
-			const previousInfo = this._previousStyles.get(property) || null
-			if (previousInfo === null || previousInfo.value !== styleInfo.value) this._changes.push(property)
+		for (const property of this._currentStyles.keys()) {
+			const hasStyle = this._previousStyles.has(property)
+			if(hasStyle === false){
+				this._changes.push(property)
+			} else if(hasStyle && this._previousStyles.get(property).value !== this._currentStyles.get(property).value){
+				this._changes.push(property)
+			}
 		}
-		for (const [property, previousInfo] of this._previousStyles) {
+		for (const property of this._previousStyles.keys()) {
 			if (this._currentStyles.has(property) === false) this._changes.push(property)
 		}
 	}
@@ -86,7 +90,9 @@ class ComputedStyles {
 
 	/** Iterate over the current declarations */
 	*[Symbol.iterator]() {
-		for (const [property, styleInfo] of this._currentStyles) yield styleInfo
+		for (const styleInfo of this._currentStyles.values()){
+			yield styleInfo
+		}
 	}
 }
 

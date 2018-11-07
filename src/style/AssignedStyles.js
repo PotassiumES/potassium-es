@@ -52,7 +52,9 @@ class AssignedStyles {
 
 	/** Iterate over the {StyleInfo}s */
 	*[Symbol.iterator]() {
-		for (const [property, styleInfo] of this._map) yield styleInfo
+		for (const styleInfo of this._map.values()){
+			yield styleInfo
+		}
 	}
 }
 

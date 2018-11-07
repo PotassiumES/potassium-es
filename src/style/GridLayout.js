@@ -156,12 +156,11 @@ class Grid {
 	}
 
 	/**
-	Generates the positions for an arbitrary number of grid children using specified cell positions and then auto positions
-
-	@param {number} count - the number of child nodes for which positions are needed
-	@return {Array<number[]>} returns an array of x,y tuples, one for each position
+	Sets the positions for this._node.children using specified cell positions and then auto positions
 	*/
-	_positions(count) {
+	apply() {
+		const count = this._node.children.length
+		if (count === 0) return
 		/*
 		The autoflow is the major track and the other flow is the minor track
 		*/
@@ -183,11 +182,12 @@ class Grid {
 		const majorMultiplier = this._autoFlow === Grid.Row ? -1 : 1
 		const minorMultiplier = this._autoFlow === Grid.Row ? 1 : -1
 
-		const results = []
+		let childIndex = 0
 
 		// First get positions for explicit cells
 		let majorPosition = majorStart
 		let minorPosition = minorStart
+		let workingChild = null
 		for (let majorIndex = 0; majorIndex < majorCellSizes.length; majorIndex++) {
 			minorPosition = minorStart
 			if (majorIndex !== 0) {
@@ -201,11 +201,23 @@ class Grid {
 					minorPosition += (minorGap / 2 + minorCellSizes[minorIndex] / 2) * minorMultiplier
 				}
 
-				results.push(this._autoFlow === Grid.Row ? [minorPosition, majorPosition] : [majorPosition, minorPosition])
+				workingChild = this._node.children[childIndex]
+				if(
+					workingChild.position.x !== (this._autoFlow === Grid.Row ? minorPosition : majorPosition)
+					|| workingChild.position.y !== (this._autoFlow === Grid.Row ? majorPosition : minorPosition)
+					|| workingChild.position.z !== 0
+				){
+					workingChild.position.set(
+						this._autoFlow === Grid.Row ? minorPosition : majorPosition,
+						this._autoFlow === Grid.Row ? majorPosition : minorPosition,
+						0
+					)
+				}
+				childIndex += 1
 
-				// If count is less than the number of specific cells then return results
-				if (results.length === count) {
-					return results
+				// If count is less than the number of specific cells then return
+				if (childIndex === count) {
+					return
 				}
 				// Move from minor center to minor edge
 				minorPosition += (minorCellSizes[minorIndex] / 2 + minorGap / 2) * minorMultiplier
@@ -217,7 +229,7 @@ class Grid {
 		// major and minor positions are now at the edges of the far corner cell of the explicit grid
 
 		// Now get positions for auto-flow cells
-		let remainingPositions = count - results.length
+		let remainingPositions = count - childIndex
 		let minorIndex = 0
 		majorPosition += (this._autoFlowSize / 2 + majorGap / 2) * majorMultiplier
 		while (remainingPositions > 0) {
@@ -227,7 +239,19 @@ class Grid {
 				minorPosition += (minorCellSizes[minorIndex] / 2 + minorGap / 2) * minorMultiplier
 			}
 
-			results.push(this._autoFlow === Grid.Row ? [minorPosition, majorPosition] : [majorPosition, minorPosition])
+			workingChild = this._node.children[childIndex]
+			if(
+				workingChild.position.x !== (this._autoFlow === Grid.Row ? minorPosition : majorPosition)
+				|| workingChild.position.y !== (this._autoFlow === Grid.Row ? majorPosition : minorPosition)
+				|| workingChild.position.z !== 0
+			){
+				workingChild.position.set(
+					this._autoFlow === Grid.Row ? minorPosition : majorPosition,
+					this._autoFlow === Grid.Row ? majorPosition : minorPosition,
+					0
+				)
+			}
+			childIndex += 1
 
 			minorPosition += (minorCellSizes[minorIndex] / 2 + minorGap / 2) * minorMultiplier
 			minorIndex = (minorIndex + 1) % minorCellSizes.length
@@ -236,16 +260,6 @@ class Grid {
 				majorPosition += (this._autoFlowSize + majorGap) * majorMultiplier
 			}
 		}
-		return results
-	}
-
-	apply() {
-		if (this._node.children.length === 0) return
-		let childIndex = 0
-		this._positions(this._node.children.length).forEach(position => {
-			this._node.children[childIndex].position.set(...position, 0)
-			childIndex += 1
-		})
 	}
 }
 

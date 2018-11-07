@@ -16,8 +16,8 @@ Multiple elements with explicit combinators
 */
 class SelectorFragmentList {
 	constructor(selectorFragments) {
-		// Selectors in reversed order from how they are written
-		this._reversedFragments = selectorFragments.reverse()
+		this._forwardFragments = selectorFragments.slice(0, selectorFragments.length)
+		this._reverseFragments = selectorFragments.slice(0, selectorFragments.length).reverse()
 		this._specificity = this._calculateSpecificity()
 	}
 
@@ -30,9 +30,7 @@ class SelectorFragmentList {
 	}
 
 	*[Symbol.iterator]() {
-		const forwardFragments = this._reversedFragments.slice(0, this._reversedFragments.length)
-		forwardFragments.reverse()
-		for (const frag of forwardFragments) {
+		for (const frag of this._forwardFragments) {
 			yield frag
 		}
 	}
@@ -52,20 +50,20 @@ class SelectorFragmentList {
 	@return {bool} true if the node is matched
 	*/
 	matches(node, fragmentIndex = 0, previouslyMatchedNode = null) {
-		if (fragmentIndex < 0 || fragmentIndex >= this._reversedFragments.length) {
+		if (fragmentIndex < 0 || fragmentIndex >= this._reverseFragments.length) {
 			console.error('Invalid fragmentIndex', fragmentIndex, node, this)
 			return false
 		}
-		const fragment = this._reversedFragments[fragmentIndex]
+		const fragment = this._reverseFragments[fragmentIndex]
 
 		// Handle a combinator
 		if (fragment instanceof Combinator) {
 			// Refuse if there is no previous matched node
 			if (previouslyMatchedNode === null) return false
 			// Refuse if there is a combinator but no following element
-			if (fragmentIndex + 1 >= this._reversedFragments.length) return false
+			if (fragmentIndex + 1 >= this._reverseFragments.length) return false
 			// Refuse if there are two combinators in a row
-			if (this._reversedFragments[fragmentIndex + 1] instanceof Combinator) return false
+			if (this._reverseFragments[fragmentIndex + 1] instanceof Combinator) return false
 
 			switch (fragment.type) {
 				case Combinator.DESCENDANT: // >>
@@ -83,7 +81,7 @@ class SelectorFragmentList {
 					// Refuse if the descendent match failed
 					if (parentMatched === false) return false
 					// Accept if there are no more fragments after the post-combinator fragment
-					if (fragmentIndex + 2 >= this._reversedFragments.length) return true
+					if (fragmentIndex + 2 >= this._reverseFragments.length) return true
 					// Refuse if this is the root but there are more fragments to match
 					if (workingNode.parent === null) return false
 					// Move on to the parent and next fragment
@@ -122,11 +120,11 @@ class SelectorFragmentList {
 			}
 		} else {
 			// Refuse if this node and SelectorElement don't match
-			if (this._reversedFragments[fragmentIndex].matches(node) === false) {
+			if (this._reverseFragments[fragmentIndex].matches(node) === false) {
 				return false
 			}
 			// Accept if there are no more fragments
-			if (fragmentIndex === this._reversedFragments.length - 1) return true
+			if (fragmentIndex === this._reverseFragments.length - 1) return true
 			// Refuse if there are more fragments but this is the root
 			if (node.parent === null) return false
 			// Move on to the next ancestor and fragment
@@ -171,7 +169,7 @@ class SelectorFragmentList {
 		// Ones: Score one in this column for each element selector or pseudo-element contained inside the overall selector.
 		let oneCount = 0
 
-		for (const fragment of this._reversedFragments) {
+		for (const fragment of this._reverseFragments) {
 			if (fragment instanceof Combinator) continue
 			// IDs
 			hundredCount += fragment._elements.filter(element => element.type === SelectorElement.ID_ELEMENT).length
