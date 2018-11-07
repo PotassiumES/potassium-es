@@ -1,10 +1,11 @@
 import dom from './DOM.js'
 import som from './SOM.js'
-import { Engine, FlatDisplay } from './Engine.js'
 import Router from './Router.js'
 import Component from './Component.js'
+import Localizer from './Localizer.js'
 import AssetLoader from './AssetLoader.js'
 import EventHandler from './EventHandler.js'
+import { Engine, FlatDisplay } from './Engine.js'
 import { throttledConsoleLog } from './throttle.js'
 import DisplayModeTracker from './DisplayModeTracker.js'
 
@@ -441,6 +442,18 @@ const App = class extends EventHandler {
 			this._debugScene = null
 			this._actionManager.deactivateActionMaps('flat-dev')
 		}
+	}
+
+	set localizerGathering(shouldGather){
+		Localizer.Singleton.gathering = shouldGather
+	}
+
+	get localizerGathering(){
+		return Localizer.Singleton.gathering
+	}
+
+	get localizerGatheredData(){
+		return Localizer.Singleton.gatheredData
 	}
 
 	/**

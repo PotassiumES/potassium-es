@@ -1,4 +1,5 @@
 import EventHandler from './EventHandler.js'
+import dom from './DOM.js'
 
 let Singleton = null
 let MonthNames = null // [locale, [names]]
@@ -7,6 +8,7 @@ let DateFieldOrder = null
 
 const TestDateMilliseconds = 1517385600000
 
+const GatheringCookieName = 'potassiumes-localizer-gathering'
 /**
 Localizer provides the functionality necessary to:
 
@@ -25,6 +27,9 @@ const Localizer = class extends EventHandler {
 		this._defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 		this._dateTimeFormatter = new Intl.DateTimeFormat(this._defaultLocales)
+
+		this._gathering = dom.getCookie(GatheringCookieName) === 'true'
+		this._gatheredStrings = this._gathering ? [] : null
 	}
 
 	get defaultLocales() {
@@ -35,11 +40,56 @@ const Localizer = class extends EventHandler {
 		return this._defaultTimeZone
 	}
 
+	/**
+	This should NOT be turned on in production because it continuously grows in memory.
+	@return {boolean} true if the Localizer is accumulating strings to translate
+	*/
+	get gathering(){
+		return this._gathering
+	}
+
+	set gathering(val){
+		if(!!val){
+			if(this._gathering) return
+			dom.setCookie(GatheringCookieName, 'true')
+			this._gathering = true
+			this._gatheredStrings = []
+		} else {
+			if(this._gathering === false) return
+			dom.removeCookie(GatheringCookieName)
+			this._gathering = false
+			this._gatheredStrings = null
+		}
+	}
+
+	get gatheredData(){
+		if(this._gathering === false) return null
+		return {
+			strings: this._gatheredStrings
+		}
+	}
+
+	_gatherString(key, value, defaultValue){
+		if(!key || !key.trim()) return
+		this._gatheredStrings.push({
+			key: key,
+			value: value,
+			defaultValue: defaultValue
+		})
+	}
+
 	translate(key, defaultValue = null) {
 		const translation = this._translations.get(key)
-		if (!translation) return defaultValue !== null ? defaultValue : key
+		if (!translation){
+			if(this._gathering) this._gatherString(key, null, defaultValue)
+			return defaultValue !== null ? defaultValue : key
+		}
 		const value = translation.get(key)
-		if (!value) return defaultValue !== null ? defaultValue : key
+		if (!value){
+			if(this._gathering) this._gatherString(key, null, defaultValue)
+			return defaultValue !== null ? defaultValue : key
+		}
+		if(this._gathering) this._gatherString(key, value, defaultValue)
 		return value
 	}
 
