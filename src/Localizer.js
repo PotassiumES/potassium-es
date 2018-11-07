@@ -17,21 +17,20 @@ Localizer provides the functionality necessary to:
 @todo load translations
 */
 const Localizer = class extends EventHandler {
-	constructor(defaultLanguage = 'en', defaultLocale = 'en-US', defaultTimeZone = 'America/Los_Angeles') {
+	constructor() {
 		super()
 		/** @type {Map<{string},{Translation}>} */
 		this._translations = new Map()
-		this._defaultLanguage = defaultLanguage
-		this._defaultLocale = defaultLocale
-		this._defaultTimeZone = defaultTimeZone
+		this._defaultLocales = navigator.languages ? navigator.languages : [navigator.language]
+		this._defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+		this._dateTimeFormatter = new Intl.DateTimeFormat(this._defaultLocales)
 	}
 
-	get defaultLanguage() {
-		return this._defaultLanguage
+	get defaultLocales() {
+		return this._defaultLocales
 	}
-	get defaultLocale() {
-		return this._defaultLocale
-	}
+
 	get defaultTimeZone() {
 		return this._defaultTimeZone
 	}
@@ -45,9 +44,9 @@ const Localizer = class extends EventHandler {
 	}
 
 	get monthNames() {
-		if (MonthNames === null || MonthNames[0] !== this._defaultLocale) {
+		if (MonthNames === null || MonthNames[0] !== this._defaultLocales[0]) {
 			MonthNames = []
-			MonthNames[0] = this._defaultLocale
+			MonthNames[0] = this._defaultLocales
 			MonthNames[1] = []
 			const options = {
 				month: 'long'
@@ -56,7 +55,7 @@ const Localizer = class extends EventHandler {
 			date.setDate(1)
 			for (let i = 0; i < 12; i++) {
 				date.setMonth(i)
-				MonthNames[1].push(date.toLocaleString(this._defaultLocale, options))
+				MonthNames[1].push(date.toLocaleString(this._defaultLocales, options))
 			}
 		}
 		return MonthNames[1]
@@ -69,7 +68,18 @@ const Localizer = class extends EventHandler {
 	get dateFieldOrder(){
 		if(DateFieldOrder !== null) return DateFieldOrder
 
-		const tokens = new Date(TestDateMilliseconds).toLocaleDateString(this._defaultLocale, {
+		if(typeof this._dateTimeFormatter.formatToParts === 'function'){
+			DateFieldOrder = this._dateTimeFormatter.formatToParts(new Date(), {
+				year: 'numeric',
+				month: 'numeric',
+				day: 'numeric'
+			}).filter(part => part.type !== 'literal').map(part => part.type)
+			console.log('dfo', DateFieldOrder)
+			return DateFieldOrder
+		}
+
+		// Ok the correct but less supported function is not there, try this hack
+		const tokens = new Date(TestDateMilliseconds).toLocaleDateString(this._defaultLocales, {
 			day: 'numeric',
 			month: 'numeric',
 			year: 'numeric'
@@ -93,7 +103,7 @@ const Localizer = class extends EventHandler {
 	}
 
 	formatDateObject(date, options) {
-		return date.toLocaleDateString(this._defaultLocale, options)
+		return date.toLocaleDateString(this._defaultLocales, options)
 	}
 
 	formatDate(date, long = false, options = null) {
