@@ -74,7 +74,6 @@ const Localizer = class extends EventHandler {
 				month: 'numeric',
 				day: 'numeric'
 			}).filter(part => part.type !== 'literal').map(part => part.type)
-			console.log('dfo', DateFieldOrder)
 			return DateFieldOrder
 		}
 
