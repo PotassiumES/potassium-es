@@ -2,6 +2,7 @@ import dom from './DOM.js'
 import som from './SOM.js'
 import EventHandler from './EventHandler.js'
 import AudioManager from './AudioManager.js'
+import DisplayModeTracker from './DisplayModeTracker.js'
 
 /**
 Component contains the reactive logic for a responsive UI element.
@@ -135,6 +136,8 @@ const Component = class extends EventHandler {
 		this.listenTo('blur', this._flatDOM, this.blur)
 		this.listenTo('focus', this._portalDOM, this.focus)
 		this.listenTo('blur', this._portalDOM, this.blur)
+
+		this.listenTo(DisplayModeTracker.DisplayModeChangedEvent, DisplayModeTracker.Singleton, this.handleDisplayModeChange)
 	}
 
 	cleanup() {
@@ -168,10 +171,21 @@ const Component = class extends EventHandler {
 		}
 	}
 
+	get displayModeTracker(){
+		return DisplayModeTracker.Singleton
+	}
+
+	get currentDisplayMode(){
+		return DisplayModeTracker.Singleton.currentDisplayMode
+	}
+
 	/* 
-	Called when a App parent changes display mode: App.FLAT, App.PORTAL, or App.IMMERSIVE
+	Called when the containing App changes display mode: App.FLAT, App.PORTAL, or App.IMMERSIVE
+	Ancestors of this class should override this to react to state changes or just read this.currentDisplayMode to make choices
 	*/
-	handleDisplayModeChange(mode) {}
+	handleDisplayModeChange(eventName, mode, displayModeTracker) {
+		console.log('display mode change', eventName, mode, displayModeTracker)
+	}
 
 	/** @type {string} */
 	get activationAnchor() {

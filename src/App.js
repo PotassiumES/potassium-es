@@ -265,16 +265,8 @@ const App = class extends EventHandler {
 		this.addListener((eventName, mode) => {
 			this._actionManager.switchToActionMaps(mode)
 
-			/** @todo use a better method than flatDOM traversal */
-			const dive = node => {
-				if (typeof node.component !== 'undefined' && typeof node.component.handleDisplayModeChange === 'function') {
-					node.component.handleDisplayModeChange(mode)
-				}
-				for (let i = 0; i < node.children.length; i++) {
-					dive(node.children[i])
-				}
-			}
-			dive(this._flatDOM)
+			/* Component listens for events on the DisplayModeTracker and updates itself accordingly */
+			DisplayModeTracker.Singleton.setDisplayMode(mode)
 		}, App.DisplayModeChangedEvent)
 
 		this._updateClasses()

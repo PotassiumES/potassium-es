@@ -12,6 +12,8 @@ export default class DisplayModeTracker extends EventHandler {
 		this._flatCapable = null
 		this._portalCapable = null
 		this._immersiveCapable = null
+
+		this._mode = 'flat'
 	}
 
 	get flatCapable() {
@@ -39,6 +41,17 @@ export default class DisplayModeTracker extends EventHandler {
 		this._triggerUpdate()
 	}
 
+	get currentDisplayMode(){ return this._mode }
+
+	/**
+	@param {string} mode like 'flat', 'portal', or 'immersive'
+	*/
+	set currentDisplayMode(mode){
+		if(mode === this._mode) return
+		this._mode = mode
+		this.trigger(DisplayModeTracker.DisplayModeChangedEvent, mode, this)
+	}
+
 	_triggerUpdate() {
 		this.trigger(DisplayModeTracker.DisplayUpdatedEvent, this.flatCapable, this.portalCapable, this.immersiveCapable)
 	}
@@ -53,4 +66,5 @@ export default class DisplayModeTracker extends EventHandler {
 
 let SINGLETON = null
 
-DisplayModeTracker.DisplayUpdatedEvent = 'display-mode-updated'
+DisplayModeTracker.DisplayUpdatedEvent = 'display-modes-updated'
+DisplayModeTracker.DisplayModeChangedEvent = 'display-mode-changed'
