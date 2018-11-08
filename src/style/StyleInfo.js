@@ -27,6 +27,10 @@ class StyleInfo {
 		this._declaration.value = value
 		this._declaration.important = important
 	}
+
+	toString(){
+		return this.property + ': ' + this.value + (this.important ? ' !important' : '')
+	}
 }
 
 /**

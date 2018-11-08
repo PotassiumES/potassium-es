@@ -180,7 +180,7 @@ const App = class extends EventHandler {
 		The root DOM elmenent that will contain everything for every display mode
 		Add this to your page's DOM
 		*/
-		this._dom = dom.div({ class: 'app' })
+		this._dom = dom.div({ class: 'app page-app' })
 
 		/** Flat display mode DOM elements */
 		this._flatDOM = dom
@@ -200,7 +200,7 @@ const App = class extends EventHandler {
 
 		/** Portal display mode 3D scene */
 		this._portalScene = som.scene()
-		this._portalScene.addClass('portal-scene')
+		this._portalScene.addClass('portal-scene', 'app', 'spatial-app')
 		this._portalScene.name = 'PortalScene'
 		this._portalEngine = new Engine(this._portalScene, Engine.PORTAL, this._handlePortalTick)
 		this._portalEngine.addListener((eventName, engine) => {
@@ -209,9 +209,14 @@ const App = class extends EventHandler {
 			}
 		}, Engine.STOPPED)
 
+		/** Portal display Spatial Object Model (SOM) container */
+		this._portalSOM = som.group().appendTo(this._portalScene)
+		this._portalSOM.addClass('som-root', 'portal-root', 'portal-som')
+		this._portalSOM.name = 'PortalSOM'
+
 		/** Immersive display mode 3D scene */
 		this._immersiveScene = som.scene()
-		this._immersiveScene.addClass('immersive-scene')
+		this._immersiveScene.addClass('immersive-scene', 'app', 'spatial-app')
 		this._immersiveScene.name = 'ImmersiveScene'
 		this._immersiveEngine = new Engine(this._immersiveScene, Engine.IMMERSIVE, this._handleImmersiveTick)
 		this._immersiveEngine.addListener((eventName, engine) => {
@@ -219,6 +224,12 @@ const App = class extends EventHandler {
 				this.setDisplayMode(App.FLAT)
 			}
 		}, Engine.STOPPED)
+
+
+		/** Immersive display Spatial Object Model (SOM) container */
+		this._immersiveSOM = som.group().appendTo(this._immersiveScene)
+		this._immersiveSOM.addClass('som-root', 'immersive-root', 'immersive-som')
+		this._immersiveSOM.name = 'ImmersiveSOM'
 
 		/* Set up WebXR, WebVR, or fallback based displays for the portal and immersive engines */
 		Engine.chooseDisplays(this._portalEngine, this._immersiveEngine)
@@ -301,8 +312,16 @@ const App = class extends EventHandler {
 		return this._portalScene
 	}
 	/** @type {THREE.Group} */
+	get portalSOM() {
+		return this._portalSOM
+	}
+	/** @type {THREE.Group} */
 	get immersiveScene() {
 		return this._immersiveScene
+	}
+	/** @type {THREE.Group} */
+	get immersiveSOM() {
+		return this._immersiveSOM
 	}
 	/** @type {ActionManager} */
 	get actionManager() {
@@ -316,8 +335,8 @@ const App = class extends EventHandler {
 	appendComponent(childComponent) {
 		this._flatDOM.appendChild(childComponent.flatDOM)
 		this._portalDOM.appendChild(childComponent.portalDOM)
-		this._portalScene.add(childComponent.portalSOM)
-		this._immersiveScene.add(childComponent.immersiveSOM)
+		this._portalSOM.add(childComponent.portalSOM)
+		this._immersiveSOM.add(childComponent.immersiveSOM)
 	}
 	/*
 	removeComponent removes the childComponent's flatDOM, portalDOM, portalSOM, and immersiveSOM from this Component's equivalent attributes.
@@ -326,8 +345,8 @@ const App = class extends EventHandler {
 	removeComponent(childComponent) {
 		this._flatDOM.removeChild(childComponent.flatDOM)
 		this._portalDOM.removeChild(childComponent.portalDOM)
-		this._portalScene.remove(childComponent.portalSOM)
-		this._immersiveScene.remove(childComponent.immersiveSOM)
+		this._portalSOM.remove(childComponent.portalSOM)
+		this._immersiveSOM.remove(childComponent.immersiveSOM)
 	}
 
 	/** @type {string} flat|portal|immersive */

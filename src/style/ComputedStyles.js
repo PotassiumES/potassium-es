@@ -94,6 +94,13 @@ class ComputedStyles {
 			yield styleInfo
 		}
 	}
+
+	log(showVars=false){
+		for(let styleInfo of this){
+			if(showVars === false && styleInfo.property.startsWith('--')) continue
+			console.log(styleInfo.toString())
+		}
+	}
 }
 
 /**

@@ -45,6 +45,13 @@ class LocalStyles {
 			yield styleInfos[0]
 		}
 	}
+
+	log(showVars=false){
+		for(let styleInfo of this){
+			if(showVars === false && styleInfo.property.startsWith('--')) continue
+			console.log(styleInfo.toString())
+		}
+	}
 }
 
 export default LocalStyles

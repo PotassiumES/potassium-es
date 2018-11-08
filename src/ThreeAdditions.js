@@ -113,6 +113,32 @@ THREE.Object3D.prototype.querySelector = function(selector) {
 	return null
 }
 
+
+/**
+@param {Object3D} node
+@return {Object3D[]} returns an array of the ancesters of `node`, starting at the root and ending with the `node`
+*/
+THREE.Object3D.prototype.getAncestry = function(node = this){
+	const lineage = []
+	let workingNode = node
+	while(workingNode){
+		lineage.push(workingNode)
+		workingNode = workingNode.parent
+	}
+	lineage.reverse()
+	return lineage
+}
+
+/**
+Logs the ancestry of `node` starting with the root and ending with the `node`
+@param {Object3D} node
+*/
+THREE.Object3D.prototype.logAncestry = function(node=this, showVars=false, localsOnly=false){
+	node.getAncestry().forEach(obj => {
+		obj._getStyleTreeLines(undefined, undefined, undefined, showVars, localsOnly, false).forEach(line => console.log(line))
+	})
+}
+
 /**
 logs to the console the computed styles for a node and its descendents
 @param {THREE.Object3D} node
@@ -124,16 +150,32 @@ THREE.Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVar
 	this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).forEach(line => console.log(line))
 }
 
+/**
+@param {THREE.Object3D} node
+@param {int} [tabDepth=0]
+@param {bool} [showVars=false] if true, log the CSS variables of the form `--name`
+@param {bool} [localsOnly=false] if true, show the local instead of the computed styles
+@return {string} a string describing the computed styles for a node and its descendents
+*/
 THREE.Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
 	return this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).join('\n')
 }
 
+/**
+@param {THREE.Object3D} node
+@param {string[]} [results=[]] an accumulator array
+@param {int} [tabDepth=0]
+@param {bool} [showVars=false] if true, log the CSS variables of the form `--name`
+@param {bool} [localsOnly=false] if true, show the local instead of the computed styles
+@return {string} a string describing the computed styles for a node and its descendents
+*/
 THREE.Object3D.prototype._getStyleTreeLines = function(
 	node = this,
 	results = [],
 	tabDepth = 0,
 	showVars = false,
-	localsOnly = false
+	localsOnly = false,
+	traverseChildren = true
 ) {
 	const tabs = _generateTabs(tabDepth)
 	results.push(
@@ -151,16 +193,19 @@ THREE.Object3D.prototype._getStyleTreeLines = function(
 		for (const styleInfo of node.localStyles) {
 			if (showVars === false && styleInfo.property.startsWith('--')) continue
 			reults.push(
-				tabs + '\t' + styleInfo.property + ': ' + styleInfo.value + (styleInfo.important ? ' !important' : '')
+				tabs + '\t' + styleInfo.toString()
 			)
 		}
 	} else {
 		for (const styleInfo of node.computedStyles) {
 			if (showVars === false && styleInfo.property.startsWith('--')) continue
 			results.push(
-				tabs + '\t' + styleInfo.property + ': ' + styleInfo.value + (styleInfo.important ? ' !important' : '')
+				tabs + '\t' + styleInfo.toString()
 			)
 		}
+	}
+	if(traverseChildren === false){
+		return results
 	}
 	for (const child of node.children) {
 		this._getStyleTreeLines(child, results, tabDepth + 1, showVars, localsOnly)
