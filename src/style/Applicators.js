@@ -54,12 +54,24 @@ Applicators.set('color', (node, styleInfo) => {
 	node.setRGB(...parsedValue)
 })
 
-/** the emissive color of a node's material */
+/** the emissive value of a node's material */
 Applicators.set('material-emissive', (node, styleInfo) => {
 	if (!node.material || !node.material.emissive) return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
 	if (typeof parsedValue === 'undefined') return
-	node.material.emissive.setRGB(...parsedValue)
+	if(node.material && node.material.emissive){
+		node.material.emissive.setRGB(...parsedValue)
+	}
+})
+
+/** the duffuse color value of a node's material */
+Applicators.set('material-color', (node, styleInfo) => {
+	if (!node.material || !node.material.emissive) return
+	const parsedValue = Evaluators.parse(styleInfo.value, node)
+	if (typeof parsedValue === 'undefined') return
+	if(node.material && node.material.color){
+		node.material.color.setRGB(...parsedValue)
+	}
 })
 
 /** the node.position */
