@@ -49,25 +49,20 @@ const App = class extends EventHandler {
 
 		this._stylist = new Stylist()
 		this._stylist.addListener((eventName, stylist) => {
-			this._stylist.calculateStyles(this._portalScene)
-			this._stylist.applyStyles(this._portalScene)
-			this._stylist.calculateStyles(this._immersiveScene)
-			this._stylist.applyStyles(this._immersiveScene)
+			this._stylist.calculateAndApplyStyles(this._portalScene)
+			this._stylist.calculateAndApplyStyles(this._immersiveScene)
 			/** @todo figure out a smarter way to apply styles when they are needed */
 			setInterval(() => {
 				switch (this.displayMode) {
 					case App.IMMERSIVE:
-						this._stylist.calculateStyles(this._immersiveScene)
-						this._stylist.applyStyles(this._immersiveScene)
+						this._stylist.calculateAndApplyStyles(this._immersiveScene)
 						break
 					case App.PORTAL:
-						this._stylist.calculateStyles(this._portalScene)
-						this._stylist.applyStyles(this._portalScene)
+						this._stylist.calculateAndApplyStyles(this._portalScene)
 						break
 					case App.FLAT:
 						if (this._debugScene !== null) {
-							this._stylist.calculateStyles(this._debugScene)
-							this._stylist.applyStyles(this._debugScene)
+							this._stylist.calculateAndApplyStyles(this._debugScene)
 						}
 						break
 				}

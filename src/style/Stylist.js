@@ -61,7 +61,7 @@ const Stylist = class extends EventHandler {
 		/** @todo Apply animations */
 	}
 
-	_calculateAndApplyStyles(scene, renderer) {
+	calculateAndApplyStyles(scene, renderer) {
 		this.calculateStyles(scene)
 		this.applyStyles(scene, renderer)
 	}
