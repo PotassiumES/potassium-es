@@ -161,6 +161,9 @@ class Grid {
 	apply() {
 		const count = this._node.children.length
 		if (count === 0) return
+		let childIndex = this._nextVisibleChild(0)
+		if(childIndex === -1) return
+
 		/*
 		The autoflow is the major track and the other flow is the minor track
 		*/
@@ -171,18 +174,16 @@ class Grid {
 		const minorGap = this._autoFlow === Grid.Row ? this._columnGap : this._rowGap
 
 		// Get starting center position for major and minor tracks
+		// Note: we start to -x half width but we start at 0 y for easier positioning relative to other components
 		const gridCenterToCenterWidth = this._calculateCenterToCenterSize(this._columnCellSizes, this._columnGap)
-		const gridCenterToCenterHeight = this._calculateCenterToCenterSize(this._rowCellSizes, this._rowGap)
-		const majorStart = (this._autoFlow === Grid.Row ? gridCenterToCenterHeight : gridCenterToCenterWidth) / -2
-		const minorStart = (this._autoFlow === Grid.Row ? gridCenterToCenterWidth : gridCenterToCenterHeight) / -2
+		const majorStart = (this._autoFlow === Grid.Row ? 0 : gridCenterToCenterWidth) / -2
+		const minorStart = (this._autoFlow === Grid.Row ? gridCenterToCenterWidth : 0) / -2
 
 		// Rows move from top to bottom, which is -y
 		// Columns move from left to right, which is +x
 		// Set up the correct multipliers for major and minor
 		const majorMultiplier = this._autoFlow === Grid.Row ? -1 : 1
 		const minorMultiplier = this._autoFlow === Grid.Row ? 1 : -1
-
-		let childIndex = 0
 
 		// First get positions for explicit cells
 		let majorPosition = majorStart
@@ -213,12 +214,9 @@ class Grid {
 						0
 					)
 				}
-				childIndex += 1
+				childIndex = this._nextVisibleChild(childIndex + 1)
+				if (childIndex === -1) return
 
-				// If count is less than the number of specific cells then return
-				if (childIndex === count) {
-					return
-				}
 				// Move from minor center to minor edge
 				minorPosition += (minorCellSizes[minorIndex] / 2 + minorGap / 2) * minorMultiplier
 			}
@@ -251,7 +249,8 @@ class Grid {
 					0
 				)
 			}
-			childIndex += 1
+			childIndex = this._nextVisibleChild(childIndex + 1)
+			if (childIndex === -1) return
 
 			minorPosition += (minorCellSizes[minorIndex] / 2 + minorGap / 2) * minorMultiplier
 			minorIndex = (minorIndex + 1) % minorCellSizes.length
@@ -260,6 +259,14 @@ class Grid {
 				majorPosition += (this._autoFlowSize + majorGap) * majorMultiplier
 			}
 		}
+	}
+
+	/** @return {integer} the index of the next visible child starting from `startIndex` or -1 if there are none */
+	_nextVisibleChild(startIndex){
+		for(let i=startIndex; i < this._node.children.length; i++){
+			if(this._node.children[i].visible) return i
+		}
+		return -1
 	}
 }
 

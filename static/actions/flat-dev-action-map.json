@@ -81,7 +81,6 @@
       "destination": "/action/transform-scene",
       "parameters": { "reset": true }
     },
-
     {
       "comment": "Move forward (w)",
       "source": "/input/keyboard/0/key/87",
@@ -91,8 +90,24 @@
       }
     },
     {
+      "comment": "Move forward (up arrow)",
+      "source": "/input/keyboard/0/key/38",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "translation": [0, 0, 1]
+      }
+    },
+    {
       "comment": "Move backward (s)",
       "source": "/input/keyboard/0/key/83",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "translation": [0, 0, -1]
+      }
+    },
+    {
+      "comment": "Move backward (down arrow)",
+      "source": "/input/keyboard/0/key/40",
       "destination": "/action/transform-scene",
       "parameters": {
         "translation": [0, 0, -1]
@@ -139,8 +154,24 @@
       }
     },
     {
+      "comment": "Rotate left (left arrow)",
+      "source": "/input/keyboard/0/key/37",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "rotation": [0, 0.02, 0]
+      }
+    },
+    {
       "comment": "Rotate right (d)",
       "source": "/input/keyboard/0/key/68",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "rotation": [0, -0.02, 0]
+      }
+    },
+    {
+      "comment": "Rotate right (right arrow)",
+      "source": "/input/keyboard/0/key/39",
       "destination": "/action/transform-scene",
       "parameters": {
         "rotation": [0, -0.02, 0]

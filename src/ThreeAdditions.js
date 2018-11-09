@@ -44,6 +44,24 @@ THREE.Object3D.prototype.getClasses = function() {
 }
 
 /**
+If the Object3D has a geometry then show a THREE.Box3Helper for it
+*/
+THREE.Object3D.prototype.showBox3Helper = function(){
+	if(!this.geometry){
+		console.error('No geometry for bounding box')
+		return false
+	}
+	this.geometry.computeBoundingBox()
+	this.add(new THREE.Box3Helper(this.geometry.boundingBox))
+	return true
+}
+
+THREE.Object3D.prototype.findRoot = function(node=this){
+	if(node.parent === null) return node
+	return node.findRoot(node.parent)
+}
+
+/**
 A handy function for depth first traversal of all children and this node
 @param {function} func a function of the signature function(Object3D)
 */
