@@ -15,6 +15,14 @@ Applicators.set('scale', (node, styleInfo) => {
 	node.scale.set(...parsedValue)
 })
 
+/** set Object3D.rotation */
+Applicators.set('rotation', (node, styleInfo) => {
+	const parsedValue = Evaluators.parse(styleInfo.value, node)
+	if (parsedValue === undefined || parsedValue instanceof Array === false) return
+	if (parsedValue.length !== 4) return
+	node.quaternion.set(...parsedValue)
+})
+
 /** display */
 Applicators.set('display', (node, styleInfo) => {
 	switch (styleInfo.value) {
@@ -31,7 +39,7 @@ Applicators.set('display', (node, styleInfo) => {
 			node.visible = true
 			return
 		default:
-			console.log('unknown display mode', styleInfo)
+			console.error('unknown display mode', styleInfo)
 			return
 	}
 })

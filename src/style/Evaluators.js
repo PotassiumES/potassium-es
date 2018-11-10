@@ -62,6 +62,14 @@ Singleton.add(
 )
 
 Singleton.add(
+	new Evaluator('quaternion', /quaternion\((?:([\.0-9])+,[\s]?){3}(([\.0-9]+){1})\)/gi, (value, node) => {
+		const result = _parseNumberArray(value.substring(11, value.length - 1))
+		if (typeof result === 'undefined') return undefined
+		return result
+	})
+)
+
+Singleton.add(
 	new Evaluator('long hash color', /^#[0-9A-F]{6}$/i, (value, node) => {
 		const result = [
 			_parseHexNumber(value.substring(1, 3)),

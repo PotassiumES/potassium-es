@@ -56,8 +56,3 @@ body					{ z-index: 2; }
 .portal-mode .flat-root, .portal-mode .immersive-root { display: none; }
 .immersive-mode .flat-root, .immersive-mode .portal-root { display: none; }
 
-/* Handy display mode exclusion and inclusion classes */
-.app.flat-mode .overlay-only, .app.flat-mode .scenic-only { display: none; }
-.app.overlay-mode .flat-only, .app.overlay-mode .scenic-only { display: none; }
-.app.scenic-mode .flat-only, .app.scenic-mode .overlay-only { display: none; }
-
