@@ -152,8 +152,8 @@ const App = class extends EventHandler {
 			this._flatClock.start() // resets delta to zero
 			this._flatTransformation = {
 				reset: transformation.reset === true,
-				translation: null,
-				rotation: null
+				translation: transformation.translation || null,
+				rotation: transformation.rotation || null
 			}
 			if (transformation.translation) {
 				this._flatTransformation.translation = _calculateTranslation(
@@ -501,20 +501,29 @@ const App = class extends EventHandler {
 	_handleFlatDisplayTick() {
 		if (this._flatCamera === null || this._flatTransformation === null) return
 		if (this._flatTransformation.reset) {
-			this._debugScene.position.set(0, 0, 0)
-			this._debugScene.quaternion.set(0, 0, 0, 1)
+			if(this._flatTransformation.translation){
+				this._debugScene.position.set(...this._flatTransformation.translation)
+			} else {
+				this._debugScene.position.set(0, 0, 0)
+			}
+			if(this._flatTransformation.rotation){
+				this._debugScene.quaternion.setFromEuler(new THREE.Euler(...this._flatTransformation.rotation))
+			} else {
+				this._debugScene.quaternion.set(0, 0, 0, 1)
+			}
 			return
-		}
-		const delta = this._flatClock.getDelta()
-		if (this._flatTransformation.rotation) {
-			this._debugScene.quaternion.multiply(this._flatTransformation.rotation)
-		}
-		if (this._flatTransformation.translation) {
-			this._debugScene.position.set(
-				this._debugScene.position.x + this._flatTransformation.translation[0] * delta,
-				this._debugScene.position.y + this._flatTransformation.translation[1] * delta,
-				this._debugScene.position.z + this._flatTransformation.translation[2] * delta
-			)
+		} else {
+			const delta = this._flatClock.getDelta()
+			if (this._flatTransformation.rotation) {
+				this._debugScene.quaternion.multiply(this._flatTransformation.rotation)
+			}
+			if (this._flatTransformation.translation) {
+				this._debugScene.position.set(
+					this._debugScene.position.x + this._flatTransformation.translation[0] * delta,
+					this._debugScene.position.y + this._flatTransformation.translation[1] * delta,
+					this._debugScene.position.z + this._flatTransformation.translation[2] * delta
+				)
+			}
 		}
 	}
 

@@ -101,7 +101,10 @@ som.text = (text = '', options = {}) => {
 		options
 	)
 	if (options.material === null) {
-		options.material = new THREE.MeshLambertMaterial({ color: options.color })
+		options.material = new THREE.MeshStandardMaterial({
+			color: options.color,
+			side: THREE.DoubleSide
+		})
 	}
 	const fontOptions = {
 		size: options.size,
@@ -118,10 +121,10 @@ som.text = (text = '', options = {}) => {
 	resultGroup.isText = true
 
 	resultGroup.setRGB = (red, green, blue) => {
-		if (resultGroup.material.emissive) {
-			resultGroup.material.emissive.setRGB(red, green, blue)
-		} else if (resultGroup.material.color) {
+		if (resultGroup.material.color) {
 			resultGroup.material.color.setRGB(red, green, blue)
+		} else if (resultGroup.material.emissive) {
+			resultGroup.material.emissive.setRGB(red, green, blue)
 		}
 	}
 
@@ -146,7 +149,7 @@ Creates a THREE.Mesh containing a THREE.BoxBufferGeometry
 som.cube = (size = [1, 1, 1], options = {}) => {
 	let material = null
 	if (options.color) {
-		material = new THREE.MeshLambertMaterial({ color: color })
+		material = new THREE.MeshStandardMaterial({ color: color })
 	} else if (options.material) {
 		material = options.material
 	}
@@ -187,7 +190,8 @@ som.SUPPORT_CLASSES = [
 	{ class: 'SphereBufferGeometry', name: 'sphereBufferGeometry' },
 	{ class: 'MeshBasicMaterial', name: 'meshBasicMaterial' },
 	{ class: 'LineBasicMaterial', name: 'lineBasicMaterial' },
-	{ class: 'MeshLambertMaterial', name: 'meshLambertMaterial' }
+	{ class: 'MeshLambertMaterial', name: 'meshLambertMaterial' },
+	{ class: 'MeshStandardMaterial', name: 'meshStandardMaterial' }
 ]
 for (const classInfo of som.SUPPORT_CLASSES) {
 	const innerClazz = classInfo.class

@@ -182,6 +182,15 @@
       "source": "/input/keyboard/0/key/49",
       "destination": "/action/transform-scene",
       "parameters": { "reset": true }
+    },
+    {
+      "comment": "2 resets to no rotation and translated forward by 6 meters",
+      "source": "/input/keyboard/0/key/50",
+      "destination": "/action/transform-scene",
+      "parameters": {
+        "reset": true,
+        "translation": [0, 0, 6]
+      }
     }
   ],
   "aliases": []

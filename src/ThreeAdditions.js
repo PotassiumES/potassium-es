@@ -79,7 +79,7 @@ const _traverseDepthFirst = function(node, func) {
 /**
 Used to determine when to trigger re-layout via styles
 */
-THREE.Object3D.prototype.layoutIsDirty = false
+THREE.Object3D.prototype.layoutIsDirty = true
 
 /**
 Sets this node layoutIsDirty to true and if it has a parent it calls parent.setLayoutDirty() (which calls its parent, etc)
@@ -89,18 +89,26 @@ THREE.Object3D.prototype.setLayoutDirty = function() {
 	if (this.parent && this.parent.layoutIsDirty === false) this.parent.setLayoutDirty()
 }
 
+THREE.Object3D.prototype.setGraphLayoutDirty = function(){
+	this.traverse(node => node.layoutIsDirty = true)
+}
+
 /**
 Set the layout dirty when adding or removing a child
 */
 const _oldAdd = THREE.Object3D.prototype.add
-THREE.Object3D.prototype.add = function(object) {
-	_oldAdd.call(this, object)
-	object.setLayoutDirty()
+THREE.Object3D.prototype.add = function(...objects) {
+	for(const obj of objects){
+		_oldAdd.call(this, obj)
+		obj.setLayoutDirty()
+	}
 	return this
 }
 const _oldRemove = THREE.Object3D.prototype.remove
-THREE.Object3D.prototype.remove = function(object) {
-	_oldRemove.call(this, object)
+THREE.Object3D.prototype.remove = function(...objects) {
+	for(const obj of objects){
+		_oldRemove.call(this, obj)
+	}
 	this.setLayoutDirty()
 	return this
 }
@@ -200,7 +208,7 @@ THREE.Object3D.prototype._getStyleTreeLines = function(
 		tabs +
 			'> ' +
 			(node.name || 'unnamed') +
-			': ' +
+			(node.type ? `[type=${node.type}] ` : ': ') +
 			node
 				.getClasses()
 				.map(clazz => `.${clazz}`)

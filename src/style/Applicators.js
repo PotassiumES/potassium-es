@@ -74,7 +74,7 @@ Applicators.set('material-emissive', (node, styleInfo) => {
 
 /** the duffuse color value of a node's material */
 Applicators.set('material-color', (node, styleInfo) => {
-	if (!node.material || !node.material.emissive) return
+	if (!node.material || !node.material.color) return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
 	if (typeof parsedValue === 'undefined') return
 	if(node.material && node.material.color){
