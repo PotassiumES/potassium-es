@@ -52,7 +52,7 @@ const styleInfoComparator = function(info1, info2) {
 
 	// Greater specificity is lesser for the sort
 	if (info1.selector !== null && info2.selector !== null) {
-		if (info1.selector.specificity !== info2.specificity) {
+		if (info1.selector.specificity !== info2.selector.specificity) {
 			return info1.selector.specificity > info2.selector.specificity ? -1 : 1
 		}
 	}
