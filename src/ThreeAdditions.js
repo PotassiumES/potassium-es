@@ -60,7 +60,7 @@ Object.defineProperty(THREE.Object3D.prototype, 'visible', {
 Helper functions to handling classes used by the Stylist
 */
 THREE.Object3D.prototype.addClass = function(...classNames) {
-	if (typeof this.userData.classes === 'undefined') {
+	if (this.userData.classes === undefined) {
 		this.userData.classes = [...classNames]
 		return
 	}
@@ -70,7 +70,7 @@ THREE.Object3D.prototype.addClass = function(...classNames) {
 	}
 }
 THREE.Object3D.prototype.removeClass = function(...classNames) {
-	if (typeof this.userData.classes === 'undefined' || this.userData.classes.length === 0) return
+	if (this.userData.classes === undefined || this.userData.classes.length === 0) return
 	for (const className of classNames) {
 		const index = this.userData.classes.indexOf(className)
 		if (index === -1) continue
@@ -78,11 +78,11 @@ THREE.Object3D.prototype.removeClass = function(...classNames) {
 	}
 }
 THREE.Object3D.prototype.hasClass = function(className) {
-	if (typeof this.userData.classes === 'undefined') return false
+	if (this.userData.classes === undefined) return false
 	return this.userData.classes.includes(className)
 }
 THREE.Object3D.prototype.getClasses = function() {
-	if (!this.userData.classes || this.userData.classes.length === 0) return []
+	if (this.userData.classes === undefined) return []
 	return this.userData.classes
 }
 

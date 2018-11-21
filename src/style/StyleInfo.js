@@ -43,13 +43,17 @@ const styleInfoComparator = function(info1, info2) {
 	}
 
 	// Not having a selector means that it's an assigned style and thus highly specific
-	if (info1.selector === null && info2.selector !== null) return -1
-	if (info1.selector !== null && info2.selector === null) return 1
+	if (info1.selector === null && info2.selector !== null) {
+		return -1
+	}
+	if (info1.selector !== null && info2.selector === null) {
+		return 1
+	}
 
 	// Greater specificity is lesser for the sort
 	if (info1.selector !== null && info2.selector !== null) {
 		if (info1.selector.specificity !== info2.specificity) {
-			return info1.specificity > info2.specificity ? -1 : 1
+			return info1.selector.specificity > info2.selector.specificity ? -1 : 1
 		}
 	}
 
