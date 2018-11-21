@@ -5,7 +5,6 @@ let Singleton = null
 let MonthNames = null // [locale, [names]]
 let DateFieldOrder = null
 
-
 const TestDateMilliseconds = 1517385600000
 
 const GatheringCookieName = 'potassiumes-localizer-gathering'
@@ -44,33 +43,33 @@ const Localizer = class extends EventHandler {
 	This should NOT be turned on in production because it continuously grows in memory.
 	@return {boolean} true if the Localizer is accumulating strings to translate
 	*/
-	get gathering(){
+	get gathering() {
 		return this._gathering
 	}
 
-	set gathering(val){
-		if(!!val){
-			if(this._gathering) return
+	set gathering(val) {
+		if (!!val) {
+			if (this._gathering) return
 			dom.setCookie(GatheringCookieName, 'true')
 			this._gathering = true
 			this._gatheredStrings = []
 		} else {
-			if(this._gathering === false) return
+			if (this._gathering === false) return
 			dom.removeCookie(GatheringCookieName)
 			this._gathering = false
 			this._gatheredStrings = null
 		}
 	}
 
-	get gatheredData(){
-		if(this._gathering === false) return null
+	get gatheredData() {
+		if (this._gathering === false) return null
 		return {
 			strings: this._gatheredStrings
 		}
 	}
 
-	_gatherString(key, value, defaultValue){
-		if(!key || !key.trim()) return
+	_gatherString(key, value, defaultValue) {
+		if (!key || !key.trim()) return
 		this._gatheredStrings.push({
 			key: key,
 			value: value,
@@ -80,16 +79,16 @@ const Localizer = class extends EventHandler {
 
 	translate(key, defaultValue = null) {
 		const translation = this._translations.get(key)
-		if (!translation){
-			if(this._gathering) this._gatherString(key, null, defaultValue)
+		if (!translation) {
+			if (this._gathering) this._gatherString(key, null, defaultValue)
 			return defaultValue !== null ? defaultValue : key
 		}
 		const value = translation.get(key)
-		if (!value){
-			if(this._gathering) this._gatherString(key, null, defaultValue)
+		if (!value) {
+			if (this._gathering) this._gatherString(key, null, defaultValue)
 			return defaultValue !== null ? defaultValue : key
 		}
-		if(this._gathering) this._gatherString(key, value, defaultValue)
+		if (this._gathering) this._gatherString(key, value, defaultValue)
 		return value
 	}
 
@@ -115,35 +114,41 @@ const Localizer = class extends EventHandler {
 	Different locales order their dates in various ways: mm/dd/yyyy or yyyy.mm.dd or 2012년 12월 20일 목요일
 	@return {string[]} - a length 3 array of 'day', 'month', and 'year' in the order that this locale renders date fields
 	*/
-	get dateFieldOrder(){
-		if(DateFieldOrder !== null) return DateFieldOrder
+	get dateFieldOrder() {
+		if (DateFieldOrder !== null) return DateFieldOrder
 
-		if(typeof this._dateTimeFormatter.formatToParts === 'function'){
-			DateFieldOrder = this._dateTimeFormatter.formatToParts(new Date(), {
-				year: 'numeric',
-				month: 'numeric',
-				day: 'numeric'
-			}).filter(part => part.type !== 'literal').map(part => part.type)
+		if (typeof this._dateTimeFormatter.formatToParts === 'function') {
+			DateFieldOrder = this._dateTimeFormatter
+				.formatToParts(new Date(), {
+					year: 'numeric',
+					month: 'numeric',
+					day: 'numeric'
+				})
+				.filter(part => part.type !== 'literal')
+				.map(part => part.type)
 			return DateFieldOrder
 		}
 
 		// Ok the correct but less supported function is not there, try this hack
-		const tokens = new Date(TestDateMilliseconds).toLocaleDateString(this._defaultLocales, {
-			day: 'numeric',
-			month: 'numeric',
-			year: 'numeric'
-		}).split(/[\/ \.]/).filter(token => token.trim().length > 0)
+		const tokens = new Date(TestDateMilliseconds)
+			.toLocaleDateString(this._defaultLocales, {
+				day: 'numeric',
+				month: 'numeric',
+				year: 'numeric'
+			})
+			.split(/[\/ \.]/)
+			.filter(token => token.trim().length > 0)
 		let monthIndex = 0
 		let yearIndex = 0
-		for(let i=1; i < 3; i++){
-			if(tokens[i].length < tokens[monthIndex].length) monthIndex = i
-			if(tokens[i].length > tokens[yearIndex].length) yearIndex = i
+		for (let i = 1; i < 3; i++) {
+			if (tokens[i].length < tokens[monthIndex].length) monthIndex = i
+			if (tokens[i].length > tokens[yearIndex].length) yearIndex = i
 		}
 		DateFieldOrder = []
 		DateFieldOrder[monthIndex] = 'month'
-		DateFieldOrder[yearIndex] =  'year'
-		for(let i=0; i < 3; i++){
-			if(!DateFieldOrder[i]){
+		DateFieldOrder[yearIndex] = 'year'
+		for (let i = 0; i < 3; i++) {
+			if (!DateFieldOrder[i]) {
 				DateFieldOrder[i] = 'day'
 				break
 			}

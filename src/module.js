@@ -1,5 +1,5 @@
-import dom from './DOM.js'
 import App from './App.js'
+import dom from './DOM.js'
 import som from './SOM.js'
 import Engine from './Engine.js'
 import Router from './Router.js'
@@ -20,8 +20,8 @@ import DisplayModeTracker from './DisplayModeTracker.js'
  */
 
 export {
-	dom,
 	App,
+	dom,
 	som,
 	Engine,
 	Router,

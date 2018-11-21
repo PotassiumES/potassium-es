@@ -1,10 +1,16 @@
+import Evaluators from './Evaluators.js'
+
 /**
 ComputedStyles holds the previous and computed declarations for a single Object3D
 
 The computed styles are the combined output of a node's {AssignedStyles}, {LocalStyles}, and inherited computed parental styles.
 */
 class ComputedStyles {
-	constructor() {
+	/**
+	@param {THREE.Object3D} node
+	*/
+	constructor(node) {
+		this.node = node
 		/** @type {Map<string, StyleInfo>} property -> style */
 		this._previousStyles = new Map()
 		/** @type {Map<string, StyleInfo>} property -> style */
@@ -65,9 +71,9 @@ class ComputedStyles {
 		//Recalculate the changes list
 		for (const property of this._currentStyles.keys()) {
 			const hasStyle = this._previousStyles.has(property)
-			if(hasStyle === false){
+			if (hasStyle === false) {
 				this._changes.push(property)
-			} else if(hasStyle && this._previousStyles.get(property).value !== this._currentStyles.get(property).value){
+			} else if (hasStyle && this._previousStyles.get(property).value !== this._currentStyles.get(property).value) {
 				this._changes.push(property)
 			}
 		}
@@ -80,6 +86,14 @@ class ComputedStyles {
 		return this._currentStyles.get(property) || null
 	}
 
+	getNumber(property, defaultValue = null) {
+		const styleInfo = this.get(property)
+		if (styleInfo === null) return defaultValue
+		const parsedValue = Evaluators.parse(styleInfo.value, this.node)
+		if (parsedValue === null) return defaultValue
+		return parsedValue
+	}
+
 	/**
 	changes is used by the Stylist to know which styles need to be updated on the Three.Object3D
 	@return {Array<property{string}>} the declarations that changed since the last update
@@ -90,14 +104,14 @@ class ComputedStyles {
 
 	/** Iterate over the current declarations */
 	*[Symbol.iterator]() {
-		for (const styleInfo of this._currentStyles.values()){
+		for (const styleInfo of this._currentStyles.values()) {
 			yield styleInfo
 		}
 	}
 
-	log(showVars=false){
-		for(let styleInfo of this){
-			if(showVars === false && styleInfo.property.startsWith('--')) continue
+	log(showVars = false) {
+		for (const styleInfo of this) {
+			if (showVars === false && styleInfo.property.startsWith('--')) continue
 			console.log(styleInfo.toString())
 		}
 	}
@@ -148,5 +162,19 @@ const InheritedProperties = [
 	'word-wrap'
 ]
 
+const LayoutEffectingProperties = [
+	'margin',
+	'border-width',
+	'padding',
+	'scale',
+	'display',
+	'grid',
+	'grid-template',
+	'gap',
+	'grid-auto-flow',
+	'grid-auto-rows',
+	'grid-auto-columns'
+]
+
 export default ComputedStyles
-export { ComputedStyles, InheritedProperties }
+export { ComputedStyles, InheritedProperties, LayoutEffectingProperties }

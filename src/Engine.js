@@ -48,6 +48,11 @@ const Engine = class extends EventHandler {
 		this._sceneDisplay = sceneDisplay
 	}
 
+	get renderer() {
+		if (this._sceneDisplay === null) return null
+		return this._sceneDisplay.renderer
+	}
+
 	get dom() {
 		return this._dom
 	}
@@ -226,6 +231,10 @@ const SceneDisplay = class extends EventHandler {
 		throw new Error('Not implemented')
 	}
 
+	get renderer() {
+		throw new Error('Not implemented')
+	}
+
 	start() {
 		throw new Error('Not implemented')
 	}
@@ -270,6 +279,10 @@ const FlatDisplay = class extends SceneDisplay {
 
 	get blendMode() {
 		return Engine.OPAQUE
+	}
+
+	get renderer() {
+		return this._renderer
 	}
 
 	get isStarted() {
@@ -356,6 +369,10 @@ const WebVRDisplay = class extends SceneDisplay {
 
 	get blendMode() {
 		return Engine.OPAQUE
+	}
+
+	get renderer() {
+		return this._renderer
 	}
 
 	get isStarted() {
@@ -450,6 +467,7 @@ const WebXRDisplay = class extends SceneDisplay {
 		this._xrDevice = xrDevice
 		this._dom = domElement
 
+		this._renderer = null
 		this._session = null // XRSession
 		this._eyeLevelFrameOfReference = null
 
@@ -471,6 +489,10 @@ const WebXRDisplay = class extends SceneDisplay {
 			this._xrCanvas = null
 			this._xrContext = null
 		}
+	}
+
+	get renderer() {
+		return this._renderer
 	}
 
 	get isStarted() {

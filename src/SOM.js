@@ -3,12 +3,8 @@ Functions that generate Spatial Object Model (SOM) elements like som.group(...)
 Underlying the SOM is the Three.js scene som 
 */
 import AssetLoader from './AssetLoader.js'
-import * as ta from './ThreeAdditions.js'
 
 import Attributes from './style/Attributes.js'
-import LocalStyles from './style/LocalStyles.js'
-import AssignedStyles from './style/AssignedStyles.js'
-import ComputedStyles from './style/ComputedStyles.js'
 import { SelectorFragmentList } from './style/Selector.js'
 
 const som = {}
@@ -130,11 +126,12 @@ som.text = (text = '', options = {}) => {
 
 	resultGroup.setFontOptions = newOptions => {
 		Object.assign(fontOptions, newOptions)
-		resultGroup.setText(currentText)
+		resultGroup.setText(currentText, true)
 	}
 
-	resultGroup.setText = newText => {
-		if (newText === currentText) return
+	resultGroup.setText = (newText, force = false) => {
+		newText = newText || ''
+		if (force === false && newText === currentText) return
 		currentText = newText
 		loadText(resultGroup, currentText, options.material, options.fontURL, fontOptions)
 	}
@@ -182,9 +179,11 @@ The methods created from these info just pass through any params to the class co
 For example, creating a MeshBasicMaterial will be som.meshBasicMaterial(...params).
 */
 som.SUPPORT_CLASSES = [
+	{ class: 'Box3', name: 'box3' },
 	{ class: 'Mesh', name: 'mesh' },
 	{ class: 'Line', name: 'line' },
 	{ class: 'Euler', name: 'euler' },
+	{ class: 'Matrix4', name: 'matrix4' },
 	{ class: 'Vector3', name: 'vector3' },
 	{ class: 'Geometry', name: 'geometry' },
 	{ class: 'SphereBufferGeometry', name: 'sphereBufferGeometry' },

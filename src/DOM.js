@@ -263,22 +263,19 @@ for (const tag of dom.TAGS) {
 	}
 }
 
-const CookieValueRegularExpressionParts = [
-	'(?:(?:^|.*;\\s*)',
-	'\\s*\\=\\s*([^;]*).*$)|^.*$'
-]
+const CookieValueRegularExpressionParts = ['(?:(?:^|.*;\\s*)', '\\s*\\=\\s*([^;]*).*$)|^.*$']
 
-dom.getCookie = function(cookieName){
+dom.getCookie = function(cookieName) {
 	const cookieRegExp = new RegExp(
 		`${CookieValueRegularExpressionParts[0]}${encodeURIComponent(cookieName)}${CookieValueRegularExpressionParts[1]}`
 	)
 	return document.cookie.replace(cookieRegExp, '$1')
 }
 
-dom.setCookie = function(cookieName, value){
+dom.setCookie = function(cookieName, value) {
 	document.cookie = `${encodeURIComponent(cookieName)}=${encodeURIComponent(value)}`
 }
 
-dom.removeCookie = function(cookieName){
-	document.cookie =`${encodeURIComponent(cookieName)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+dom.removeCookie = function(cookieName) {
+	document.cookie = `${encodeURIComponent(cookieName)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT`
 }

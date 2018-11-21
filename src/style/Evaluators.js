@@ -47,7 +47,7 @@ const Singleton = new Evaluators()
 Singleton.add(
 	new Evaluator('custom properties / variables', /^var\(\-\-[^-\)][\-a-z0-9_]*\)$/i, (value, node) => {
 		const variableName = value.substring(4, value.length - 1)
-		const variableStyle = node.computedStyles.get(variableName)
+		const variableStyle = node.styles.computedStyles.get(variableName)
 		if (!variableStyle) return undefined
 		return Singleton.parse(variableStyle.value, node)
 	})

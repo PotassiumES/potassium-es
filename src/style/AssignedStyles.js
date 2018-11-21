@@ -33,6 +33,7 @@ class AssignedStyles {
 	@return {bool} true if property existed
 	*/
 	delete(property) {
+		this._node.styles.stylesAreDirty = true
 		return this._map.delete(property)
 	}
 
@@ -48,18 +49,19 @@ class AssignedStyles {
 			important: important
 		})
 		this._map.set(property, new StyleInfo(declaration))
+		this._node.styles.stylesAreDirty = true
 	}
 
 	/** Iterate over the {StyleInfo}s */
 	*[Symbol.iterator]() {
-		for (const styleInfo of this._map.values()){
+		for (const styleInfo of this._map.values()) {
 			yield styleInfo
 		}
 	}
 
-	log(showVars=false){
-		for(let styleInfo of this){
-			if(showVars === false && styleInfo.property.startsWith('--')) continue
+	log(showVars = false) {
+		for (const styleInfo of this) {
+			if (showVars === false && styleInfo.property.startsWith('--')) continue
 			console.log(styleInfo.toString())
 		}
 	}

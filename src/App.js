@@ -1,3 +1,5 @@
+import * as ta from './ThreeAdditions.js'
+
 import dom from './DOM.js'
 import som from './SOM.js'
 import Router from './Router.js'
@@ -49,20 +51,17 @@ const App = class extends EventHandler {
 
 		this._stylist = new Stylist()
 		this._stylist.addListener((eventName, stylist) => {
-			this._stylist.calculateAndApplyStyles(this._portalScene)
-			this._stylist.calculateAndApplyStyles(this._immersiveScene)
-			/** @todo figure out a smarter way to apply styles when they are needed */
 			setInterval(() => {
 				switch (this.displayMode) {
 					case App.IMMERSIVE:
-						this._stylist.calculateAndApplyStyles(this._immersiveScene)
+						this._stylist.style(this._immersiveScene, this._immersiveEngine.renderer)
 						break
 					case App.PORTAL:
-						this._stylist.calculateAndApplyStyles(this._portalScene)
+						this._stylist.style(this._portalScene, this._portalEngine.renderer)
 						break
 					case App.FLAT:
 						if (this._debugScene !== null) {
-							this._stylist.calculateAndApplyStyles(this._debugScene)
+							this._stylist.style(this._debugScene, this._flatDisplay.renderer)
 						}
 						break
 				}
@@ -220,7 +219,6 @@ const App = class extends EventHandler {
 			}
 		}, Engine.STOPPED)
 
-
 		/** Immersive display Spatial Object Model (SOM) container */
 		this._immersiveSOM = som.group().appendTo(this._immersiveScene)
 		this._immersiveSOM.addClass('som-root', 'immersive-root', 'immersive-som')
@@ -273,6 +271,16 @@ const App = class extends EventHandler {
 
 			/* Component listens for events on the DisplayModeTracker and updates itself accordingly */
 			DisplayModeTracker.Singleton.setDisplayMode(mode)
+
+			/* style once right at the start to avoid seeing unstyled scenes */
+			switch (mode) {
+				case App.IMMERSIVE:
+					this._stylist.style(this._immersiveScene, this._immersiveEngine.renderer)
+					break
+				case App.PORTAL:
+					this._stylist.style(this._portalScene, this._portalEngine.renderer)
+					break
+			}
 		}, App.DisplayModeChangedEvent)
 
 		this._updateClasses()
@@ -434,6 +442,7 @@ const App = class extends EventHandler {
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
 			this._flatDisplay = new FlatDisplay(this._flatCamera, this._debugScene, this._handleFlatDisplayTick)
+			this._stylist.style(this._debugScene, this._flatDisplay.renderer)
 			document.body.prepend(this._flatDisplay.dom)
 			this._flatDisplay.start()
 			this._actionManager.activateActionMaps('flat-dev')
@@ -450,15 +459,15 @@ const App = class extends EventHandler {
 		}
 	}
 
-	set localizerGathering(shouldGather){
+	set localizerGathering(shouldGather) {
 		Localizer.Singleton.gathering = shouldGather
 	}
 
-	get localizerGathering(){
+	get localizerGathering() {
 		return Localizer.Singleton.gathering
 	}
 
-	get localizerGatheredData(){
+	get localizerGatheredData() {
 		return Localizer.Singleton.gatheredData
 	}
 
@@ -501,12 +510,12 @@ const App = class extends EventHandler {
 	_handleFlatDisplayTick() {
 		if (this._flatCamera === null || this._flatTransformation === null) return
 		if (this._flatTransformation.reset) {
-			if(this._flatTransformation.translation){
+			if (this._flatTransformation.translation) {
 				this._debugScene.position.set(...this._flatTransformation.translation)
 			} else {
 				this._debugScene.position.set(0, 0, 0)
 			}
-			if(this._flatTransformation.rotation){
+			if (this._flatTransformation.rotation) {
 				this._debugScene.quaternion.setFromEuler(new THREE.Euler(...this._flatTransformation.rotation))
 			} else {
 				this._debugScene.quaternion.set(0, 0, 0, 1)

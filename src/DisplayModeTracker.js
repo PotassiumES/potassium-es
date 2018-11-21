@@ -41,13 +41,15 @@ export default class DisplayModeTracker extends EventHandler {
 		this._triggerUpdate()
 	}
 
-	get currentDisplayMode(){ return this._mode }
+	get currentDisplayMode() {
+		return this._mode
+	}
 
 	/**
 	@param {string} mode like 'flat', 'portal', or 'immersive'
 	*/
-	set currentDisplayMode(mode){
-		if(mode === this._mode) return
+	set currentDisplayMode(mode) {
+		if (mode === this._mode) return
 		this._mode = mode
 		this.trigger(DisplayModeTracker.DisplayModeChangedEvent, mode, this)
 	}

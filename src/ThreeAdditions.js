@@ -1,7 +1,5 @@
 import Attributes from './style/Attributes.js'
-import LocalStyles from './style/LocalStyles.js'
-import AssignedStyles from './style/AssignedStyles.js'
-import ComputedStyles from './style/ComputedStyles.js'
+import NodeStyles from './style/NodeStyles.js'
 
 import { SelectorFragmentList } from './style/Selector.js'
 
@@ -12,6 +10,51 @@ importing this extends THREE.Object3D with many methods and attributes useful fo
 // Used by KSS tag selectors
 THREE.Object3D.prototype.isNode = true
 THREE.Scene.prototype.isScene = true
+
+Object.defineProperty(THREE.Object3D.prototype, 'styles', {
+	/**
+	Object3D.styles holds the KSS and layout information for an Object3D
+	@type {NodeStyles}
+	*/
+	get: function() {
+		if (this._styles === undefined) this._styles = new NodeStyles(this)
+		return this._styles
+	}
+})
+
+/**
+Set the styles.hierarchyIsDirty when adding or removing a child
+*/
+const _oldAdd = THREE.Object3D.prototype.add
+THREE.Object3D.prototype.add = function(...objects) {
+	for (const obj of objects) {
+		_oldAdd.call(this, obj)
+	}
+	this.styles.setAncestorsHierarchyDirty()
+	return this
+}
+const _oldRemove = THREE.Object3D.prototype.remove
+THREE.Object3D.prototype.remove = function(...objects) {
+	for (const obj of objects) {
+		_oldRemove.call(this, obj)
+	}
+	this.styles.setAncestorsHierarchyDirty()
+	return this
+}
+
+/**
+Override the Object3D.visible property in order to update styles when it changes
+*/
+Object.defineProperty(THREE.Object3D.prototype, 'visible', {
+	get: function() {
+		return this._visible !== false
+	},
+	set: function(val) {
+		if (this._visible === val) return
+		this._visible = val
+		this.styles.setAncestorsHierarchyDirty()
+	}
+})
 
 /**
 Helper functions to handling classes used by the Stylist
@@ -46,8 +89,8 @@ THREE.Object3D.prototype.getClasses = function() {
 /**
 If the Object3D has a geometry then show a THREE.Box3Helper for it
 */
-THREE.Object3D.prototype.showBox3Helper = function(){
-	if(!this.geometry){
+THREE.Object3D.prototype.showBox3Helper = function() {
+	if (!this.geometry) {
 		console.error('No geometry for bounding box')
 		return false
 	}
@@ -56,8 +99,8 @@ THREE.Object3D.prototype.showBox3Helper = function(){
 	return true
 }
 
-THREE.Object3D.prototype.findRoot = function(node=this){
-	if(node.parent === null) return node
+THREE.Object3D.prototype.findRoot = function(node = this) {
+	if (node.parent === null) return node
 	return node.findRoot(node.parent)
 }
 
@@ -70,84 +113,48 @@ THREE.Object3D.prototype.traverseDepthFirst = function(func) {
 }
 
 const _traverseDepthFirst = function(node, func) {
-	for (let i=0; i < node.children.length; i++) {
+	for (let i = 0; i < node.children.length; i++) {
 		_traverseDepthFirst(node.children[i], func)
 	}
 	func(node)
 }
 
 /**
-Used to determine when to trigger re-layout via styles
+@param {string} selector - like 'node[name=ModeSwitcherComponent] .button-component > text'
+@param {boolean} atMostOne - true if only one result is desired
+@return {Object3D[]} nodes that match the selector
 */
-THREE.Object3D.prototype.layoutIsDirty = true
-
-/**
-Sets this node layoutIsDirty to true and if it has a parent it calls parent.setLayoutDirty() (which calls its parent, etc)
-*/
-THREE.Object3D.prototype.setLayoutDirty = function() {
-	this.layoutIsDirty = true
-	if (this.parent && this.parent.layoutIsDirty === false) this.parent.setLayoutDirty()
-}
-
-THREE.Object3D.prototype.setGraphLayoutDirty = function(){
-	this.traverse(node => node.layoutIsDirty = true)
-}
-
-/**
-Set the layout dirty when adding or removing a child
-*/
-const _oldAdd = THREE.Object3D.prototype.add
-THREE.Object3D.prototype.add = function(...objects) {
-	for(const obj of objects){
-		_oldAdd.call(this, obj)
-		obj.setLayoutDirty()
-	}
-	return this
-}
-const _oldRemove = THREE.Object3D.prototype.remove
-THREE.Object3D.prototype.remove = function(...objects) {
-	for(const obj of objects){
-		_oldRemove.call(this, obj)
-	}
-	this.setLayoutDirty()
-	return this
-}
-
-/**
-@param {string} selector like 'node[name=ModeSwitcherComponent] .button-component > text'
-@return {Array<Object3D>} nodes that match the selector
-*/
-THREE.Object3D.prototype.getObjectsBySelector = function(selector) {
+THREE.Object3D.prototype.getObjectsBySelector = function(selector, atMostOne = false) {
 	const selectorFragmentList = SelectorFragmentList.Parse(selector)
 	const results = []
 	this.traverse(node => {
 		if (node === this) return
 		if (selectorFragmentList.matches(node)) {
 			results.push(node)
+			if (atMostOne) return results
 		}
 	})
 	return results
 }
 
 /**
-@param {string} selector like 'node[name=ModeSwitcherComponent] .button-component > text'
+@param {string} selector - like 'node[name=ModeSwitcherComponent] .button-component > text'
 @return {Object3D?} the first node to match the selector or null if none were found
 */
 THREE.Object3D.prototype.querySelector = function(selector) {
-	const results = this.getObjectsBySelector(selector)
+	const results = this.getObjectsBySelector(selector, true)
 	if (results.length > 0) return results[0]
 	return null
 }
-
 
 /**
 @param {Object3D} node
 @return {Object3D[]} returns an array of the ancesters of `node`, starting at the root and ending with the `node`
 */
-THREE.Object3D.prototype.getAncestry = function(node = this){
+THREE.Object3D.prototype.getAncestry = function(node = this) {
 	const lineage = []
 	let workingNode = node
-	while(workingNode){
+	while (workingNode) {
 		lineage.push(workingNode)
 		workingNode = workingNode.parent
 	}
@@ -159,9 +166,11 @@ THREE.Object3D.prototype.getAncestry = function(node = this){
 Logs the ancestry of `node` starting with the root and ending with the `node`
 @param {Object3D} node
 */
-THREE.Object3D.prototype.logAncestry = function(node=this, showVars=false, localsOnly=false){
+THREE.Object3D.prototype.logAncestry = function(node = this, showVars = false, localsOnly = false) {
 	node.getAncestry().forEach(obj => {
-		obj._getStyleTreeLines(undefined, undefined, undefined, showVars, localsOnly, false).forEach(line => console.log(line))
+		obj
+			._getStyleTreeLines(undefined, undefined, undefined, showVars, localsOnly, false)
+			.forEach(line => console.log(line))
 	})
 }
 
@@ -213,24 +222,20 @@ THREE.Object3D.prototype._getStyleTreeLines = function(
 				.getClasses()
 				.map(clazz => `.${clazz}`)
 				.join('') +
-			(node.layoutIsDirty ? '\tdirty' : '')
+			(node.hierarchyIsDirty ? '\tdirty' : '')
 	)
 	if (localsOnly) {
-		for (const styleInfo of node.localStyles) {
+		for (const styleInfo of node.styles.localStyles) {
 			if (showVars === false && styleInfo.property.startsWith('--')) continue
-			reults.push(
-				tabs + '\t' + styleInfo.toString()
-			)
+			reults.push(tabs + '\t' + styleInfo.toString())
 		}
 	} else {
-		for (const styleInfo of node.computedStyles) {
+		for (const styleInfo of node.styles.computedStyles) {
 			if (showVars === false && styleInfo.property.startsWith('--')) continue
-			results.push(
-				tabs + '\t' + styleInfo.toString()
-			)
+			results.push(tabs + '\t' + styleInfo.toString())
 		}
 	}
-	if(traverseChildren === false){
+	if (traverseChildren === false) {
 		return results
 	}
 	for (const child of node.children) {
@@ -245,61 +250,6 @@ const _generateTabs = function(depth) {
 	result[depth - 1] = null
 	return result.fill('\t').join('')
 }
-
-/**
-Object3D.matchingRules is used by the Stylist to track rules with selectors that match this node
-*/
-Object.defineProperty(THREE.Object3D.prototype, 'matchingRules', {
-	/** @type {Array[{
-		rule: { selectors, declarations },
-		stylesheet: Stylesheet,
-		selector: SelectorFragmentList
-	}]} */
-	get: function() {
-		if (typeof this._matchingRules === 'undefined') this._matchingRules = []
-		return this._matchingRules
-	}
-})
-
-/**
-Object3D.localStyles holds the individual styles that were assigned to this node
-You should use Object3D.computedStyles to see the final values after inheriting values via the cascade
-*/
-Object.defineProperty(THREE.Object3D.prototype, 'localStyles', {
-	/**
-	@type {LocalStyles}
-	*/
-	get: function() {
-		if (typeof this._localStyles === 'undefined') this._localStyles = new LocalStyles()
-		return this._localStyles
-	}
-})
-
-/**
-Object3D.computedStyles holds the final computed styles that apply to this node
-*/
-Object.defineProperty(THREE.Object3D.prototype, 'computedStyles', {
-	/**
-	@type {ComputedStyles}
-	*/
-	get: function() {
-		if (typeof this._computedStyles === 'undefined') this._computedStyles = new ComputedStyles()
-		return this._computedStyles
-	}
-})
-
-/**
-Object3D.assignedStyles holds the styles that are programmatically (not via KSS) assigned to a node
-*/
-Object.defineProperty(THREE.Object3D.prototype, 'assignedStyles', {
-	/**
-	@type {AssignedStyles}
-	*/
-	get: function() {
-		if (typeof this._assignedStyles === 'undefined') this._assignedStyles = new AssignedStyles(this)
-		return this._assignedStyles
-	}
-})
 
 /**
 Object3D.attributes is a helper API for accessing attributes on the node or in node.userData

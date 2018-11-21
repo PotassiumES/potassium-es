@@ -37,11 +37,10 @@ class GridLayout extends Layout {
 	constructor(node) {
 		super(node)
 		this._grid = new Grid(node)
-		this.updateFromNodeStyles()
 	}
 
 	updateFromNodeStyles() {
-		const gridTemplateStyleInfo = this.node.computedStyles.get('grid-template')
+		const gridTemplateStyleInfo = this.node.styles.computedStyles.get('grid-template')
 		if (gridTemplateStyleInfo) {
 			const directions = _parseGridTemplate(gridTemplateStyleInfo.value, this.node)
 			if (directions && (directions.length === 1 || directions.length === 2)) {
@@ -51,13 +50,13 @@ class GridLayout extends Layout {
 			}
 		}
 
-		const autoFlowStyleInfo = this.node.computedStyles.get('grid-auto-flow')
+		const autoFlowStyleInfo = this.node.styles.computedStyles.get('grid-auto-flow')
 		if (autoFlowStyleInfo) {
 			this._grid._autoFlow = autoFlowStyleInfo.value === 'column' ? Grid.Column : Grid.Row
 		}
 
 		const autoFlowStyleName = this._grid._autoFlow === Grid.Row ? 'grid-auto-rows' : 'grid-auto-columns'
-		const autoFlowSizeStyleInfo = this.node.computedStyles.get(autoFlowStyleName)
+		const autoFlowSizeStyleInfo = this.node.styles.computedStyles.get(autoFlowStyleName)
 		if (autoFlowSizeStyleInfo) {
 			const autoFlowSize = Evaluators.parse(autoFlowSizeStyleInfo.value, this.node)
 			if (typeof autoFlowSize === 'undefined') {
@@ -67,7 +66,7 @@ class GridLayout extends Layout {
 			}
 		}
 
-		const gapStyleInfo = this.node.computedStyles.get('gap')
+		const gapStyleInfo = this.node.styles.computedStyles.get('gap')
 		if (gapStyleInfo) {
 			const gapSizes = Evaluators.parse(gapStyleInfo.value, this.node)
 			if (typeof gapSizes === 'undefined' || gapSizes.length < 1) {
@@ -83,15 +82,12 @@ class GridLayout extends Layout {
 		this._grid.apply()
 	}
 
-	/** @type {bool} */
-	get isGrid() {
-		return true
-	}
-
 	prettyPrint() {
 		this._grid.prettyPrint()
 	}
 }
+
+GridLayout.prototype.isGrid = true
 
 const DefaultCellSize = 0.02 // meters
 const DefaultGapSize = 0.01 // meters
@@ -162,7 +158,7 @@ class Grid {
 		const count = this._node.children.length
 		if (count === 0) return
 		let childIndex = this._nextVisibleChild(0)
-		if(childIndex === -1) return
+		if (childIndex === -1) return
 
 		/*
 		The autoflow is the major track and the other flow is the minor track
@@ -203,11 +199,11 @@ class Grid {
 				}
 
 				workingChild = this._node.children[childIndex]
-				if(
-					workingChild.position.x !== (this._autoFlow === Grid.Row ? minorPosition : majorPosition)
-					|| workingChild.position.y !== (this._autoFlow === Grid.Row ? majorPosition : minorPosition)
-					|| workingChild.position.z !== 0
-				){
+				if (
+					workingChild.position.x !== (this._autoFlow === Grid.Row ? minorPosition : majorPosition) ||
+					workingChild.position.y !== (this._autoFlow === Grid.Row ? majorPosition : minorPosition) ||
+					workingChild.position.z !== 0
+				) {
 					workingChild.position.set(
 						this._autoFlow === Grid.Row ? minorPosition : majorPosition,
 						this._autoFlow === Grid.Row ? majorPosition : minorPosition,
@@ -238,11 +234,11 @@ class Grid {
 			}
 
 			workingChild = this._node.children[childIndex]
-			if(
-				workingChild.position.x !== (this._autoFlow === Grid.Row ? minorPosition : majorPosition)
-				|| workingChild.position.y !== (this._autoFlow === Grid.Row ? majorPosition : minorPosition)
-				|| workingChild.position.z !== 0
-			){
+			if (
+				workingChild.position.x !== (this._autoFlow === Grid.Row ? minorPosition : majorPosition) ||
+				workingChild.position.y !== (this._autoFlow === Grid.Row ? majorPosition : minorPosition) ||
+				workingChild.position.z !== 0
+			) {
 				workingChild.position.set(
 					this._autoFlow === Grid.Row ? minorPosition : majorPosition,
 					this._autoFlow === Grid.Row ? majorPosition : minorPosition,
@@ -262,9 +258,9 @@ class Grid {
 	}
 
 	/** @return {integer} the index of the next visible child starting from `startIndex` or -1 if there are none */
-	_nextVisibleChild(startIndex){
-		for(let i=startIndex; i < this._node.children.length; i++){
-			if(this._node.children[i].visible) return i
+	_nextVisibleChild(startIndex) {
+		for (let i = startIndex; i < this._node.children.length; i++) {
+			if (this._node.children[i].visible) return i
 		}
 		return -1
 	}

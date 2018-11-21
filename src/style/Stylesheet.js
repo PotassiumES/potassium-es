@@ -12,8 +12,8 @@ class Stylesheet {
 	constructor(kssData) {
 		this._data = kssData
 		for (let i = 0; i < this._data.rules.length; i++) {
-			;(this._data.rules[i].index = i),
-				(this._data.rules[i].selectors = this._parseSelectors(this._data.rules[i].selectors))
+			this._data.rules[i].index = i
+			this._data.rules[i].selectors = this._parseSelectors(this._data.rules[i].selectors)
 			this._data.rules[i].declarations = this._parseDeclarations(this._data.rules[i].declarations)
 		}
 		this._loadIndex = -1 // Will be set by Stylist
@@ -34,43 +34,20 @@ class Stylesheet {
 		return this._data
 	}
 
-	get raw() {
-		return this._data.rules.map(rule => this.rawRule(rule)).join('\n\n')
-	}
-
-	/**
-	Log to console a human readable dump of this stylesheet
-	*/
-	prettyPrint() {
-		this._data.rules.forEach(rule => console.log(this.rawRule(rule)))
-	}
-
-	updateLocalStyles(node, traverseChildren = true) {
-		// Get a list of this node and all descendents
-		const nodes = []
-		if (traverseChildren) {
-			node.traverse(n => {
-				nodes.push(n)
-			})
-		} else {
-			nodes.push(node)
-		}
-
-		// Now test each rule against each node in nodes
+	updateLocalStyles(node) {
+		// Now test each rule
 		for (const rule of this._data.rules) {
-			for (const n of nodes) {
-				const matchingSelector = rule.selectors.find(sfList => sfList.matches(n))
-				if (!matchingSelector) continue
-				n.matchingRules.push({
-					rule: rule,
-					stylesheet: this,
-					selector: matchingSelector
-				})
-				for (const declaration of rule.declarations) {
-					n.localStyles.add(declaration, matchingSelector, this, rule)
-				}
-				n.localStyles.sort()
+			const matchingSelector = rule.selectors.find(sfList => sfList.matches(node))
+			if (!matchingSelector) continue
+			node.styles.matchingRules.push({
+				rule: rule,
+				stylesheet: this,
+				selector: matchingSelector
+			})
+			for (const declaration of rule.declarations) {
+				node.styles.localStyles.add(declaration, matchingSelector, this, rule)
 			}
+			node.styles.localStyles.sort()
 		}
 	}
 
@@ -91,17 +68,6 @@ class Stylesheet {
 	_parseDeclarations(rawDeclarations) {
 		const declarations = rawDeclarations.map(rawDeclaration => new Declaration(rawDeclaration))
 		return new DeclarationList(declarations)
-	}
-
-	/** @return {string} the raw KSS for a rule */
-	rawRule(rule) {
-		const selector = Array.from(rule.selectors)
-			.map(selector => selector.raw)
-			.join(',\n')
-		const declarations = Array.from(rule.declarations)
-			.map(declaration => `\t${declaration.raw}`)
-			.join('\n')
-		return `${selector} \{\n${declarations}\n\}`
 	}
 }
 

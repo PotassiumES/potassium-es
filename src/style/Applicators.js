@@ -27,8 +27,8 @@ Applicators.set('rotation', (node, styleInfo) => {
 Applicators.set('display', (node, styleInfo) => {
 	switch (styleInfo.value) {
 		case 'grid':
-			if (!node.layout || node.layout.isGrid === false) {
-				node.layout = new GridLayout(node)
+			if (!node.styles.layout || node.styles.layout.isGrid === false) {
+				node.styles.layout = new GridLayout(node)
 			}
 			// The other grid declarations like 'grid-template' are handled in GridLayout
 			return
@@ -67,7 +67,7 @@ Applicators.set('material-emissive', (node, styleInfo) => {
 	if (!node.material || !node.material.emissive) return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
 	if (typeof parsedValue === 'undefined') return
-	if(node.material && node.material.emissive){
+	if (node.material && node.material.emissive) {
 		node.material.emissive.setRGB(...parsedValue)
 	}
 })
@@ -77,7 +77,7 @@ Applicators.set('material-color', (node, styleInfo) => {
 	if (!node.material || !node.material.color) return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
 	if (typeof parsedValue === 'undefined') return
-	if(node.material && node.material.color){
+	if (node.material && node.material.color) {
 		node.material.color.setRGB(...parsedValue)
 	}
 })
