@@ -3,6 +3,8 @@ import Runner from '/node_modules/potassium-test/src/Runner.js'
 import SynchronousFetchMap from '/node_modules/potassium-test/src/SynchronousFetchMap.js'
 import TestResultsRenderer from '/node_modules/potassium-test/src/TestResultsRenderer.js'
 
+import * as ta from '/src/ThreeAdditions.js'
+
 import dom from '/src/DOM.js'
 import Router from '/src/Router.js'
 import Component from '/src/Component.js'
@@ -10,7 +12,85 @@ import DataModel from '/src/DataModel.js'
 import DataObject from '/src/DataObject.js'
 import DataCollection from '/src/DataCollection.js'
 
+import {RegexTemplates} from '/src/style/Evaluators.js'
+
 const tests = []
+
+tests.push(
+	new Test('Regex test', test => {
+		test.assertRegExpMatches(RegexTemplates.positiveIntegerRegex, '23', ['23'])
+		test.assertRegExpMatchCount(RegexTemplates.positiveIntegerRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.positiveIntegerRegex, '', 0)
+
+		test.assertRegExpMatches(RegexTemplates.integerRegex, '23', ['23'])
+		test.assertRegExpMatches(RegexTemplates.integerRegex, '-23', ['-23'])
+		test.assertRegExpMatches(RegexTemplates.integerRegex, '+23', ['+23'])
+		test.assertRegExpMatchCount(RegexTemplates.integerRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.integerRegex, '', 0)
+
+		test.assertRegExpMatches(RegexTemplates.positiveFloatRegex, '23', ['23'])
+		test.assertRegExpMatches(RegexTemplates.positiveFloatRegex, '0.23', ['0.23'])
+		test.assertRegExpMatches(RegexTemplates.positiveFloatRegex, '33.23', ['33.23'])
+		test.assertRegExpMatches(RegexTemplates.positiveFloatRegex, '33.', ['33'])
+		test.assertRegExpMatchCount(RegexTemplates.positiveFloatRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.positiveFloatRegex, '', 0)
+
+		test.assertRegExpMatches(RegexTemplates.floatRegex, '23', ['23'])
+		test.assertRegExpMatches(RegexTemplates.floatRegex, '0.23', ['0.23'])
+		test.assertRegExpMatches(RegexTemplates.floatRegex, '33.23', ['33.23'])
+		test.assertRegExpMatches(RegexTemplates.floatRegex, '-23', ['-23'])
+		test.assertRegExpMatches(RegexTemplates.floatRegex, '-0.23', ['-0.23'])
+		test.assertRegExpMatches(RegexTemplates.floatRegex, '-33.23', ['-33.23'])
+		test.assertRegExpMatchCount(RegexTemplates.floatRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.floatRegex, '', 0)
+
+		test.assertRegExpMatches(RegexTemplates.metricDistanceFloatRegex, '23m', ['23m'])
+		test.assertRegExpMatches(RegexTemplates.metricDistanceFloatRegex, '23cm', ['23cm'])
+		test.assertRegExpMatches(RegexTemplates.metricDistanceFloatRegex, '23mm', ['23mm'])
+		test.assertRegExpMatches(RegexTemplates.metricDistanceFloatRegex, '23.5m', ['23.5m'])
+		test.assertRegExpMatches(RegexTemplates.metricDistanceFloatRegex, '23.5cm', ['23.5cm'])
+		test.assertRegExpMatches(RegexTemplates.metricDistanceFloatRegex, '23.5mm', ['23.5mm'])
+		test.assertRegExpMatchCount(RegexTemplates.metricDistanceFloatRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.metricDistanceFloatRegex, '', 0)
+
+		test.assertRegExpMatches(RegexTemplates.fractionRegex, '1fr', ['1fr'])
+		test.assertRegExpMatches(RegexTemplates.fractionRegex, '23fr', ['23fr'])
+		test.assertRegExpMatchCount(RegexTemplates.fractionRegex, 'fr', 0)
+		test.assertRegExpMatchCount(RegexTemplates.fractionRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.fractionRegex, '', 0)
+
+		test.assertRegExpMatches(RegexTemplates.percentageFloatRegex, '2%', ['2%'])
+		test.assertRegExpMatches(RegexTemplates.percentageFloatRegex, '-2%', ['-2%'])
+		test.assertRegExpMatches(RegexTemplates.percentageFloatRegex, '23.5%', ['23.5%'])
+		test.assertRegExpMatches(RegexTemplates.percentageFloatRegex, '-23.5%', ['-23.5%'])
+		test.assertRegExpMatchCount(RegexTemplates.percentageFloatRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.percentageFloatRegex, '', 0)
+
+		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23fr', ['23fr'])
+		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23%', ['23%'])
+		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, 'auto', ['auto'])
+		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23m', ['23m'])
+		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23cm', ['23cm'])
+		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23mm', ['23mm'])
+		test.assertRegExpMatchCount(RegexTemplates.anyDistanceRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.anyDistanceRegex, '', 0)
+
+		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '23%', ['23%'], 'g')
+		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '4mm', ['4mm'], 'g')
+		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '4fr', ['4fr'], 'g')
+		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, 'auto', ['auto'], 'g')
+		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, 'auto 23mm 4fr', ['auto', '23mm', '4fr'], 'g')
+		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '23mm 4fr auto 6mm 9fr auto', ['23mm', '4fr', 'auto', '6mm', '9fr', 'auto'], 'g')
+		test.assertRegExpMatchCount(RegexTemplates.anyDistanceArrayRegex, 'bogo', 0, 'g')
+		test.assertRegExpMatchCount(RegexTemplates.anyDistanceArrayRegex, '', 0, 'g')
+
+		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto / 4fr', ['auto / 4fr', 'auto', '4fr'])
+		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 1fr / 4fr 20%', ['auto 1fr / 4fr 20%', 'auto 1fr', '4fr 20%'])
+		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 1fr / 4fr 20% auto', ['auto 1fr / 4fr 20% auto', 'auto 1fr', '4fr 20% auto'])
+		test.assertRegExpMatchCount(RegexTemplates.gridTemplateRegex, 'bogo', 0)
+		test.assertRegExpMatchCount(RegexTemplates.gridTemplateRegex, '', 0)
+	})
+)
 
 tests.push(
 	new Test('Events test', test => {

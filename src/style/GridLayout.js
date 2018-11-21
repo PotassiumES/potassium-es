@@ -11,6 +11,8 @@ Container declarations:
 
 	- grid-template
 		20cm 40cm / 40cm 60cm
+		1fr / 20cm 1fr 1fr
+		auto / auto 1fr 2fr
 
 	- gap
 		4cm
@@ -270,12 +272,12 @@ Grid.Row = Symbol('grid-row')
 Grid.Column = Symbol('grid-column')
 
 const _parseGridTemplate = function(rawValue, node) {
-	const directions = rawValue
-		.split('/')
-		.filter(half => half.trim().length > 0)
-		.map(half => Evaluators.parse(half, node))
-	if (directions.some(direction => typeof direction === 'undefined')) return undefined
-	return directions
+	const evaledTemplate = Evaluators.parse(rawValue, node)
+	if(evaledTemplate === null || evaledTemplate.length !== 2){
+		console.error('Error parsing grid template', rawValue, evaledTemplate)
+		return null
+	}
+	return evaledTemplate
 }
 
 export default GridLayout

@@ -44,6 +44,75 @@ class Evaluator {
 
 const Singleton = new Evaluators()
 
+// Template regexp for common types
+// Numbers
+const PositiveIntegerRegex = '[0-9]+'
+const IntegerRegex = `[+\\-]?${PositiveIntegerRegex}`
+const PositiveFloatRegex = '[0-9]+(?:\\.[0-9]+)?'
+const FloatRegex = `[+\\-]?${PositiveFloatRegex}`
+// Distances
+const MetricDistanceFloatRegex = `${FloatRegex}[c]?m{1,2}`
+const FractionRegex = `${PositiveIntegerRegex}fr`
+// Misc
+const PercentageFloatRegex = `${FloatRegex}%`
+// Combos
+const AnyDistanceRegex = `${MetricDistanceFloatRegex}|${FractionRegex}|${PercentageFloatRegex}|auto`
+const AnyDistanceArrayRegex = `(?:${AnyDistanceRegex})+`
+const GridTemplateRegex = `([^\/]+)(?:\\s+\/\\s+)([^\/]+)`
+
+// For easy export
+const RegexTemplates = {
+	positiveIntegerRegex: PositiveIntegerRegex,
+	integerRegex: IntegerRegex,
+	positiveFloatRegex: PositiveFloatRegex,
+	floatRegex: FloatRegex,
+
+	metricDistanceFloatRegex: MetricDistanceFloatRegex,
+	fractionRegex: FractionRegex,
+	percentageFloatRegex: PercentageFloatRegex,
+
+	anyDistanceRegex: AnyDistanceRegex,
+	anyDistanceArrayRegex: AnyDistanceArrayRegex,
+	gridTemplateRegex: GridTemplateRegex
+}
+
+Singleton.add(
+	/*
+	Overall grid-template structure
+		<some values> / <some values>
+
+	Accepted values:
+	- margin size of child: auto
+	- explicit distances: 23mm 40cm 3m
+	- fractional counts: 2fr
+	- percentages: 10%
+
+	(auto|[0-9\.]fr|[0-9\.](c)?m|
+
+	Not supported:
+	- named areas like "head middle middle side"
+	*/
+	new Evaluator('grid-template', new RegExp(GridTemplateRegex, 'i'), (value, node) => {
+		const [total, major, minor] = value.match(new RegExp(GridTemplateRegex, 'i'))
+		const valuesRegExp = new RegExp(AnyDistanceArrayRegex, 'g')
+		const majorValues = major.match(valuesRegExp)
+		const minorValues = minor.match(valuesRegExp)
+		if(majorValues === null || minorValues === null) return null
+		// Convert any explicit distances to a float
+		for (let i=0; i < majorValues.length; i++){
+			if(majorValues[i].endsWith('m')){
+				majorValues[i] = Singleton.parse(majorValues[i], node)[0]
+			}
+		}
+		for (let i=0; i < minorValues.length; i++){
+			if(minorValues[i].endsWith('m')){
+				minorValues[i] = Singleton.parse(minorValues[i], node)[0]
+			}
+		}
+		return [majorValues, minorValues]
+	})
+)
+
 Singleton.add(
 	new Evaluator('custom properties / variables', /^var\(\-\-[^-\)][\-a-z0-9_]*\)$/i, (value, node) => {
 		const variableName = value.substring(4, value.length - 1)
@@ -95,7 +164,7 @@ Singleton.add(
 
 const DistanceVectorRegex = /(\+?\-?[\d\.]+(?:cm|m)?)/gi
 Singleton.add(
-	new Evaluator('distance vector', DistanceVectorRegex, (value, node) => {
+	new Evaluator('explicit distance vector', DistanceVectorRegex, (value, node) => {
 		const splitValues = value.match(DistanceVectorRegex)
 		const parsedValues = splitValues.map(val => {
 			return _parseDistance(val, val.endsWith('cm') ? 0.01 : 1)
@@ -106,7 +175,7 @@ Singleton.add(
 )
 
 export default Singleton
-export { Evaluators, Evaluator, Singleton }
+export { Evaluators, Evaluator, Singleton, RegexTemplates }
 
 const _parseHexNumber = function(strVal) {
 	return parseInt(strVal, 16)

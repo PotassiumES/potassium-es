@@ -543,7 +543,7 @@ const Binder = class {
 			bindInfo.dataObject.removeListener(bindInfo.callback)
 		}
 		for (const info of this._eventCallbacks) {
-			if (info.target.isObject3D) {
+			if (info.target instanceof EventHandler){
 				info.target.removeListener(info.callback, info.eventName)
 			} else {
 				info.target.removeEventListener(info.eventName, info.callback)
