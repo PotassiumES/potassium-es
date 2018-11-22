@@ -342,10 +342,12 @@ const Component = class extends EventHandler {
 	@param {Component} childComponent
 	*/
 	appendComponent(childComponent) {
-		if (this.options.usesFlat) this._flatDOM.appendChild(childComponent.flatDOM)
-		if (this.options.usesPortalOverlay) this._portalDOM.appendChild(childComponent.portalDOM)
-		if (this.options.usesPortalSpatial) this._portalSOM.add(childComponent.portalSOM)
-		if (this.options.usesImmersive) this._immersiveSOM.add(childComponent.immersiveSOM)
+		if (this.options.usesFlat && childComponent.usesFlat) this._flatDOM.appendChild(childComponent.flatDOM)
+		if (this.options.usesPortalOverlay && childComponent.usesPortalOverlay)
+			this._portalDOM.appendChild(childComponent.portalDOM)
+		if (this.options.usesPortalSpatial && childComponent.usesPortalSpatial)
+			this._portalSOM.add(childComponent.portalSOM)
+		if (this.options.usesImmersive && childComponent.usesImmersive) this._immersiveSOM.add(childComponent.immersiveSOM)
 		return this
 	}
 	/**
@@ -353,10 +355,13 @@ const Component = class extends EventHandler {
 	@param {Component} childComponent
 	*/
 	removeComponent(childComponent) {
-		if (this.options.usesFlat) this._flatDOM.removeChild(childComponent.flatDOM)
-		if (this.options.usesPortalOverlay) this._portalDOM.removeChild(childComponent.portalDOM)
-		if (this.options.usesPortalSpatial) this._portalSOM.remove(childComponent.portalSOM)
-		if (this.options.usesImmersive) this._immersiveSOM.remove(childComponent.immersiveSOM)
+		if (this.options.usesFlat && childComponent.usesFlat) this._flatDOM.removeChild(childComponent.flatDOM)
+		if (this.options.usesPortalOverlay && childComponent.usesPortalOverlay)
+			this._portalDOM.removeChild(childComponent.portalDOM)
+		if (this.options.usesPortalSpatial && childComponent.usesPortalSpatial)
+			this._portalSOM.remove(childComponent.portalSOM)
+		if (this.options.usesImmersive && childComponent.usesImmersive)
+			this._immersiveSOM.remove(childComponent.immersiveSOM)
 		return this
 	}
 
@@ -543,7 +548,7 @@ const Binder = class {
 			bindInfo.dataObject.removeListener(bindInfo.callback)
 		}
 		for (const info of this._eventCallbacks) {
-			if (info.target instanceof EventHandler){
+			if (info.target instanceof EventHandler) {
 				info.target.removeListener(info.callback, info.eventName)
 			} else {
 				info.target.removeEventListener(info.eventName, info.callback)

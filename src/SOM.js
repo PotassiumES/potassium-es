@@ -143,14 +143,20 @@ som.text = (text = '', options = {}) => {
 /**
 Creates a THREE.Mesh containing a THREE.BoxBufferGeometry
 */
-som.cube = (size = [1, 1, 1], options = {}) => {
+som.cube = (size = 1, options = {}) => {
+	options = Object.assign(
+		{
+			color: 0x444444
+		},
+		options
+	)
 	let material = null
-	if (options.color) {
-		material = new THREE.MeshStandardMaterial({ color: color })
-	} else if (options.material) {
+	if (options.material) {
 		material = options.material
+	} else {
+		material = new THREE.MeshStandardMaterial({ color: color })
 	}
-	const result = new THREE.Mesh(new THREE.BoxBufferGeometry(...size), material)
+	const result = new THREE.Mesh(THREE.MakeCubeGeometry(size), material)
 	// set up for kss element selection, like `cube {}` or `node[name=Cube] {}`
 	result.name = 'Cube'
 	result.isCube = true

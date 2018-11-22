@@ -12,7 +12,7 @@ import DataModel from '/src/DataModel.js'
 import DataObject from '/src/DataObject.js'
 import DataCollection from '/src/DataCollection.js'
 
-import {RegexTemplates} from '/src/style/Evaluators.js'
+import { RegexTemplates } from '/src/style/Evaluators.js'
 
 const tests = []
 
@@ -80,13 +80,26 @@ tests.push(
 		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '4fr', ['4fr'], 'g')
 		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, 'auto', ['auto'], 'g')
 		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, 'auto 23mm 4fr', ['auto', '23mm', '4fr'], 'g')
-		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '23mm 4fr auto 6mm 9fr auto', ['23mm', '4fr', 'auto', '6mm', '9fr', 'auto'], 'g')
+		test.assertRegExpMatches(
+			RegexTemplates.anyDistanceArrayRegex,
+			'23mm 4fr auto 6mm 9fr auto',
+			['23mm', '4fr', 'auto', '6mm', '9fr', 'auto'],
+			'g'
+		)
 		test.assertRegExpMatchCount(RegexTemplates.anyDistanceArrayRegex, 'bogo', 0, 'g')
 		test.assertRegExpMatchCount(RegexTemplates.anyDistanceArrayRegex, '', 0, 'g')
 
 		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto / 4fr', ['auto / 4fr', 'auto', '4fr'])
-		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 1fr / 4fr 20%', ['auto 1fr / 4fr 20%', 'auto 1fr', '4fr 20%'])
-		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 1fr / 4fr 20% auto', ['auto 1fr / 4fr 20% auto', 'auto 1fr', '4fr 20% auto'])
+		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 1fr / 4fr 20%', [
+			'auto 1fr / 4fr 20%',
+			'auto 1fr',
+			'4fr 20%'
+		])
+		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 1fr / 4fr 20% auto', [
+			'auto 1fr / 4fr 20% auto',
+			'auto 1fr',
+			'4fr 20% auto'
+		])
 		test.assertRegExpMatchCount(RegexTemplates.gridTemplateRegex, 'bogo', 0)
 		test.assertRegExpMatchCount(RegexTemplates.gridTemplateRegex, '', 0)
 	})

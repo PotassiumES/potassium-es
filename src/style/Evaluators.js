@@ -56,7 +56,7 @@ const FractionRegex = `${PositiveIntegerRegex}fr`
 // Misc
 const PercentageFloatRegex = `${FloatRegex}%`
 // Combos
-const AnyDistanceRegex = `${MetricDistanceFloatRegex}|${FractionRegex}|${PercentageFloatRegex}|auto`
+const AnyDistanceRegex = `${MetricDistanceFloatRegex}|auto`
 const AnyDistanceArrayRegex = `(?:${AnyDistanceRegex})+`
 const GridTemplateRegex = `([^\/]+)(?:\\s+\/\\s+)([^\/]+)`
 
@@ -84,12 +84,10 @@ Singleton.add(
 	Accepted values:
 	- margin size of child: auto
 	- explicit distances: 23mm 40cm 3m
-	- fractional counts: 2fr
-	- percentages: 10%
-
-	(auto|[0-9\.]fr|[0-9\.](c)?m|
 
 	Not supported:
+	- Fractional values like "1fr"
+	- Percentage values like "10%"
 	- named areas like "head middle middle side"
 	*/
 	new Evaluator('grid-template', new RegExp(GridTemplateRegex, 'i'), (value, node) => {
@@ -97,15 +95,15 @@ Singleton.add(
 		const valuesRegExp = new RegExp(AnyDistanceArrayRegex, 'g')
 		const majorValues = major.match(valuesRegExp)
 		const minorValues = minor.match(valuesRegExp)
-		if(majorValues === null || minorValues === null) return null
-		// Convert any explicit distances to a float
-		for (let i=0; i < majorValues.length; i++){
-			if(majorValues[i].endsWith('m')){
+		if (majorValues === null || minorValues === null) return null
+		// Normalize any explicit distances to a float in meters
+		for (let i = 0; i < majorValues.length; i++) {
+			if (majorValues[i].endsWith('m')) {
 				majorValues[i] = Singleton.parse(majorValues[i], node)[0]
 			}
 		}
-		for (let i=0; i < minorValues.length; i++){
-			if(minorValues[i].endsWith('m')){
+		for (let i = 0; i < minorValues.length; i++) {
+			if (minorValues[i].endsWith('m')) {
 				minorValues[i] = Singleton.parse(minorValues[i], node)[0]
 			}
 		}

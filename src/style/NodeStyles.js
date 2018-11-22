@@ -54,11 +54,11 @@ class NodeStyles {
 		this.layout = null
 
 		// Bounding boxes using model (not world) coordinates
-		this.marginBounds = som.box3()
-		this.borderBounds = som.box3()
-		this.paddingBounds = som.box3()
-		this.contentBounds = som.box3()
-		this.geometryBounds = som.box3()
+		this.marginBounds = som.box3().makeZero()
+		this.borderBounds = som.box3().makeZero()
+		this.paddingBounds = som.box3().makeZero()
+		this.contentBounds = som.box3().makeZero()
+		this.geometryBounds = som.box3().makeZero()
 	}
 
 	get isInAnyWayDirty() {
@@ -101,41 +101,43 @@ class NodeStyles {
 	}
 
 	calculateEdgeBounds() {
-		/** @todo */
 		this.contentBounds.set(this.geometryBounds.min, this.geometryBounds.max)
+		for (const child of this.node.children) {
+			if (child.visible === false) continue
+			if (child.styles.computedStyles.getString('position') === 'absolute') continue
+			_workingBox3_1.set(child.styles.marginBounds.min, child.styles.marginBounds.max)
+			_workingBox3_1.translate(child.position)
+			this.contentBounds.expandByPoint(_workingBox3_1.min)
+			this.contentBounds.expandByPoint(_workingBox3_1.max)
+		}
+		this.contentBounds.scale(this.node.scale)
 
 		this.paddingBounds.set(this.contentBounds.min, this.contentBounds.max)
-		let edgeWidth = this.computedStyles.getNumber('padding')
-		if (edgeWidth) {
-			_workingVector3_1.set(edgeWidth[0], edgeWidth[0], edgeWidth[0])
-			this.paddingBounds.expandByVector(_workingVector3_1)
-		}
+		let edgeWidth = this.computedStyles.getNumber('padding', [0])
+		_workingVector3_1.set(edgeWidth[0], edgeWidth[0], edgeWidth[0])
+		this.paddingBounds.expandByVector(_workingVector3_1)
 
 		this.borderBounds.set(this.paddingBounds.min, this.paddingBounds.max)
-		edgeWidth = this.computedStyles.getNumber('border-width')
-		if (edgeWidth) {
-			_workingVector3_1.set(edgeWidth[0], edgeWidth[0], edgeWidth[0])
-			this.borderBounds.expandByVector(_workingVector3_1)
-		}
+		edgeWidth = this.computedStyles.getNumber('border-width', [0])
+		_workingVector3_1.set(edgeWidth[0], edgeWidth[0], edgeWidth[0])
+		this.borderBounds.expandByVector(_workingVector3_1)
 
 		this.marginBounds.set(this.borderBounds.min, this.borderBounds.max)
-		edgeWidth = this.computedStyles.getNumber('margin')
-		if (edgeWidth) {
-			_workingVector3_1.set(edgeWidth[0], edgeWidth[0], edgeWidth[0])
-			this.borderBounds.expandByVector(_workingVector3_1)
-		}
+		edgeWidth = this.computedStyles.getNumber('margin', [0])
+		_workingVector3_1.set(edgeWidth[0], edgeWidth[0], edgeWidth[0])
+		this.marginBounds.expandByVector(_workingVector3_1)
 	}
 
 	calculateGeometryBounds() {
-		this.geometryBounds.makeEmpty()
-		if (this.geometry === undefined) return
-		if (this.geometry.isGeometry) {
-			const vertices = this.geometry.vertices
+		this.geometryBounds.makeZero()
+		if (this.node.geometry === undefined) return
+		if (this.node.geometry.isGeometry) {
+			const vertices = this.node.geometry.vertices
 			for (let i = 0, l = vertices.length; i < l; i++) {
 				this.geometryBounds.expandByPoint(vertices[i])
 			}
-		} else if (this.geometry.isBufferGeometry) {
-			const attribute = this.geometry.attributes.position
+		} else if (this.node.geometry.isBufferGeometry) {
+			const attribute = this.node.geometry.attributes.position
 			if (attribute !== undefined) {
 				for (let i = 0, l = attribute.count; i < l; i++) {
 					_workingVector3_1.fromBufferAttribute(attribute, i)
@@ -146,6 +148,7 @@ class NodeStyles {
 	}
 }
 
-const _workingVector3_1 = new THREE.Vector3()
+const _workingVector3_1 = som.vector3()
+const _workingBox3_1 = som.box3()
 
 export default NodeStyles

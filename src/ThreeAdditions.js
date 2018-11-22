@@ -7,9 +7,33 @@ import { SelectorFragmentList } from './style/Selector.js'
 importing this extends THREE.Object3D with many methods and attributes useful for creating and manipulating the SOM
 */
 
+const _workingVector3_1 = new THREE.Vector3()
+const _workingVector3_2 = new THREE.Vector3()
+
 // Used by KSS tag selectors
 THREE.Object3D.prototype.isNode = true
 THREE.Scene.prototype.isScene = true
+
+THREE.Box3.prototype.makeZero = function() {
+	this.min.set(0, 0, 0)
+	this.max.set(0, 0, 0)
+	return this
+}
+
+THREE.Box3.prototype.centerAtOrigin = function() {
+	this.getCenter(_workingVector3_1)
+	_workingVector3_1.negate()
+	this.translate(_workingVector3_1)
+}
+
+THREE.Box3.prototype.scale = function(vec3) {
+	this.min.x *= vec3.x
+	this.min.y *= vec3.y
+	this.min.z *= vec3.z
+	this.max.x *= vec3.x
+	this.max.y *= vec3.y
+	this.max.z *= vec3.z
+}
 
 Object.defineProperty(THREE.Object3D.prototype, 'styles', {
 	/**
@@ -87,16 +111,58 @@ THREE.Object3D.prototype.getClasses = function() {
 }
 
 /**
-If the Object3D has a geometry then show a THREE.Box3Helper for it
+If the Object3D has a geometry then show a debugging box around it
 */
-THREE.Object3D.prototype.showBox3Helper = function() {
-	if (!this.geometry) {
-		console.error('No geometry for bounding box')
-		return false
+THREE.Object3D.prototype.showEdges = function(includingChildren = false) {
+	if (this._marginBox === undefined) {
+		if (_edgeBoxMaterial === null) {
+			_edgeBoxMaterial = new THREE.LineBasicMaterial({
+				color: 0x660000,
+				linewidth: 200
+			})
+		}
+		if (_edgeBoxGeometry === null) {
+			_edgeBoxGeometry = THREE.MakeCubeGeometry(1)
+		}
+		this._marginBox = new THREE.LineSegments(_edgeBoxGeometry, _edgeBoxMaterial)
+		this._marginBox.addClass('margin-box')
+		this._marginBox.styles.assignedStyles.set('position', 'absolute')
+		this.add(this._marginBox)
 	}
-	this.geometry.computeBoundingBox()
-	this.add(new THREE.Box3Helper(this.geometry.boundingBox))
-	return true
+
+	this.styles.marginBounds.getSize(_workingVector3_1)
+	// Scales can't be zero
+	_workingVector3_1.x = Math.max(0.0001, _workingVector3_1.x)
+	_workingVector3_1.y = Math.max(0.0001, _workingVector3_1.y)
+	_workingVector3_1.z = Math.max(0.0001, _workingVector3_1.z)
+	this._marginBox.scale.copy(_workingVector3_1)
+
+	this.styles.marginBounds.getCenter(_workingVector3_2)
+	this._marginBox.position.copy(_workingVector3_2)
+
+	if (includingChildren) {
+		for (const child of this.children) {
+			if (child.visible === false) continue
+			if (child.hasClass('margin-box')) continue
+			child.showEdges(true)
+		}
+	}
+}
+
+/**
+Remove boxes shown by `Object3D.showEdges`
+*/
+THREE.Object3D.prototype.hideEdges = function(includingChildren = false) {
+	if (this._marginBox !== undefined) {
+		this.remove(this._marginBox)
+		this._marginBox = undefined
+	}
+	if (includingChildren) {
+		for (const child of this.children) {
+			if (child.hasClass('margin-box')) continue
+			child.hideEdges(true)
+		}
+	}
 }
 
 THREE.Object3D.prototype.findRoot = function(node = this) {
@@ -316,5 +382,101 @@ THREE.Object3D.prototype.append = function(child = null) {
 	}
 	return this
 }
+
+THREE.MakeCubeGeometry = function(size) {
+	const h = size * 0.5
+	const geometry = new THREE.BufferGeometry()
+	const position = []
+	position.push(
+		-h,
+		-h,
+		-h,
+		-h,
+		h,
+		-h,
+
+		-h,
+		h,
+		-h,
+		h,
+		h,
+		-h,
+
+		h,
+		h,
+		-h,
+		h,
+		-h,
+		-h,
+
+		h,
+		-h,
+		-h,
+		-h,
+		-h,
+		-h,
+
+		-h,
+		-h,
+		h,
+		-h,
+		h,
+		h,
+
+		-h,
+		h,
+		h,
+		h,
+		h,
+		h,
+
+		h,
+		h,
+		h,
+		h,
+		-h,
+		h,
+
+		h,
+		-h,
+		h,
+		-h,
+		-h,
+		h,
+
+		-h,
+		-h,
+		-h,
+		-h,
+		-h,
+		h,
+
+		-h,
+		h,
+		-h,
+		-h,
+		h,
+		h,
+
+		h,
+		h,
+		-h,
+		h,
+		h,
+		h,
+
+		h,
+		-h,
+		-h,
+		h,
+		-h,
+		h
+	)
+	geometry.addAttribute('position', new THREE.Float32BufferAttribute(position, 3))
+	return geometry
+}
+
+let _edgeBoxMaterial = null
+let _edgeBoxGeometry = null
 
 export {}

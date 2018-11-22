@@ -7,6 +7,7 @@
     "build": "rollup -c rollup.config.js",
     "docs": "./node_modules/.bin/esdoc",
     "lint": "eslint src",
+    "lint-fix": "eslint src --fix",
     "prettier": "prettier --write src/*.js src/**/*.js tests/*.js",
     "host-tests": "http-server ./"
   },

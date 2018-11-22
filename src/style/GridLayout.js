@@ -11,8 +11,7 @@ Container declarations:
 
 	- grid-template
 		20cm 40cm / 40cm 60cm
-		1fr / 20cm 1fr 1fr
-		auto / auto 1fr 2fr
+		auto / 25cm auto auto
 
 	- gap
 		4cm
@@ -45,7 +44,7 @@ class GridLayout extends Layout {
 		const gridTemplateStyleInfo = this.node.styles.computedStyles.get('grid-template')
 		if (gridTemplateStyleInfo) {
 			const directions = _parseGridTemplate(gridTemplateStyleInfo.value, this.node)
-			if (directions && (directions.length === 1 || directions.length === 2)) {
+			if (directions && directions.length === 2) {
 				this._grid.updateTemplate(directions)
 			} else {
 				console.error('Could not parse grid template', gridTemplateStyleInfo)
@@ -89,7 +88,7 @@ class GridLayout extends Layout {
 	}
 }
 
-GridLayout.prototype.isGrid = true
+GridLayout.prototype.isGridLayout = true
 
 const DefaultCellSize = 0.02 // meters
 const DefaultGapSize = 0.01 // meters
@@ -108,7 +107,7 @@ class Grid {
 		this._columnGap = DefaultGapSize // meters
 	}
 
-	prettyPrint() {
+	log() {
 		console.log('Grid')
 		console.log('\tautoflow', this._autoFlow === Grid.Row ? 'row' : 'column', this._autoFlowSize)
 		console.log('\trow cells:', ...this._rowCellSizes)
@@ -133,49 +132,20 @@ class Grid {
 	}
 
 	/**
-	@param {number[]} cellSizes - an array of sizes in meters of either cell rows or cell columns
-	@param {number} gap - the distance between the cells 
-	@return {number} the distance from the center of the first cell to the center of the last cell
-	*/
-	_calculateCenterToCenterSize(cellSizes, gap) {
-		if (cellSizes.length < 2) return 0
-		let result = 0
-		for (let i = 0; i < cellSizes.length; i++) {
-			if (i === 0 || i === cellSizes.length - 1) {
-				result += cellSizes[i] / 2
-			} else {
-				result += cellSizes[i]
-			}
-			if (i !== 0) {
-				result += gap
-			}
-		}
-		return result
-	}
-
-	/**
-	Sets the positions for this._node.children using specified cell positions and then auto positions
+	Sets the positions for this._node.children using assigned cell sizes and then autoflow sizes
 	*/
 	apply() {
-		const count = this._node.children.length
-		if (count === 0) return
-		let childIndex = this._nextVisibleChild(0)
-		if (childIndex === -1) return
+		const childrenToLayout = this._node.children.filter(child => {
+			return child.visible && child.styles.computedStyles.getString('position') !== 'absolute'
+		})
+		if (childrenToLayout.length === 0) return
 
-		/*
-		The autoflow is the major track and the other flow is the minor track
-		*/
+		// The autoflow is the major track and the other flow is the minor track
 		const majorCellSizes = this._autoFlow === Grid.Row ? this._rowCellSizes : this._columnCellSizes
 		const minorCellSizes = this._autoFlow === Grid.Row ? this._columnCellSizes : this._rowCellSizes
 
 		const majorGap = this._autoFlow === Grid.Row ? this._rowGap : this._columnGap
 		const minorGap = this._autoFlow === Grid.Row ? this._columnGap : this._rowGap
-
-		// Get starting center position for major and minor tracks
-		// Note: we start to -x half width but we start at 0 y for easier positioning relative to other components
-		const gridCenterToCenterWidth = this._calculateCenterToCenterSize(this._columnCellSizes, this._columnGap)
-		const majorStart = (this._autoFlow === Grid.Row ? 0 : gridCenterToCenterWidth) / -2
-		const minorStart = (this._autoFlow === Grid.Row ? gridCenterToCenterWidth : 0) / -2
 
 		// Rows move from top to bottom, which is -y
 		// Columns move from left to right, which is +x
@@ -183,97 +153,91 @@ class Grid {
 		const majorMultiplier = this._autoFlow === Grid.Row ? -1 : 1
 		const minorMultiplier = this._autoFlow === Grid.Row ? 1 : -1
 
-		// First get positions for explicit cells
-		let majorPosition = majorStart
-		let minorPosition = minorStart
-		let workingChild = null
-		for (let majorIndex = 0; majorIndex < majorCellSizes.length; majorIndex++) {
-			minorPosition = minorStart
-			if (majorIndex !== 0) {
-				// Move from major edge to major center
-				majorPosition += (majorGap / 2 + majorCellSizes[majorIndex] / 2) * majorMultiplier
-			}
+		// Find the count past which we're into autoflow
+		const assignedCellCount = majorCellSizes * minorCellSizes
 
-			for (let minorIndex = 0; minorIndex < minorCellSizes.length; minorIndex++) {
-				if (minorIndex !== 0) {
-					// Move from minor edge to minor center
-					minorPosition += (minorGap / 2 + minorCellSizes[minorIndex] / 2) * minorMultiplier
-				}
-
-				workingChild = this._node.children[childIndex]
-				if (
-					workingChild.position.x !== (this._autoFlow === Grid.Row ? minorPosition : majorPosition) ||
-					workingChild.position.y !== (this._autoFlow === Grid.Row ? majorPosition : minorPosition) ||
-					workingChild.position.z !== 0
-				) {
-					workingChild.position.set(
-						this._autoFlow === Grid.Row ? minorPosition : majorPosition,
-						this._autoFlow === Grid.Row ? majorPosition : minorPosition,
-						0
-					)
-				}
-				childIndex = this._nextVisibleChild(childIndex + 1)
-				if (childIndex === -1) return
-
-				// Move from minor center to minor edge
-				minorPosition += (minorCellSizes[minorIndex] / 2 + minorGap / 2) * minorMultiplier
-			}
-
-			// Move from major center to major edge
-			majorPosition += (majorCellSizes[majorIndex] / 2 + majorGap / 2) * majorMultiplier
-		}
-		// major and minor positions are now at the edges of the far corner cell of the explicit grid
-
-		// Now get positions for auto-flow cells
-		let remainingPositions = count - childIndex
+		// Create a 3D array: major/minor/sizes+child
+		const computedSizes = new Array()
+		let majorIndex = -1
 		let minorIndex = 0
-		majorPosition += (this._autoFlowSize / 2 + majorGap / 2) * majorMultiplier
-		while (remainingPositions > 0) {
+		let majorSize = 0
+		for (let i = 0; i < childrenToLayout.length; i++) {
+			minorIndex = i % minorCellSizes.length
 			if (minorIndex === 0) {
-				minorPosition = minorStart
+				majorIndex += 1
+			}
+			if (computedSizes[majorIndex] === undefined) {
+				computedSizes[majorIndex] = new Array(minorCellSizes.length)
+			}
+			computedSizes[majorIndex][minorIndex] = new Array(2) // major size, minor size
+			computedSizes[majorIndex][minorIndex].child = childrenToLayout[i]
+
+			childrenToLayout[i].styles.marginBounds.getSize(_workingVector3_1)
+
+			// Use either the assigned major cell size or the autoflow size
+			majorSize = i < assignedCellCount ? majorCellSizes[majorIndex] : this._autoFlowSize
+			// Set major size for this cell
+			if (majorSize === 'auto') {
+				if (this._autoFlow === Grid.Row) {
+					computedSizes[majorIndex][minorIndex][0] = _workingVector3_1.y
+				} else {
+					computedSizes[majorIndex][minorIndex][0] = _workingVector3_1.x
+				}
 			} else {
-				minorPosition += (minorCellSizes[minorIndex] / 2 + minorGap / 2) * minorMultiplier
+				computedSizes[majorIndex][minorIndex][0] = majorSize
 			}
-
-			workingChild = this._node.children[childIndex]
-			if (
-				workingChild.position.x !== (this._autoFlow === Grid.Row ? minorPosition : majorPosition) ||
-				workingChild.position.y !== (this._autoFlow === Grid.Row ? majorPosition : minorPosition) ||
-				workingChild.position.z !== 0
-			) {
-				workingChild.position.set(
-					this._autoFlow === Grid.Row ? minorPosition : majorPosition,
-					this._autoFlow === Grid.Row ? majorPosition : minorPosition,
-					0
-				)
-			}
-			childIndex = this._nextVisibleChild(childIndex + 1)
-			if (childIndex === -1) return
-
-			minorPosition += (minorCellSizes[minorIndex] / 2 + minorGap / 2) * minorMultiplier
-			minorIndex = (minorIndex + 1) % minorCellSizes.length
-			remainingPositions -= 1
-			if (minorIndex === 0) {
-				majorPosition += (this._autoFlowSize + majorGap) * majorMultiplier
+			// Set minor size
+			if (minorCellSizes[minorIndex] === 'auto') {
+				if (this._autoFlow === Grid.Row) {
+					computedSizes[majorIndex][minorIndex][1] = _workingVector3_1.x
+				} else {
+					computedSizes[majorIndex][minorIndex][1] = _workingVector3_1.y
+				}
+			} else {
+				computedSizes[majorIndex][minorIndex][1] = minorCellSizes[minorIndex]
 			}
 		}
-	}
 
-	/** @return {integer} the index of the next visible child starting from `startIndex` or -1 if there are none */
-	_nextVisibleChild(startIndex) {
-		for (let i = startIndex; i < this._node.children.length; i++) {
-			if (this._node.children[i].visible) return i
+		// Ok, cell sizes are calculated. Let's move some nodes!
+		const majorArray = null
+		let majorPosition = 0
+		let majorMaxSize = 0
+		let minorPosition = 0
+		let minorArray = null
+		let childInfo = null
+		for (majorIndex = 0; majorIndex < computedSizes.length; majorIndex++) {
+			minorArray = computedSizes[majorIndex]
+			minorPosition = 0
+			majorMaxSize = 0
+			for (minorIndex = 0; minorIndex < minorArray.length; minorIndex++) {
+				if (minorArray[minorIndex] === undefined) {
+					break
+				}
+				childInfo = minorArray[minorIndex]
+				if (this._autoFlow === Grid.Row) {
+					childInfo.child.position.setX(minorPosition * minorMultiplier)
+					childInfo.child.position.setY(majorPosition * majorMultiplier)
+				} else {
+					childInfo.child.position.setX(majorPosition * majorMultiplier)
+					childInfo.child.position.setY(minorPosition * minorMultiplier)
+				}
+
+				majorMaxSize = Math.max(majorMaxSize, childInfo[0])
+				minorPosition += minorArray[minorIndex][1] + minorGap
+			}
+			majorPosition += majorMaxSize + majorGap
 		}
-		return -1
 	}
 }
 
 Grid.Row = Symbol('grid-row')
 Grid.Column = Symbol('grid-column')
 
+const _workingVector3_1 = new THREE.Vector3()
+
 const _parseGridTemplate = function(rawValue, node) {
 	const evaledTemplate = Evaluators.parse(rawValue, node)
-	if(evaledTemplate === null || evaledTemplate.length !== 2){
+	if (evaledTemplate === null || evaledTemplate.length !== 2) {
 		console.error('Error parsing grid template', rawValue, evaledTemplate)
 		return null
 	}

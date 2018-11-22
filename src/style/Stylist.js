@@ -2,6 +2,7 @@ import Stylesheet from './Stylesheet.js'
 import Applicators from './Applicators.js'
 import EventHandler from '../EventHandler.js'
 
+import BoxLayout from './BoxLayout.js'
 import { LayoutEffectingProperties } from './ComputedStyles.js'
 
 /**
@@ -153,6 +154,7 @@ const Stylist = class extends EventHandler {
 	*/
 	_layout(scene) {
 		scene.traverseDepthFirst(node => {
+			if (node.visible === false) return
 			if (node.styles.isInAnyWayDirty === false) return
 			this._updateCount += 1
 
@@ -173,6 +175,8 @@ const Stylist = class extends EventHandler {
 		})
 	}
 }
+
+const _boxLayout = new BoxLayout()
 
 Stylist.LINKS_LOADED_EVENT = 'stylist-links-loaded'
 Stylist.KSS_LOADED_EVENT = 'stylist-kss-loaded'

@@ -14,6 +14,12 @@ class Layout {
 	get node() {
 		return this._node
 	}
+	set node(val) {
+		this._node = val
+	}
+
+	/** @abstract */
+	updateFromNodeStyles() {}
 
 	/**
 	Runs the layout algorithm

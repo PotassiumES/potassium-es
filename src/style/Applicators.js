@@ -1,5 +1,6 @@
 import Evaluators from './Evaluators.js'
 import GridLayout from './GridLayout.js'
+import BoxLayout from './BoxLayout.js'
 
 /**
 Applicators holds functions that apply a declared style property (color, font-size, etc.) to a Three.Object3D
@@ -27,10 +28,15 @@ Applicators.set('rotation', (node, styleInfo) => {
 Applicators.set('display', (node, styleInfo) => {
 	switch (styleInfo.value) {
 		case 'grid':
-			if (!node.styles.layout || node.styles.layout.isGrid === false) {
+			if (!node.styles.layout || node.styles.layout.isGridLayout !== true) {
 				node.styles.layout = new GridLayout(node)
 			}
 			// The other grid declarations like 'grid-template' are handled in GridLayout
+			return
+		case 'box':
+			if (!node.styles.layout || node.styles.layout.isBoxLayout !== true) {
+				node.styles.layout = new BoxLayout(node)
+			}
 			return
 		case 'none':
 			node.visible = false

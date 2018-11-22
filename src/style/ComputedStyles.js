@@ -94,6 +94,18 @@ class ComputedStyles {
 		return parsedValue
 	}
 
+	getBoolean(property, defaultValue = null) {
+		const styleInfo = this.get(property)
+		if (styleInfo === null) return defaultValue
+		return styleInfo.value === 'true'
+	}
+
+	getString(property, defaultValue = null) {
+		const styleInfo = this.get(property)
+		if (styleInfo === null) return defaultValue
+		return styleInfo.value
+	}
+
 	/**
 	changes is used by the Stylist to know which styles need to be updated on the Three.Object3D
 	@return {Array<property{string}>} the declarations that changed since the last update
