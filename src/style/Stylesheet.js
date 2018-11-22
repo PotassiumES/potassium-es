@@ -7,7 +7,7 @@ It holds the parsed data used to apply styles to a Three.js scene.
 */
 class Stylesheet {
 	/**
-	@param {Object} kssData the style JSON emitted by postcss-potassium
+	@param {Object} kssData - the style JSON emitted by postcss-potassium
 	*/
 	constructor(kssData) {
 		this._data = kssData
@@ -32,6 +32,21 @@ class Stylesheet {
 
 	get data() {
 		return this._data
+	}
+
+	get raw() {
+		const lines = []
+		for (const rule of this._data.rules) {
+			for (const selector of rule.selectors) {
+				lines.push(selector.raw)
+			}
+			lines.push('{')
+			for (const declaration of rule.declarations) {
+				lines.push('\t' + declaration.raw)
+			}
+			lines.push('}\n')
+		}
+		return lines.join('\n')
 	}
 
 	updateLocalStyles(node) {

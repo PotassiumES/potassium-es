@@ -111,6 +111,17 @@ THREE.Object3D.prototype.getClasses = function() {
 }
 
 /**
+Calls showEdges or hideEdges to toggle the debugging edge boxes
+*/
+THREE.Object3D.prototype.toggleEdges = function(includingChildren = false) {
+	if (this._marginBox) {
+		this.hideEdges(includingChildren)
+	} else {
+		this.showEdges(includingChildren)
+	}
+}
+
+/**
 If the Object3D has a geometry then show a debugging box around it
 */
 THREE.Object3D.prototype.showEdges = function(includingChildren = false) {

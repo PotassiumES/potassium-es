@@ -413,6 +413,23 @@ const App = class extends EventHandler {
 		throw new Error('Unhandled display mode', value)
 	}
 
+	toggleEdges() {
+		if (this._debugScene !== null) {
+			this._debugScene.toggleEdges(true)
+			return
+		}
+		switch (this.displayMode) {
+			case App.FLAT:
+				return
+			case App.PORTAL:
+				this.portalSOM.toggleEdges(true)
+				return
+			case App.IMMERSIVE:
+				this.immersiveSOM.toggleEdges(true)
+				return
+		}
+	}
+
 	/**
 	toggleFlatDisplay enables creators to see a debugging view into the immersive scene on their flat screens.
 	This is handy for coding and styling spatial controls when a headset is not available or you are having a good hair day and don't want to mess with success.
@@ -498,10 +515,13 @@ const App = class extends EventHandler {
 				)
 				break
 			case App.ShowFlatDisplayAction:
-				app.toggleFlatDisplay(true, event.data.display !== 'portal')
+				this.toggleFlatDisplay(true, event.data.display !== 'portal')
 				break
 			case App.HideFlatDisplayAction:
-				app.toggleFlatDisplay(false)
+				this.toggleFlatDisplay(false)
+				break
+			case App.ToggleEdgesAction:
+				this.toggleEdges()
 				break
 		}
 	}
@@ -651,6 +671,7 @@ App.GetStyleTreeAction = 'getStyleTree'
 App.PutStyleTreeAction = 'putStyleTree'
 App.ShowFlatDisplayAction = 'showFlatDisplay'
 App.HideFlatDisplayAction = 'hideFlatDisplay'
+App.ToggleEdgesAction = 'toggleEdges'
 
 App.DefaultLeftHandPosition = [-0.1, -0.4, -0.2]
 App.DefaultRightHandPosition = [0.1, -0.4, -0.2]
