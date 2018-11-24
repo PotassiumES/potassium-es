@@ -57,7 +57,6 @@ const Component = class extends EventHandler {
 	@param {THREE.Object3D} [options.portalSOM]
 	@param {THREE.Object3D} [options.immersiveSOM]
 	@param {string} [options.name=null] = if not null, use Component.setName with the value
-	@param {string} [options.classes=null] - if not null, a string to add to the class attribute of the DOMs and SOMs
 	@param {boolean} [options.usesFlat=true] - if set to false the flatDOM will be hidden
 	@param {boolean} [options.usesPortalOverlay=true] - if set to false the portalDOM will be hidden
 	@param {boolean} [options.usesPortalSpatial=true] - if set to false the portalSOM will be hidden
@@ -78,7 +77,6 @@ const Component = class extends EventHandler {
 				usesPortalSpatial: true,
 				portalSOM: null,
 
-				classes: null,
 				name: null,
 
 				usesImmersive: true,
@@ -148,11 +146,6 @@ const Component = class extends EventHandler {
 
 		// All Components are selectable by the 'component' class
 		this.addClass('component')
-
-		if (this.options.classes) {
-			this.addClass(...this.options.classes.split(/\s/).filter(cls => cls.trim().length > 0))
-		}
-
 		this._updateClasses()
 
 		if (this.options.name) {

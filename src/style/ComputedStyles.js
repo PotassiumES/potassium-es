@@ -94,6 +94,40 @@ class ComputedStyles {
 		return parsedValue
 	}
 
+	/*
+
+	The fillLength allows us to quickly handle array values that auto-expand, like margin-width or padding.
+	This method will fill the result array with enough copies of the parsedValue that when combined with parsedValue it is fillLength long
+	For example:
+		a parsedValue of: [1, 2, 3]
+		with a fillValue of 7
+		would result in: [1, 2, 3, 1, 2, 3, 1]
+
+	@param {string} property
+	@param {Array?} defaultValue - the default to return if the property is not set or not parsable
+	@param {number?} expectedLength
+	*/
+	getNumberArray(property, defaultValue = null, fillLength = null) {
+		const styleInfo = this.get(property)
+		if (styleInfo === null) return defaultValue
+		const parsedValue = Evaluators.parse(styleInfo.value, this.node)
+		if (parsedValue === null) return defaultValue
+		if (Array.isArray(parsedValue) === false){
+			console.error('Expected an array', parsedValue, typeof parsedValue)
+			return defaultValue
+		}
+		if(parsedValue.length === 0) return defaultValue
+		if(fillLength !== null && parsedValue.length < fillLength){
+			const numToFill = fillLength - parsedValue.length
+			const fillValues = new Array(numToFill)
+			for(let i=0; i < numToFill; i++){
+				fillValues[i] = parsedValue[i % parsedValue.length]
+			}
+			parsedValue.push(...fillValues)
+		}
+		return parsedValue
+	}
+
 	getBoolean(property, defaultValue = null) {
 		const styleInfo = this.get(property)
 		if (styleInfo === null) return defaultValue

@@ -165,7 +165,13 @@ Singleton.add(
 	new Evaluator('explicit distance vector', DistanceVectorRegex, (value, node) => {
 		const splitValues = value.match(DistanceVectorRegex)
 		const parsedValues = splitValues.map(val => {
-			return _parseDistance(val, val.endsWith('cm') ? 0.01 : 1)
+			let multiplier = 1
+			if(val.endsWith('cm')){
+				multiplier = 0.01
+			} else if(val.endsWith('mm')){
+				multiplier = 0.001
+			}
+			return _parseDistance(val, multiplier)
 		})
 		if (parsedValues.some(pv => Number.isNaN(pv))) return undefined
 		return parsedValues

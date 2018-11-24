@@ -37,16 +37,15 @@ class BoxLayout extends Layout {
 		let position = BoxLayout.VERTICAL ? _workingVector3_1.y : _workingVector3_1.x
 		for (const child of childrenToPosition) {
 			_workingBox3_1.set(child.styles.marginBounds.min, child.styles.marginBounds.max)
-			_workingBox3_1.scale(child.scale)
 			_workingBox3_1.getSize(_workingVector3_1)
 			_workingBox3_1.getCenter(_workingVector3_2)
 			if (direction === BoxLayout.VERTICAL) {
-				child.position.setX(_workingVector3_1.x / -2)
-				child.position.setY(position - _workingVector3_1.y / 2 - _workingVector3_2.y)
+				child.position.setX(child.styles.marginBounds.min.x * -1)
+				child.position.setY(position - child.styles.marginBounds.max.y)
 				position -= _workingVector3_1.y
 			} else {
-				child.position.setX(position + _workingVector3_1.x / 2 - _workingVector3_2.x)
-				child.position.setY(_workingVector3_1.y / -2)
+				child.position.setX(position - child.styles.marginBounds.min.x)
+				child.position.setY(child.styles.marginBounds.max.y * -1)
 				position += _workingVector3_1.x
 			}
 		}

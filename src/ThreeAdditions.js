@@ -14,6 +14,20 @@ const _workingVector3_2 = new THREE.Vector3()
 THREE.Object3D.prototype.isNode = true
 THREE.Scene.prototype.isScene = true
 
+/**
+Expands or contracts along the XR plane by:
+- adding top to this.max.y
+- adding right to this.max.x
+- subbtracting bottom from this.min.y
+- subbtracting left from this.min.x
+*/
+THREE.Box3.prototype.changeXYPlane = function(top, right, bottom, left){
+	this.max.y += top
+	this.max.x += right
+	this.min.y -= bottom
+	this.min.x -= left
+}
+
 THREE.Box3.prototype.makeZero = function() {
 	this.min.set(0, 0, 0)
 	this.max.set(0, 0, 0)
