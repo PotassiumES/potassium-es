@@ -56,3 +56,13 @@ body					{ z-index: 2; }
 .portal-mode .flat-root, .portal-mode .immersive-root { display: none; }
 .immersive-mode .flat-root, .immersive-mode .portal-root { display: none; }
 
+.dom-modal {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 100;
+	padding: 20px;
+	background-color: var(--dom-background-color);
+	border: gb(255, 102, 153);
+}

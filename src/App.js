@@ -270,7 +270,7 @@ const App = class extends EventHandler {
 			this._actionManager.switchToActionMaps(mode)
 
 			/* Component listens for events on the DisplayModeTracker and updates itself accordingly */
-			DisplayModeTracker.Singleton.setDisplayMode(mode)
+			DisplayModeTracker.Singleton.displayMode = mode
 
 			/* style once right at the start to avoid seeing unstyled scenes */
 			switch (mode) {
