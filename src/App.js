@@ -65,7 +65,7 @@ const App = class extends EventHandler {
 						}
 						break
 				}
-			}, 500)
+			}, 100)
 		}, Stylist.LINKS_LOADED_EVENT)
 		this._stylist.loadLinks()
 
