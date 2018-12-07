@@ -1,5 +1,5 @@
 /**
-BorderLine extends THREE.Line (an Object3D) and is used to render the box border set by KSS
+BorderLine extends THREE.Mesh (an Object3D) and is used to render the box border set by KSS
 */
 function BorderLine(lineWidth = 0.01, width = 0, height = 0, radius = 0) {
 	THREE.Mesh.call(
@@ -62,7 +62,7 @@ BorderGeometry.prototype._updatePoints = function() {
 	}
 
 	// Make two triangles per quad
-	const positions = new Float32Array(triangleCount * 9) // three points per tri
+	const positions = new Float32Array(triangleCount * 9) // three points per triangle
 	for (let i = 0; i < curvePointCount; i++) {
 		const positionsIndex = i * 18 // 9 floats per triangle
 		push((i + 1) % curvePointCount, positionsIndex)
