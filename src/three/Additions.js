@@ -1,7 +1,7 @@
-import Attributes from './style/Attributes.js'
-import NodeStyles from './style/NodeStyles.js'
+import Attributes from '../style/Attributes.js'
+import NodeStyles from '../style/NodeStyles.js'
 
-import { SelectorFragmentList } from './style/Selector.js'
+import { SelectorFragmentList } from '../style/Selector.js'
 
 /**
 importing this extends THREE.Object3D with many methods and attributes useful for creating and manipulating the SOM
@@ -21,7 +21,7 @@ Expands or contracts along the XR plane by:
 - subbtracting bottom from this.min.y
 - subbtracting left from this.min.x
 */
-THREE.Box3.prototype.changeXYPlane = function(top, right, bottom, left){
+THREE.Box3.prototype.changeXYPlane = function(top, right, bottom, left) {
 	this.max.y += top
 	this.max.x += right
 	this.min.y -= bottom

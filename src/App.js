@@ -1,4 +1,4 @@
-import * as ta from './ThreeAdditions.js'
+import * as ta from './three/Additions.js'
 
 import dom from './DOM.js'
 import som from './SOM.js'

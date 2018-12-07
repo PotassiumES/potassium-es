@@ -166,9 +166,9 @@ Singleton.add(
 		const splitValues = value.match(DistanceVectorRegex)
 		const parsedValues = splitValues.map(val => {
 			let multiplier = 1
-			if(val.endsWith('cm')){
+			if (val.endsWith('cm')) {
 				multiplier = 0.01
-			} else if(val.endsWith('mm')){
+			} else if (val.endsWith('mm')) {
 				multiplier = 0.001
 			}
 			return _parseDistance(val, multiplier)

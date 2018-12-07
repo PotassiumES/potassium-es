@@ -114,19 +114,19 @@ class NodeStyles {
 
 		this.paddingBounds.set(this.contentBounds.min, this.contentBounds.max)
 		let edgeWidth = this.computedStyles.getNumberArray('padding', [0, 0, 0, 0], 4)
-		if(edgeWidth !== null){
+		if (edgeWidth !== null) {
 			this.paddingBounds.changeXYPlane(edgeWidth[0], edgeWidth[1], edgeWidth[2], edgeWidth[3])
 		}
 
 		this.borderBounds.set(this.paddingBounds.min, this.paddingBounds.max)
 		edgeWidth = this.computedStyles.getNumberArray('border-width', [0, 0, 0, 0], 4)
-		if(edgeWidth !== null){
+		if (edgeWidth !== null) {
 			this.borderBounds.changeXYPlane(edgeWidth[0], edgeWidth[1], edgeWidth[2], edgeWidth[3])
 		}
 
 		this.marginBounds.set(this.borderBounds.min, this.borderBounds.max)
 		edgeWidth = this.computedStyles.getNumberArray('margin', [0, 0, 0, 0], 4)
-		if(edgeWidth !== null){
+		if (edgeWidth !== null) {
 			this.marginBounds.changeXYPlane(edgeWidth[0], edgeWidth[1], edgeWidth[2], edgeWidth[3])
 		}
 	}

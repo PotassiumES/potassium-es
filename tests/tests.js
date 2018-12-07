@@ -3,7 +3,7 @@ import Runner from '/node_modules/potassium-test/src/Runner.js'
 import SynchronousFetchMap from '/node_modules/potassium-test/src/SynchronousFetchMap.js'
 import TestResultsRenderer from '/node_modules/potassium-test/src/TestResultsRenderer.js'
 
-import * as ta from '/src/ThreeAdditions.js'
+import * as ta from '/src/three/Additions.js'
 
 import dom from '/src/DOM.js'
 import Router from '/src/Router.js'

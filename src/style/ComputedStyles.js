@@ -112,15 +112,15 @@ class ComputedStyles {
 		if (styleInfo === null) return defaultValue
 		const parsedValue = Evaluators.parse(styleInfo.value, this.node)
 		if (parsedValue === null) return defaultValue
-		if (Array.isArray(parsedValue) === false){
+		if (Array.isArray(parsedValue) === false) {
 			console.error('Expected an array', parsedValue, typeof parsedValue)
 			return defaultValue
 		}
-		if(parsedValue.length === 0) return defaultValue
-		if(fillLength !== null && parsedValue.length < fillLength){
+		if (parsedValue.length === 0) return defaultValue
+		if (fillLength !== null && parsedValue.length < fillLength) {
 			const numToFill = fillLength - parsedValue.length
 			const fillValues = new Array(numToFill)
-			for(let i=0; i < numToFill; i++){
+			for (let i = 0; i < numToFill; i++) {
 				fillValues[i] = parsedValue[i % parsedValue.length]
 			}
 			parsedValue.push(...fillValues)
