@@ -15,6 +15,7 @@ class BoxLayout extends Layout {
 	apply() {
 		const childrenToPosition = this.node.children.filter(node => {
 			if (node.visible === false) return false
+			if (node.shadowSOM === true) return false
 			if (node.styles.computedStyles.getString('position') === 'absolute') return false
 			if (
 				node.styles.computedStyles.get('centroid') !== null ||

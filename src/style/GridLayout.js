@@ -136,7 +136,9 @@ class Grid {
 	*/
 	apply() {
 		const childrenToLayout = this._node.children.filter(child => {
-			return child.visible && child.styles.computedStyles.getString('position') !== 'absolute'
+			return (
+				child.shadowSOM !== true && child.visible && child.styles.computedStyles.getString('position') !== 'absolute'
+			)
 		})
 		if (childrenToLayout.length === 0) return
 

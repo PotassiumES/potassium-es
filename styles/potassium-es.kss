@@ -64,5 +64,5 @@ body					{ z-index: 2; }
 	z-index: 100;
 	padding: 20px;
 	background-color: var(--dom-background-color);
-	border: gb(255, 102, 153);
+	border: rgb(255, 102, 153);
 }

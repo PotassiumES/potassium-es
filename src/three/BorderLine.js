@@ -26,6 +26,50 @@ BorderGeometry.prototype.constructor = BorderGeometry
 
 BorderGeometry.CurveDivisions = 15
 
+Object.defineProperty(BorderGeometry.prototype, 'lineWidth', {
+	get: function() {
+		return this._lineWidth
+	},
+	set: function(val) {
+		if (val < 0) return
+		this.setParams(val, this._width, this._height, this._radius)
+	}
+})
+
+Object.defineProperty(BorderGeometry.prototype, 'width', {
+	get: function() {
+		return this._width
+	},
+	set: function(val) {
+		if (val < 0) return
+		this.setParams(this._lineWidth, val, this._height, this._radius)
+	}
+})
+
+Object.defineProperty(BorderGeometry.prototype, 'height', {
+	get: function() {
+		return this._height
+	},
+	set: function(val) {
+		if (val < 0) return
+		this.setParams(this._lineWidth, this._width, val, this._radius)
+	}
+})
+
+Object.defineProperty(BorderGeometry.prototype, 'radius', {
+	get: function() {
+		return this._radius
+	},
+	set: function(val) {
+		if (val < 0) return
+		this.setParams(this._lineWidth, this._width, this._height, val)
+	}
+})
+
+BorderGeometry.prototype.setContentSize = function(width, height) {
+	this.setParams(this._lineWidth, width, height, this._radius)
+}
+
 BorderGeometry.prototype.setParams = function(lineWidth, width, height, radius) {
 	if (this._lineWidth === lineWidth && this._width === width && this._height === height && this._radius === radius)
 		return

@@ -5,6 +5,8 @@ import LocalStyles from './LocalStyles.js'
 import ComputedStyles from './ComputedStyles.js'
 import AssignedStyles from './AssignedStyles.js'
 
+import BorderLine from '../three/BorderLine.js'
+
 /**
 NodeStyles is assigned to the `styles` attribute of each SOM node (which are {@link THREE.Object3D}s).
 
@@ -59,6 +61,8 @@ class NodeStyles {
 		this.paddingBounds = som.box3().makeZero()
 		this.contentBounds = som.box3().makeZero()
 		this.geometryBounds = som.box3().makeZero()
+
+		this.borderLine = null
 	}
 
 	get isInAnyWayDirty() {
@@ -104,6 +108,7 @@ class NodeStyles {
 		this.contentBounds.set(this.geometryBounds.min, this.geometryBounds.max)
 		for (const child of this.node.children) {
 			if (child.visible === false) continue
+			if (child.shadowSOM === true) continue
 			if (child.styles.computedStyles.getString('position') === 'absolute') continue
 			_workingBox3_1.set(child.styles.marginBounds.min, child.styles.marginBounds.max)
 			_workingBox3_1.translate(child.position)
@@ -122,6 +127,33 @@ class NodeStyles {
 		edgeWidth = this.computedStyles.getNumberArray('border-width', [0, 0, 0, 0], 4)
 		if (edgeWidth !== null) {
 			this.borderBounds.changeXYPlane(edgeWidth[0], edgeWidth[1], edgeWidth[2], edgeWidth[3])
+			if (edgeWidth.some(w => w > 0)) {
+				this.paddingBounds.getSize(_workingVector3_1)
+				const borderRadius = this.computedStyles.getNumber('border-radius', 0)
+				if (this.borderLine === null) {
+					this.borderLine = new BorderLine(edgeWidth[0], _workingVector3_1.x, _workingVector3_1.y, borderRadius)
+					this.node.add(this.borderLine)
+				} else {
+					this.borderLine.geometry.setParams(edgeWidth[0], _workingVector3_1.x, _workingVector3_1.y, borderRadius)
+				}
+				const borderEmissive = this.computedStyles.getNumberArray('border-emissive', [0, 0, 0])
+				if (borderEmissive !== null) {
+					this.borderLine.material.emissive.setRGB(...borderEmissive)
+				}
+				this.borderBounds.getSize(_workingVector3_1)
+				this.borderLine.position.setX(this.borderBounds.min.x + _workingVector3_1.x / 2)
+				this.borderLine.position.setY(this.borderBounds.min.y + _workingVector3_1.y / 2)
+			} else {
+				if (this.borderLine !== null) {
+					this.node.remove(this.borderLine)
+					this.borderLine = null
+				}
+			}
+		} else {
+			if (this.borderLine !== null) {
+				this.node.remove(this.borderLine)
+				this.borderLine = null
+			}
 		}
 
 		this.marginBounds.set(this.borderBounds.min, this.borderBounds.max)

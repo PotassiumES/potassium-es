@@ -1,12 +1,15 @@
 import Evaluators from './Evaluators.js'
 import GridLayout from './GridLayout.js'
 import BoxLayout from './BoxLayout.js'
+import BorderLine from '../three/BorderLine.js'
 
 /**
 Applicators holds functions that apply a declared style property (color, font-size, etc.) to a Three.Object3D
 @type {Map<string, StyleInfo>}
 */
 const Applicators = new Map()
+
+const _workingVector3_1 = new THREE.Vector3()
 
 /** set Object3D.scale */
 Applicators.set('scale', (node, styleInfo) => {

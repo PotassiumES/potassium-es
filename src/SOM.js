@@ -53,7 +53,8 @@ function loadText(resultGroup, text, material, fontURL, options) {
 	if (som.fonts.has(fontURL)) {
 		const shapes = som.fonts.get(fontURL).generateShapes(text, options.size)
 		resultGroup.geometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
-		resultGroup.needsUpdate = true
+		resultGroup.styles.geometryIsDirty = true
+		resultGroup.styles.setAncestorsLayoutDirty()
 	} else {
 		assetLoader.get(fontURL).then(blob => {
 			if (!blob) {
@@ -67,7 +68,8 @@ function loadText(resultGroup, text, material, fontURL, options) {
 					som.fonts.set(fontURL, loadedFont)
 					const shapes = loadedFont.generateShapes(text, options.size)
 					resultGroup.geometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
-					resultGroup.needsUpdate = true
+					resultGroup.styles.geometryIsDirty = true
+					resultGroup.styles.setAncestorsLayoutDirty()
 					URL.revokeObjectURL(blobURL)
 				},
 				() => {},
@@ -111,16 +113,16 @@ som.text = (text = '', options = {}) => {
 
 	let currentText = null
 
-	const resultGroup = new THREE.Mesh(undefined, options.material)
+	const resultGroup = som.mesh([undefined, options.material])
 	resultGroup.name = 'Text'
 	resultGroup.addClass('text')
 	resultGroup.isText = true
 
 	resultGroup.setRGB = (red, green, blue) => {
-		if (resultGroup.material.color) {
-			resultGroup.material.color.setRGB(red, green, blue)
-		} else if (resultGroup.material.emissive) {
+		if (resultGroup.material.emissive) {
 			resultGroup.material.emissive.setRGB(red, green, blue)
+		} else if (resultGroup.material.color) {
+			resultGroup.material.color.setRGB(red, green, blue)
 		}
 	}
 
@@ -186,7 +188,6 @@ For example, creating a MeshBasicMaterial will be som.meshBasicMaterial(...param
 */
 som.SUPPORT_CLASSES = [
 	{ class: 'Box3', name: 'box3' },
-	{ class: 'Mesh', name: 'mesh' },
 	{ class: 'Line', name: 'line' },
 	{ class: 'Euler', name: 'euler' },
 	{ class: 'Matrix4', name: 'matrix4' },
@@ -209,6 +210,7 @@ for (const classInfo of som.SUPPORT_CLASSES) {
 The methods created from these classes use the som.nodeFuction (see below)
 */
 som.GRAPH_CLASSES = [
+	{ class: 'Mesh', name: 'mesh' },
 	{ class: 'Scene', name: 'scene' },
 	{ class: 'Group', name: 'group' },
 	{ class: 'AmbientLight', name: 'ambientLight' },

@@ -65,10 +65,16 @@ Set the styles.hierarchyIsDirty when adding or removing a child
 */
 const _oldAdd = THREE.Object3D.prototype.add
 THREE.Object3D.prototype.add = function(...objects) {
+	let shouldSetDirty = false
 	for (const obj of objects) {
 		_oldAdd.call(this, obj)
+		if (obj.shadowSOM !== true) {
+			shouldSetDirty = true
+		}
 	}
-	this.styles.setAncestorsHierarchyDirty()
+	if (shouldSetDirty) {
+		this.styles.setAncestorsHierarchyDirty()
+	}
 	return this
 }
 const _oldRemove = THREE.Object3D.prototype.remove
@@ -90,7 +96,9 @@ Object.defineProperty(THREE.Object3D.prototype, 'visible', {
 	set: function(val) {
 		if (this._visible === val) return
 		this._visible = val
-		this.styles.setAncestorsHierarchyDirty()
+		if (this.shadowSOM !== true) {
+			this.styles.setAncestorsHierarchyDirty()
+		}
 	}
 })
 
@@ -152,6 +160,7 @@ THREE.Object3D.prototype.showEdges = function(includingChildren = false) {
 		this._marginBox = new THREE.LineSegments(_edgeBoxGeometry, _edgeBoxMaterial)
 		this._marginBox.addClass('margin-box')
 		this._marginBox.styles.assignedStyles.set('position', 'absolute')
+		this._marginBox.shadowSOM = true
 		this.add(this._marginBox)
 	}
 
@@ -168,6 +177,7 @@ THREE.Object3D.prototype.showEdges = function(includingChildren = false) {
 	if (includingChildren) {
 		for (const child of this.children) {
 			if (child.visible === false) continue
+			if (child.shadowSOM === true) continue
 			if (child.hasClass('margin-box')) continue
 			child.showEdges(true)
 		}
@@ -185,6 +195,7 @@ THREE.Object3D.prototype.hideEdges = function(includingChildren = false) {
 	if (includingChildren) {
 		for (const child of this.children) {
 			if (child.hasClass('margin-box')) continue
+			if (child.shadowSOM === true) continue
 			child.hideEdges(true)
 		}
 	}
@@ -205,6 +216,7 @@ THREE.Object3D.prototype.traverseDepthFirst = function(func) {
 
 const _traverseDepthFirst = function(node, func) {
 	for (let i = 0; i < node.children.length; i++) {
+		if (node.children[i].shadowSOM === true) continue
 		_traverseDepthFirst(node.children[i], func)
 	}
 	func(node)
@@ -220,7 +232,7 @@ THREE.Object3D.prototype.getObjectsBySelector = function(selector, atMostOne = f
 	const results = []
 	this.traverse(node => {
 		if (node === this) return
-		if (selectorFragmentList.matches(node)) {
+		if (node.shadowSOM !== true && selectorFragmentList.matches(node)) {
 			results.push(node)
 			if (atMostOne) return results
 		}
@@ -330,6 +342,7 @@ THREE.Object3D.prototype._getStyleTreeLines = function(
 		return results
 	}
 	for (const child of node.children) {
+		if (child.shadowSOM === true) continue
 		this._getStyleTreeLines(child, results, tabDepth + 1, showVars, localsOnly)
 	}
 	return results
@@ -368,6 +381,7 @@ THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
 	console.log(tabs + '\tposition:', ...this.position.toArray())
 	console.log(tabs + '\tquaternion:', ...this.quaternion.toArray())
 	for (let i = 0; i < this.children.length; i++) {
+		if (this.children[i].shadowSOM === true) continue
 		this.children[i].prettyPrint(depth + 1)
 	}
 }
