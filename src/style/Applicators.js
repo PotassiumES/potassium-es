@@ -15,7 +15,11 @@ const _workingVector3_1 = new THREE.Vector3()
 Applicators.set('scale', (node, styleInfo) => {
 	if (typeof node.scale === 'undefined') return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
-	if (typeof parsedValue === 'undefined') return
+	if (Array.isArray(parsedValue) === false || parsedValue.length === 0) return
+	if (parsedValue.length < 3) {
+		parsedValue[1] = parsedValue[0]
+		parsedValue[2] = parsedValue[0]
+	}
 	node.scale.set(...parsedValue)
 })
 

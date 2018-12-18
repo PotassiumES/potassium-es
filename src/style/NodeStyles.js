@@ -6,6 +6,7 @@ import ComputedStyles from './ComputedStyles.js'
 import AssignedStyles from './AssignedStyles.js'
 
 import BorderLine from '../three/BorderLine.js'
+import Background from '../three/Background.js'
 
 /**
 NodeStyles is assigned to the `styles` attribute of each SOM node (which are {@link THREE.Object3D}s).
@@ -63,6 +64,7 @@ class NodeStyles {
 		this.geometryBounds = som.box3().makeZero()
 
 		this.borderLine = null
+		this.background = null
 	}
 
 	get isInAnyWayDirty() {
@@ -112,10 +114,10 @@ class NodeStyles {
 			if (child.styles.computedStyles.getString('position') === 'absolute') continue
 			_workingBox3_1.set(child.styles.marginBounds.min, child.styles.marginBounds.max)
 			_workingBox3_1.translate(child.position)
+			_workingBox3_1.scale(child.scale)
 			this.contentBounds.expandByPoint(_workingBox3_1.min)
 			this.contentBounds.expandByPoint(_workingBox3_1.max)
 		}
-		this.contentBounds.scale(this.node.scale)
 
 		this.paddingBounds.set(this.contentBounds.min, this.contentBounds.max)
 		let edgeWidth = this.computedStyles.getNumberArray('padding', [0, 0, 0, 0], 4)
@@ -127,39 +129,76 @@ class NodeStyles {
 		edgeWidth = this.computedStyles.getNumberArray('border-width', [0, 0, 0, 0], 4)
 		if (edgeWidth !== null) {
 			this.borderBounds.changeXYPlane(edgeWidth[0], edgeWidth[1], edgeWidth[2], edgeWidth[3])
-			if (edgeWidth.some(w => w > 0)) {
-				this.paddingBounds.getSize(_workingVector3_1)
-				const borderRadius = this.computedStyles.getNumber('border-radius', 0)
-				if (this.borderLine === null) {
-					this.borderLine = new BorderLine(edgeWidth[0], _workingVector3_1.x, _workingVector3_1.y, borderRadius)
-					this.node.add(this.borderLine)
-				} else {
-					this.borderLine.geometry.setParams(edgeWidth[0], _workingVector3_1.x, _workingVector3_1.y, borderRadius)
-				}
-				const borderEmissive = this.computedStyles.getNumberArray('border-emissive', [0, 0, 0])
-				if (borderEmissive !== null) {
-					this.borderLine.material.emissive.setRGB(...borderEmissive)
-				}
-				this.borderBounds.getSize(_workingVector3_1)
-				this.borderLine.position.setX(this.borderBounds.min.x + _workingVector3_1.x / 2)
-				this.borderLine.position.setY(this.borderBounds.min.y + _workingVector3_1.y / 2)
-			} else {
-				if (this.borderLine !== null) {
-					this.node.remove(this.borderLine)
-					this.borderLine = null
-				}
-			}
-		} else {
-			if (this.borderLine !== null) {
-				this.node.remove(this.borderLine)
-				this.borderLine = null
-			}
 		}
 
 		this.marginBounds.set(this.borderBounds.min, this.borderBounds.max)
 		edgeWidth = this.computedStyles.getNumberArray('margin', [0, 0, 0, 0], 4)
 		if (edgeWidth !== null) {
 			this.marginBounds.changeXYPlane(edgeWidth[0], edgeWidth[1], edgeWidth[2], edgeWidth[3])
+		}
+	}
+
+	updateShadowSOM() {
+		// Gather info
+		const borderWidth = this.computedStyles.getNumberArray('border-width', [0], 1)
+		const borderRadius = this.computedStyles.getNumber('border-radius', 0)
+		const borderEmissive = this.computedStyles.getNumberArray('border-emissive', [0, 0, 0])
+
+		const backgroundZ = this.computedStyles.getNumber('background-z', -0.02)
+		const backgroundOpacity = Math.max(0, this.computedStyles.getNumber('background-opacity', 1))
+		const backgroundEmissive = this.computedStyles.getNumberArray('background-emissive')
+
+		this.paddingBounds.getSize(_workingVector3_1)
+		this.borderBounds.getSize(_workingVector3_2)
+
+		// Update the border
+		if (borderWidth !== null && borderWidth[0] > 0) {
+			if (this.borderLine === null) {
+				this.borderLine = new BorderLine(borderWidth[0], _workingVector3_1.x, _workingVector3_1.y, borderRadius)
+				this.node.add(this.borderLine)
+			} else {
+				this.borderLine.geometry.setParams(borderWidth[0], _workingVector3_1.x, _workingVector3_1.y, borderRadius)
+			}
+			if (borderEmissive !== null) {
+				this.borderLine.material.emissive.setRGB(...borderEmissive)
+			}
+			this.borderLine.position.set(
+				this.borderBounds.min.x + _workingVector3_2.x / 2,
+				this.borderBounds.min.y + _workingVector3_2.y / 2,
+				0
+			)
+		} else if (this.borderLine !== null) {
+			this.node.remove(this.borderLine)
+			this.borderLine = null
+		}
+
+		// Update the background
+		if (Array.isArray(backgroundEmissive)) {
+			if (this.background === null) {
+				this.background = new Background(_workingVector3_2.x, _workingVector3_2.y, borderRadius)
+				this.node.add(this.background)
+			} else {
+				this.background.geometry.setParams(_workingVector3_2.x, _workingVector3_2.y, borderRadius)
+			}
+
+			this.background.material.emissive.setRGB(...backgroundEmissive)
+
+			if (backgroundOpacity >= 1) {
+				this.background.material.opacity = 1
+				this.background.material.transparent = false
+			} else {
+				this.background.material.opacity = backgroundOpacity
+				this.background.material.transparent = true
+			}
+
+			this.background.position.set(
+				this.borderBounds.min.x + _workingVector3_2.x / 2,
+				this.borderBounds.min.y + _workingVector3_2.y / 2,
+				backgroundZ
+			)
+		} else if (this.background !== null) {
+			this.node.remove(this.background)
+			this.background = null
 		}
 	}
 
@@ -184,6 +223,7 @@ class NodeStyles {
 }
 
 const _workingVector3_1 = som.vector3()
+const _workingVector3_2 = som.vector3()
 const _workingBox3_1 = som.box3()
 
 export default NodeStyles

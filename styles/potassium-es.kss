@@ -66,3 +66,17 @@ body					{ z-index: 2; }
 	background-color: var(--dom-background-color);
 	border: rgb(255, 102, 153);
 }
+
+/* App styles */
+
+.som-root {
+	padding: 6cm;
+
+	border-width: var(--som-border-width);
+	border-radius: var(--som-border-radius);
+	border-emissive: var(--som-border-color);
+
+	background-z: -8cm;
+	background-opacity: 1;
+	background-emissive: rgb(240, 240, 240);
+}

@@ -59,11 +59,15 @@ class GridLayout extends Layout {
 		const autoFlowStyleName = this._grid._autoFlow === Grid.Row ? 'grid-auto-rows' : 'grid-auto-columns'
 		const autoFlowSizeStyleInfo = this.node.styles.computedStyles.get(autoFlowStyleName)
 		if (autoFlowSizeStyleInfo) {
-			const autoFlowSize = Evaluators.parse(autoFlowSizeStyleInfo.value, this.node)
-			if (typeof autoFlowSize === 'undefined') {
-				console.error(`Could not parse ${autoFlowStyleName}`, autoFlowSizeStyleInfo)
+			if (autoFlowSizeStyleInfo.value === 'auto') {
+				this._grid._autoFlowSize = 'auto'
 			} else {
-				this._grid._autoFlowSize = autoFlowSize[0]
+				const autoFlowSize = Evaluators.parse(autoFlowSizeStyleInfo.value, this.node)
+				if (typeof autoFlowSize === 'undefined') {
+					console.error(`Could not parse ${autoFlowStyleName}`, autoFlowSizeStyleInfo)
+				} else {
+					this._grid._autoFlowSize = autoFlowSize[0]
+				}
 			}
 		}
 
@@ -102,7 +106,7 @@ class Grid {
 		this._rowCellSizes = [DefaultCellSize]
 		this._columnCellSizes = [DefaultCellSize]
 		this._autoFlow = Grid.Row
-		this._autoFlowSize = DefaultCellSize
+		this._autoFlowSize = 'auto'
 		this._rowGap = DefaultGapSize // meters
 		this._columnGap = DefaultGapSize // meters
 	}
@@ -156,7 +160,7 @@ class Grid {
 		const minorMultiplier = this._autoFlow === Grid.Row ? 1 : -1
 
 		// Find the count past which we're into autoflow
-		const assignedCellCount = majorCellSizes * minorCellSizes
+		const assignedCellCount = majorCellSizes.length * minorCellSizes.length
 
 		// Create a 3D array: major/minor/sizes+child
 		const computedSizes = new Array()
@@ -175,6 +179,7 @@ class Grid {
 			computedSizes[majorIndex][minorIndex].child = childrenToLayout[i]
 
 			childrenToLayout[i].styles.marginBounds.getSize(_workingVector3_1)
+			_workingVector3_1.multiply(childrenToLayout[i].scale)
 
 			// Use either the assigned major cell size or the autoflow size
 			majorSize = i < assignedCellCount ? majorCellSizes[majorIndex] : this._autoFlowSize
@@ -223,7 +228,6 @@ class Grid {
 					childInfo.child.position.setX(majorPosition * majorMultiplier)
 					childInfo.child.position.setY(minorPosition * minorMultiplier)
 				}
-
 				majorMaxSize = Math.max(majorMaxSize, childInfo[0])
 				minorPosition += minorArray[minorIndex][1] + minorGap
 			}

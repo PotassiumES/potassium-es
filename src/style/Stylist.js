@@ -171,6 +171,9 @@ const Stylist = class extends EventHandler {
 			// Update the edge bounds of this node using the new layout size
 			node.styles.calculateEdgeBounds()
 
+			// Update the border and background
+			node.styles.updateShadowSOM()
+
 			node.styles.clearDirtyFlags()
 		})
 	}

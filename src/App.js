@@ -454,7 +454,7 @@ const App = class extends EventHandler {
 				.removeClass('flat-mode', 'immersive-mode', 'portal-mode')
 				.addClass(immersive ? 'immersive-mode' : 'portal-mode')
 			this._debugScene = immersive ? this._immersiveScene : this._portalScene
-			this._flatCamera = som.perspectiveCamera([45, 1, 0.5, 10000])
+			this._flatCamera = som.perspectiveCamera([45, 1, 0.05, 10000])
 			this._flatClock = new THREE.Clock(false)
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
