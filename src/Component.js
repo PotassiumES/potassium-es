@@ -160,7 +160,7 @@ const Component = class extends EventHandler {
 		this.listenTo(
 			DisplayModeTracker.DisplayModeChangedEvent,
 			DisplayModeTracker.Singleton,
-			this.handleDisplayModeChange
+			this.handleDisplayModeChange.bind(this)
 		)
 	}
 
@@ -213,9 +213,7 @@ const Component = class extends EventHandler {
 	Called when the containing App changes display mode: App.FLAT, App.PORTAL, or App.IMMERSIVE
 	Ancestors of this class should override this to react to state changes or just read this.currentDisplayMode to make choices
 	*/
-	handleDisplayModeChange(eventName, mode, displayModeTracker) {
-		console.log('display mode change', eventName, mode, displayModeTracker)
-	}
+	handleDisplayModeChange(eventName, mode, displayModeTracker) {}
 
 	/** @type {string} a URL to navigate to when this `Component` receives an `activate` action */
 	get activationAnchor() {

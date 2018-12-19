@@ -91,6 +91,7 @@ class ComputedStyles {
 		if (styleInfo === null) return defaultValue
 		const parsedValue = Evaluators.parse(styleInfo.value, this.node)
 		if (parsedValue === null) return defaultValue
+		if (Array.isArray(parsedValue)) return parsedValue[0]
 		return parsedValue
 	}
 

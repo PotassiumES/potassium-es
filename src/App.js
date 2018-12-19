@@ -463,6 +463,8 @@ const App = class extends EventHandler {
 			document.body.prepend(this._flatDisplay.dom)
 			this._flatDisplay.start()
 			this._actionManager.activateActionMaps('flat-dev')
+
+			this._displayModeTracker.currentDisplayMode = immersive ? App.IMMERSIVE : App.PORTAL
 		} else {
 			if (this._flatDisplay === null) return
 			this._dom.removeClass('immersive-mode', 'portal-mode').addClass('flat-mode')
@@ -473,6 +475,7 @@ const App = class extends EventHandler {
 			this._flatClock = null
 			this._debugScene = null
 			this._actionManager.deactivateActionMaps('flat-dev')
+			this._displayModeTracker.currentDisplayMode = App.FLAT
 		}
 	}
 
