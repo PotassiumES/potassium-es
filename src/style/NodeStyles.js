@@ -140,8 +140,9 @@ class NodeStyles {
 
 	updateShadowSOM() {
 		// Gather info
-		const borderWidth = this.computedStyles.getNumberArray('border-width', [0], 1)
-		const borderRadius = this.computedStyles.getNumber('border-radius', 0)
+		const borderWidth = this.computedStyles.getNumberArray('border-width', [0, 0, 0, 0], 4)
+		const borderRadius = this.computedStyles.getNumberArray('border-radius', [0, 0, 0, 0], 4)
+
 		const borderEmissive = this.computedStyles.getNumberArray('border-emissive', [0, 0, 0])
 
 		const backgroundZ = this.computedStyles.getNumber('background-z', -0.02)
@@ -152,12 +153,12 @@ class NodeStyles {
 		this.borderBounds.getSize(_workingVector3_2)
 
 		// Update the border
-		if (borderWidth !== null && borderWidth[0] > 0) {
+		if (borderWidth !== null && borderWidth.some(w => w > 0)) {
 			if (this.borderLine === null) {
-				this.borderLine = new BorderLine(borderWidth[0], _workingVector3_1.x, _workingVector3_1.y, borderRadius)
+				this.borderLine = new BorderLine(borderWidth, _workingVector3_1.x, _workingVector3_1.y, borderRadius)
 				this.node.add(this.borderLine)
 			} else {
-				this.borderLine.geometry.setParams(borderWidth[0], _workingVector3_1.x, _workingVector3_1.y, borderRadius)
+				this.borderLine.geometry.setParams(borderWidth, _workingVector3_1.x, _workingVector3_1.y, borderRadius)
 			}
 			if (borderEmissive !== null) {
 				this.borderLine.material.emissive.setRGB(...borderEmissive)
@@ -169,6 +170,7 @@ class NodeStyles {
 			)
 		} else if (this.borderLine !== null) {
 			this.node.remove(this.borderLine)
+			this.borderLine.geometry.dispose()
 			this.borderLine = null
 		}
 
@@ -198,6 +200,7 @@ class NodeStyles {
 			)
 		} else if (this.background !== null) {
 			this.node.remove(this.background)
+			this.background.geometry.dispose()
 			this.background = null
 		}
 	}

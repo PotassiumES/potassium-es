@@ -4,7 +4,7 @@ import RoundRectCurve from './RoundRectCurve.js'
 Background extends THREE.Mesh (an Object3D) and is used to render a background panel for a Three node.
 Unlike the DOM's background, this Background is designed to float a few centimeters behind the node's BorderLine.
 */
-function Background(width = 0, height = 0, radius = 0) {
+function Background(width = 0, height = 0, radius = [0, 0, 0, 0]) {
 	THREE.Mesh.call(
 		this,
 		new BackgroundGeometry(width, height, radius),
@@ -20,7 +20,7 @@ function Background(width = 0, height = 0, radius = 0) {
 Background.prototype = Object.create(THREE.Mesh.prototype)
 Background.prototype.constructor = Background
 
-function BackgroundGeometry(width = 0, height = 0, radius = 0) {
+function BackgroundGeometry(width = 0, height = 0, radius = [0, 0, 0, 0]) {
 	THREE.BufferGeometry.call(this)
 	this.setParams(width, height, radius)
 }
@@ -67,7 +67,7 @@ BackgroundGeometry.prototype.setParams = function(width, height, radius) {
 	if (this._width === width && this._height === height && this._radius === radius) return
 	this._width = Math.max(0, width)
 	this._height = Math.max(0, height)
-	this._radius = Math.max(0, radius)
+	this._radius = Math.max(0, radius[0]) // TODO handle per-corner radius values
 	this._updatePoints()
 }
 
