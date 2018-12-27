@@ -174,6 +174,7 @@ const InheritedProperties = [
 	'border-spacing',
 	'caption-side',
 	'color',
+	'emissive',
 	'cursor',
 	'direction',
 	'empty-cells',

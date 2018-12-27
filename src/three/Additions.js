@@ -55,7 +55,9 @@ Object.defineProperty(THREE.Object3D.prototype, 'styles', {
 	@type {NodeStyles}
 	*/
 	get: function() {
-		if (this._styles === undefined) this._styles = new NodeStyles(this)
+		if (this._styles === undefined) {
+			this._styles = new NodeStyles(this)
+		}
 		return this._styles
 	}
 })
@@ -66,9 +68,9 @@ Set the styles.hierarchyIsDirty when adding or removing a child
 const _oldAdd = THREE.Object3D.prototype.add
 THREE.Object3D.prototype.add = function(...objects) {
 	let shouldSetDirty = false
-	for (const obj of objects) {
-		_oldAdd.call(this, obj)
-		if (obj.shadowSOM !== true) {
+	for (let i = 0; i < objects.length; i++) {
+		_oldAdd.call(this, objects[i])
+		if (objects[i].shadowSOM !== true) {
 			shouldSetDirty = true
 		}
 	}
@@ -79,8 +81,8 @@ THREE.Object3D.prototype.add = function(...objects) {
 }
 const _oldRemove = THREE.Object3D.prototype.remove
 THREE.Object3D.prototype.remove = function(...objects) {
-	for (const obj of objects) {
-		_oldRemove.call(this, obj)
+	for (let i = 0; i < objects.length; i++) {
+		_oldRemove.call(this, objects[i])
 	}
 	this.styles.setAncestorsHierarchyDirty()
 	return this
@@ -98,9 +100,18 @@ Object.defineProperty(THREE.Object3D.prototype, 'visible', {
 		this._visible = val
 		if (this.shadowSOM !== true) {
 			this.styles.setAncestorsHierarchyDirty()
+			this.styles.setSubgraphStylesDirty()
 		}
 	}
 })
+
+THREE.Object3D.prototype.toggleClass = function(on, ...classNames) {
+	if (on) {
+		return this.addClass(...classNames)
+	} else {
+		return this.removeClass(...classNames)
+	}
+}
 
 /**
 Helper functions to handling classes used by the Stylist
@@ -108,20 +119,25 @@ Helper functions to handling classes used by the Stylist
 THREE.Object3D.prototype.addClass = function(...classNames) {
 	if (this.userData.classes === undefined) {
 		this.userData.classes = [...classNames]
-		return
+		this.styles.stylesAreDirty = true
+		return this
 	}
-	for (const className of classNames) {
-		if (this.userData.classes.includes(className)) continue
-		this.userData.classes.push(className)
+	for (let i = 0; i < classNames.length; i++) {
+		if (this.userData.classes.includes(classNames[i])) continue
+		this.userData.classes.push(classNames[i])
+		this.styles.stylesAreDirty = true
 	}
+	return this
 }
 THREE.Object3D.prototype.removeClass = function(...classNames) {
-	if (this.userData.classes === undefined || this.userData.classes.length === 0) return
-	for (const className of classNames) {
-		const index = this.userData.classes.indexOf(className)
+	if (this.userData.classes === undefined || this.userData.classes.length === 0) return this
+	for (let i = 0; i < classNames.length; i++) {
+		const index = this.userData.classes.indexOf(classNames[i])
 		if (index === -1) continue
 		this.userData.classes.splice(index, 1)
+		this.styles.stylesAreDirty = true
 	}
+	return this
 }
 THREE.Object3D.prototype.hasClass = function(className) {
 	if (this.userData.classes === undefined) return false
@@ -141,6 +157,7 @@ THREE.Object3D.prototype.toggleEdges = function(includingChildren = false) {
 	} else {
 		this.showEdges(includingChildren)
 	}
+	return this
 }
 
 /**
@@ -182,6 +199,7 @@ THREE.Object3D.prototype.showEdges = function(includingChildren = false) {
 			child.showEdges(true)
 		}
 	}
+	return this
 }
 
 /**
@@ -199,6 +217,7 @@ THREE.Object3D.prototype.hideEdges = function(includingChildren = false) {
 			child.hideEdges(true)
 		}
 	}
+	return this
 }
 
 THREE.Object3D.prototype.findRoot = function(node = this) {
@@ -216,7 +235,6 @@ THREE.Object3D.prototype.traverseDepthFirst = function(func) {
 
 const _traverseDepthFirst = function(node, func) {
 	for (let i = 0; i < node.children.length; i++) {
-		if (node.children[i].shadowSOM === true) continue
 		_traverseDepthFirst(node.children[i], func)
 	}
 	func(node)

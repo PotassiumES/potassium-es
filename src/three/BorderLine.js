@@ -101,7 +101,6 @@ BorderGeometry.prototype.setParams = function(lineWidth, width, height, radius) 
 BorderGeometry.prototype._updatePoints = function() {
 	this.clearGroups()
 	this.removeAttribute('position')
-	console.log('lw', this._lineWidth)
 	if (this._lineWidth.some(w => w > 0) === false) return
 
 	const width = Math.max(this._width, 0.0001)

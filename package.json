@@ -59,13 +59,21 @@
   },
   "lint-staged": {
     "linters": {
-      "src/**/*.js": ["prettier --write", "eslint --fix", "git add"],
-      "test/**/*.js": ["prettier --write", "eslint --fix", "git add"]
+      "src/**/*.js": [
+        "prettier --write",
+        "eslint --fix",
+        "git add"
+      ],
+      "test/**/*.js": [
+        "prettier --write",
+        "eslint --fix",
+        "git add"
+      ]
     },
     "relative": true
   },
   "dependencies": {
-    "action-input": "git+https@github.com:PotassiumES/action-input.git"
+    "action-input": "git+https@github.com:PotassiumES/action-input.git#development"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",

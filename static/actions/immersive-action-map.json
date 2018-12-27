@@ -2,13 +2,6 @@
   "comment": "Immersive",
   "filters": [
     {
-      "filter": "/filter/text-input",
-      "filterParameters": {},
-      "actionParameters": {},
-      "source": "/input/virtual-keyboard/command",
-      "destination": "/action/text-input"
-    },
-    {
       "filter": "/filter/active-pick",
       "filterParameters": {
         "pickPath": "/input/picking/left"
@@ -18,6 +11,11 @@
       "destination": "/action/activate"
     }
   ],
-  "inputs": [],
+  "inputs": [
+    {
+      "source": "/input/text/commands",
+      "destination": "/action/text-input"
+    }
+  ],
   "aliases": []
 }

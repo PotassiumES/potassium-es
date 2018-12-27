@@ -64,22 +64,35 @@ export default class PickingInputSource extends InputSource {
 
 	/**
 	@param {string} partialPath the relative semantic path for an input
-	@return the value of the the input, or null if the path does not exist
+	@return [active, value]
 	*/
-	queryInputPath(partialPath) {
+	queryInputPath(partialPath, result = null) {
+		if (result === null) result = new Array(2)
 		switch (partialPath) {
 			case '/mouse':
-				return this._mouse
+				result[0] = !!this._mouse
+				result[1] = this._mouse
+				return result
 			case '/touch':
-				return this._touch
+				result[0] = !!this._touch
+				result[1] = this._touch
+				return result
 			case '/gaze':
-				return this._gaze
+				result[0] = !!this._gaze
+				result[1] = this._gaze
+				return result
 			case '/left':
-				return this._left
+				result[0] = !!this._left
+				result[1] = this._left
+				return result
 			case '/right':
-				return this._right
+				result[0] = !!this._right
+				result[1] = this._right
+				return result
 			default:
-				return null
+				result[0] = false
+				result[1] = null
+				return result
 		}
 	}
 }

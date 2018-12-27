@@ -67,12 +67,30 @@ Applicators.set('font-size', (node, styleInfo) => {
 	})
 })
 
-/** the text color of a text node */
+/**
+the inheritable color value of a text node's material
+a node's `material-color` (which is not inheritable) value will override `color`
+*/
 Applicators.set('color', (node, styleInfo) => {
-	if (!node.isText) return
+	if (node.isText !== true) return
+	if (!node.material || !node.material.color) return
+	if (node.styles.computedStyles.get('material-color') !== null) return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
-	if (typeof parsedValue === 'undefined') return
-	node.setRGB(...parsedValue)
+	if (Array.isArray(parsedValue) === false || parsedValue.length != 3) return
+	node.material.color.setRGB(...parsedValue)
+})
+
+/**
+the inheritable emissive value of a text node's material
+a node's `material-emissive` (which is not inheritable) value will override `emissive`
+*/
+Applicators.set('emissive', (node, styleInfo) => {
+	if (node.isText !== true) return
+	if (!node.material || !node.material.emissive) return
+	if (node.styles.computedStyles.get('material-emissive') !== null) return
+	const parsedValue = Evaluators.parse(styleInfo.value, node)
+	if (Array.isArray(parsedValue) === false || parsedValue.length != 3) return
+	node.material.emissive.setRGB(...parsedValue)
 })
 
 /** the emissive value of a node's material */
@@ -80,9 +98,7 @@ Applicators.set('material-emissive', (node, styleInfo) => {
 	if (!node.material || !node.material.emissive) return
 	const parsedValue = Evaluators.parse(styleInfo.value, node)
 	if (typeof parsedValue === 'undefined') return
-	if (node.material && node.material.emissive) {
-		node.material.emissive.setRGB(...parsedValue)
-	}
+	node.material.emissive.setRGB(...parsedValue)
 })
 
 /** the duffuse color value of a node's material */

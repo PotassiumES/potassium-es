@@ -72,10 +72,13 @@ class NodeStyles {
 	}
 
 	get needsStyleRefresh() {
-		if (this.node.parent) {
+		/** 
+		@TODO figure out why this causes constant style recomputation
+		if (this.node.parent && this.node.parent.styles.hierarchyIsDirty) {
 			// Computed styles can change based on parent's hierarchy
-			if (this.node.parent.styles.hierarchyIsDirty) return true
+			return true
 		}
+		*/
 		return this.stylesAreDirty
 	}
 
@@ -84,6 +87,13 @@ class NodeStyles {
 		this.hierarchyIsDirty = false
 		this.layoutIsDirty = false
 		this.stylesAreDirty = false
+	}
+
+	logFlags() {
+		console.log('geometry:\t', this.geometryIsDirty)
+		console.log('hierarcy:\t', this.hierarchyIsDirty)
+		console.log('layout:\t', this.layoutIsDirty)
+		console.log('styles:\t', this.stylesAreDirty)
 	}
 
 	/**
@@ -104,6 +114,12 @@ class NodeStyles {
 		for (const node of this.node.getAncestry()) {
 			node.styles.hierarchyIsDirty = true
 		}
+	}
+
+	setSubgraphStylesDirty() {
+		this.node.traverse(node => {
+			node.styles.stylesAreDirty = true
+		})
 	}
 
 	calculateEdgeBounds() {

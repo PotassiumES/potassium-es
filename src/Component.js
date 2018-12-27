@@ -4,6 +4,8 @@ import EventHandler from './EventHandler.js'
 import AudioManager from './AudioManager.js'
 import DisplayModeTracker from './DisplayModeTracker.js'
 
+import TextInputReceiver from './input/TextInputReceiver.js'
+
 /**
 `Component` contains the reactive logic for a responsive UI element.
 
@@ -228,16 +230,16 @@ const Component = class extends EventHandler {
 	/**
 	Called when an action is targeted at a Component
 	*/
-	handleAction(actionName, value, actionParameters) {
-		if (actionName === '/action/activate' && value === true) {
+	handleAction(actionName, active, value, actionParameters, filterParameters, inputSource) {
+		if (actionName === '/action/activate' && active === true) {
 			if (typeof this.options.activationAnchor === 'string') {
 				document.location.href = this.options.activationAnchor
 			}
 			this.focus()
 		}
-		this.trigger(Component.ActionEvent, actionName, value, actionParameters)
-		if (actionName === '/action/text-input' && value && this === Component.TextInputFocus) {
-			this.trigger(Component.TextInputEvent, actionParameters)
+		this.trigger(Component.ActionEvent, actionName, active, value, actionParameters, filterParameters, inputSource)
+		if (actionName === '/action/text-input' && active && this === Component.TextInputFocus) {
+			this.trigger(Component.TextInputEvent, value)
 		}
 	}
 
@@ -407,8 +409,12 @@ const Component = class extends EventHandler {
 	hide() {
 		this.flatDOM.addClass('hidden')
 		this.portalDOM.addClass('hidden')
-		if (this.options.usesPortalSpatial) this.portalSOM.visible = false
-		if (this.options.usesImmersive) this.immersiveSOM.visible = false
+		if (this.options.usesPortalSpatial) {
+			this.portalSOM.visible = false
+		}
+		if (this.options.usesImmersive) {
+			this.immersiveSOM.visible = false
+		}
 		return this
 	}
 
@@ -418,8 +424,12 @@ const Component = class extends EventHandler {
 	show() {
 		if (this.options.usesFlat) this.flatDOM.removeClass('hidden')
 		if (this.options.usesPortalOverlay) this.portalDOM.removeClass('hidden')
-		if (this.options.usesPortalSpatial) this.portalSOM.visible = true
-		if (this.options.usesImmersive) this.immersiveSOM.visible = true
+		if (this.options.usesPortalSpatial) {
+			this.portalSOM.visible = true
+		}
+		if (this.options.usesImmersive) {
+			this.immersiveSOM.visible = true
+		}
 		return this
 	}
 
@@ -503,6 +513,11 @@ const Component = class extends EventHandler {
 	static get AudioManager() {
 		return Component._AudioManager
 	}
+
+	/** @type {TextInputReceiver} */
+	static get TextInputReceiver() {
+		return Component._TextInputReceiver
+	}
 }
 
 /** a set of THREE data structures used often enough to merit re-use */
@@ -517,6 +532,9 @@ Component._TextInputFocus = null
 
 /** Components all share one {@link AudioManager}, retrieved by Component.AudioManager */
 Component._AudioManager = new AudioManager()
+
+/** Components all share one {@link TextInputReceiver} that they use to send text commands to the action-input system. */
+Component._TextInputReceiver = new TextInputReceiver()
 
 /* Events */
 Component.ActionEvent = 'component-action-event'

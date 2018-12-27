@@ -52,6 +52,10 @@ class AssignedStyles {
 		this._node.styles.stylesAreDirty = true
 	}
 
+	get infos() {
+		return this._map.values()
+	}
+
 	/** Iterate over the {StyleInfo}s */
 	*[Symbol.iterator]() {
 		for (const styleInfo of this._map.values()) {

@@ -118,14 +118,6 @@ som.text = (text = '', options = {}) => {
 	resultGroup.addClass('text')
 	resultGroup.isText = true
 
-	resultGroup.setRGB = (red, green, blue) => {
-		if (resultGroup.material.emissive) {
-			resultGroup.material.emissive.setRGB(red, green, blue)
-		} else if (resultGroup.material.color) {
-			resultGroup.material.color.setRGB(red, green, blue)
-		}
-	}
-
 	resultGroup.setFontOptions = newOptions => {
 		Object.assign(fontOptions, newOptions)
 		resultGroup.setText(currentText, true)
@@ -156,7 +148,7 @@ som.cube = (size = 1, options = {}) => {
 	if (options.material) {
 		material = options.material
 	} else {
-		material = new THREE.MeshStandardMaterial({ color: color })
+		material = new THREE.MeshStandardMaterial({ color: options.color })
 	}
 	const result = new THREE.Mesh(THREE.MakeCubeGeometry(size), material)
 	// set up for kss element selection, like `cube {}` or `node[name=Cube] {}`

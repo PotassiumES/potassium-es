@@ -70,13 +70,17 @@ body					{ z-index: 2; }
 /* App styles */
 
 .som-root {
-	padding: 6cm;
+	padding: 4cm;
 
 	border-width: var(--som-border-width);
 	border-radius: var(--som-border-radius);
 	border-emissive: var(--som-border-color);
 
-	background-z: -8cm;
+	background-z: -4cm;
 	background-opacity: 1;
 	background-emissive: rgb(240, 240, 240);
+}
+
+.som-input-group {
+	centroid: -25cm -20cm 20cm;
 }

@@ -22,25 +22,27 @@ export default class ActivePickFilter extends Filter {
 
 	/**
 	 * @param {string} inputPath
+	 * @param {boolean} inputActive
 	 * @param inputValue
 	 * @param {string} filterPath
 	 * @param {Object} filterParameters parameters for use while filtering
 	 *
-	 * @return {Array} [value, actionParameters]
+	 * @return {Array} [active, value]
 	 */
-	filter(inputPath, inputValue, filterPath, filterParameters) {
-		return [!!inputValue, { targetComponent: this._getTarget(filterParameters.pickPath) }]
+	filter(inputPath, inputActive, inputValue, filterPath, filterParameters, results = null) {
+		if (results === null) results = new Array(2)
+		results[0] = inputActive
+		results[1] = this._getTarget(filterParameters.pickPath)
+		return results
 	}
 
 	/** @return picked Potassium.Component or null */
 	_getTarget(pickPath) {
-		const pick = this._queryInputPath(pickPath)[0]
-		if (pick === null) return null
-		let obj = pick.object
-		while (true) {
-			if (obj.component) return obj.component
-			if (!obj.parent) return null
-			obj = obj.parent
-		}
+		this._queryInputPath(pickPath, _workingQueryResult)
+		if (_workingQueryResult[0] === false) return null
+		if (!_workingQueryResult[1] || !_workingQueryResult[1].object) return null
+		return _workingQueryResult[1].object.getComponent()
 	}
 }
+
+const _workingQueryResult = new Array(2)

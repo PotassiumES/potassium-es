@@ -22,10 +22,9 @@ import TouchInputSource from 'action-input/src/input/TouchInputSource'
 import GamepadInputSource from 'action-input/src/input/GamepadInputSource'
 import KeyboardInputSource from 'action-input/src/input/KeyboardInputSource'
 
-import TextInputFilter from './input/TextInputFilter.js'
+import TextInputSource from './input/TextInputSource.js'
 import ActivePickFilter from './input/ActivePickFilter.js'
 import PickingInputSource from './input/PickingInputSource.js'
-import VirtualKeyboardInputSource from './input/VirtualKeyboardInputSource.js'
 
 /**
  * App contains the orchestration logic for the entirety of what is being displayed for a given app, including the app chrome like navigation.
@@ -42,8 +41,18 @@ import VirtualKeyboardInputSource from './input/VirtualKeyboardInputSource.js'
  * App communicates these changes to {@link Component}s via events so that they may react.
  */
 const App = class extends EventHandler {
-	constructor() {
+	/**
+	@param {Object} [options]
+	@param {Component} [options.textInputComponent=null]
+	*/
+	constructor(options) {
 		super()
+		this._options = Object.assign(
+			{
+				textInputComponent: null
+			},
+			options
+		)
 		this._handlePortalTick = this._handlePortalTick.bind(this)
 		this._handleImmersiveTick = this._handleImmersiveTick.bind(this)
 		this._handleFlatDisplayTick = this._handleFlatDisplayTick.bind(this)
@@ -75,24 +84,18 @@ const App = class extends EventHandler {
 
 		this._displayMode = App.FLAT
 
-		this._virtualKeyboardInputSource = new VirtualKeyboardInputSource()
-		this._virtualKeyboardInputSource.keyboardGroup.quaternion.setFromEuler(som.euler(0, -45, 0))
-		this._virtualKeyboardInputSource.keyboardGroup.position.set(0.8, 0, -0.8)
-		this._virtualKeyboardInputSource.keyboardGroup.visible = false
-
 		this._pickingInputSource = new PickingInputSource()
 
 		this._actionManager = new ActionManager(false)
 		this._actionManager.addFilter('click', new ClickFilter(this._actionManager.queryInputPath))
 		this._actionManager.addFilter('active-pick', new ActivePickFilter(this._actionManager.queryInputPath))
-		this._actionManager.addFilter('text-input', new TextInputFilter())
 		this._actionManager.addFilter('min-max', new MinMaxFilter())
 		this._actionManager.addInputSource('picking', this._pickingInputSource)
 		this._actionManager.addInputSource('mouse', new MouseInputSource())
 		this._actionManager.addInputSource('touch', new TouchInputSource())
 		this._actionManager.addInputSource('gamepad', new GamepadInputSource())
 		this._actionManager.addInputSource('keyboard', new KeyboardInputSource())
-		this._actionManager.addInputSource('virtual-keyboard', this._virtualKeyboardInputSource)
+		this._actionManager.addInputSource('text', Component.TextInputReceiver.textInputSource)
 
 		/** @todo figure out how action map files should be bundled */
 		this._actionManager.addActionMap(
@@ -115,57 +118,70 @@ const App = class extends EventHandler {
 		this._actionManager.switchToActionMaps('flat')
 
 		// Route activate actions to the target Component
-		this._actionManager.addActionListener('/action/activate', (actionName, value, actionParameters) => {
-			if (actionParameters !== null && actionParameters.targetComponent) {
-				actionParameters.targetComponent.handleAction(actionName, value, actionParameters)
+		this._actionManager.addActionListener(
+			'/action/activate',
+			(actionPath, active, value, actionParameters, filterParameters, inputSource) => {
+				if (value) {
+					value.handleAction(actionPath, active, value, actionParameters, filterParameters, inputSource)
+				}
 			}
-			if (value && actionParameters !== null && actionParameters.pointer === 'left') {
-				this._virtualKeyboardInputSource.handleLeftActivate()
-			}
-			if (value && actionParameters !== null && actionParameters.pointer === 'right') {
-				this._virtualKeyboardInputSource.handleRightActivate()
-			}
-		})
+		)
 
-		this._actionManager.addActionListener('/action/activate-dom', (actionName, value, actionParameters) => {
-			if (actionParameters !== null && actionParameters.targetComponent) {
-				actionParameters.targetComponent.handleAction('/action/activate', value, actionParameters)
+		this._actionManager.addActionListener(
+			'/action/activate-dom',
+			(actionPath, active, value, actionParameters, filterParameters, inputSource) => {
+				if (value) {
+					value.handleAction('/action/activate', active, value, actionParameters, filterParameters, inputSource)
+				}
 			}
-		})
+		)
 
 		// Route text input actions to the Component that has text input focus
-		this._actionManager.addActionListener('/action/text-input', (actionName, value, actionParameters) => {
-			if (Component.TextInputFocus !== null) {
-				Component.TextInputFocus.handleAction(actionName, value, actionParameters)
+		this._actionManager.addActionListener(
+			'/action/text-input',
+			(actionPath, active, value, actionParameters, filterParameters, inputSource) => {
+				if (active && Component.TextInputFocus !== null) {
+					Component.TextInputFocus.handleAction(
+						actionPath,
+						active,
+						value,
+						actionParameters,
+						filterParameters,
+						inputSource
+					)
+				}
 			}
-		})
+		)
 
 		// Route flat-dev actions for moving around the camera in FlatDisplay
-		this._actionManager.addActionListener('/action/transform-scene', (actionName, active, transformation) => {
-			if (this._flatCamera === null) return
-			if (active === false) {
-				this._flatTransformation = null
-				this._flatClock.stop()
-				return
+		this._actionManager.addActionListener(
+			'/action/transform-scene',
+			(actionPath, active, value, actionParameters, filterParameters, inputSource) => {
+				if (this._flatCamera === null) return
+				if (active === false) {
+					this._flatTransformation = null
+					this._flatClock.stop()
+					return
+				}
+				this._flatClock.start() // resets delta to zero
+				this._flatTransformation = {
+					reset: actionParameters.reset === true,
+					translation: actionParameters.translation || null,
+					rotation: actionParameters.rotation || null
+				}
+				if (actionParameters.translation) {
+					this._flatTransformation.translation = _calculateTranslation(
+						actionParameters.translation,
+						this._flatCamera.quaternion
+					)
+				}
+				if (actionParameters.rotation) {
+					this._flatTransformation.rotation = new THREE.Quaternion().setFromEuler(
+						new THREE.Euler(...actionParameters.rotation)
+					)
+				}
 			}
-			this._flatClock.start() // resets delta to zero
-			this._flatTransformation = {
-				reset: transformation.reset === true,
-				translation: transformation.translation || null,
-				rotation: transformation.rotation || null
-			}
-			if (transformation.translation) {
-				this._flatTransformation.translation = _calculateTranslation(
-					transformation.translation,
-					this._flatCamera.quaternion
-				)
-			}
-			if (transformation.rotation) {
-				this._flatTransformation.rotation = new THREE.Quaternion().setFromEuler(
-					new THREE.Euler(...transformation.rotation)
-				)
-			}
-		})
+		)
 
 		// The engines call back from their raf loops, but in flat mode the App uses window.requestAnimationFrame to call ActionManager.poll
 		this._handleWindowAnimationFrame = this._handleWindowAnimationFrame.bind(this)
@@ -262,8 +278,13 @@ const App = class extends EventHandler {
 		this._rightPointer.visible = false
 		this._rightHand.add(this._rightPointer)
 
-		/* Set up the virtual keyboard */
-		this._immersiveScene.add(this._virtualKeyboardInputSource.keyboardGroup)
+		/* Set up text input group */
+		this._immersiveInputGroup = som.group().addClass('som-input-group')
+		this._immersiveInputGroup.name = 'InputGroup'
+		this._immersiveScene.add(this._immersiveInputGroup)
+		if (this._options.textInputComponent !== null) {
+			this._immersiveInputGroup.add(this._options.textInputComponent.immersiveSOM)
+		}
 
 		// When the mode changes, notify all of the children Components
 		this.addListener((eventName, mode) => {
@@ -589,9 +610,13 @@ const App = class extends EventHandler {
 	_handlePortalTick() {
 		// Update picking
 		this._pickingInputSource.clearIntersectObjects()
-		const touchInput = this._actionManager.queryInputPath('/input/touch/normalized-position')
-		if (touchInput !== null && touchInput[0] !== null) {
-			this._pickingInputSource.touch = this._portalEngine.pickScreen(...touchInput[0])
+		this._actionManager.queryInputPath('/input/touch/normalized-position', _workingQueryArray)
+		if (_workingQueryArray[0]) {
+			this._pickingInputSource.touch = this._portalEngine.pickScreen(
+				_workingQueryArray[1][0][0],
+				_workingQueryArray[1][0][1],
+				_workingQueryArray[1][0][2]
+			)
 		}
 
 		// Update actions
@@ -600,32 +625,51 @@ const App = class extends EventHandler {
 
 	_handleImmersiveTick() {
 		// Update hand poses, visibility, and pointers
-		const leftPosition = this._actionManager.queryInputPath('/input/gamepad/left/position')[0]
-		if (leftPosition) {
-			this._leftHand.position.set(...leftPosition)
+		this._actionManager.queryInputPath('/input/gamepad/left/position', _workingQueryArray)
+		if (_workingQueryArray[0]) {
+			this._leftHand.position.set(_workingQueryArray[1][0], _workingQueryArray[1][1], _workingQueryArray[1][2])
 		} else {
-			this._leftHand.position.set(...App.DefaultLeftHandPosition)
+			this._leftHand.position.set(
+				App.DefaultLeftHandPosition[0],
+				App.DefaultLeftHandPosition[1],
+				App.DefaultLeftHandPosition[2]
+			)
 		}
-		const leftOrientation = this._actionManager.queryInputPath('/input/gamepad/left/orientation')[0]
-		if (leftOrientation) {
-			this._leftHand.quaternion.set(...leftOrientation)
-			this._leftPointer.visible = this._actionManager.queryInputPath('/input/gamepad/left/button/0/touched')[0] || false
+		this._actionManager.queryInputPath('/input/gamepad/left/orientation', _workingQueryArray)
+		if (_workingQueryArray[0]) {
+			this._leftHand.quaternion.set(
+				_workingQueryArray[1][0],
+				_workingQueryArray[1][1],
+				_workingQueryArray[1][2],
+				_workingQueryArray[1][3]
+			)
+			this._actionManager.queryInputPath('/input/gamepad/left/button/0/touched', _workingQueryArray)
+			this._leftPointer.visible = _workingQueryArray[0]
 			this._leftHand.visible = true
 		} else {
 			// If it's not at least a 3dof controller, we don't show it
 			this._leftHand.visible = false
 		}
-		const rightPosition = this._actionManager.queryInputPath('/input/gamepad/right/position')[0]
-		if (rightPosition) {
-			this._rightHand.position.set(...rightPosition)
+		this._actionManager.queryInputPath('/input/gamepad/right/position', _workingQueryArray)
+		if (_workingQueryArray[0]) {
+			this._rightHand.position.set(_workingQueryArray[1][0], _workingQueryArray[1][1], _workingQueryArray[1][2])
 		} else {
-			this._rightHand.position.set(...App.DefaultRightHandPosition)
+			this._rightHand.position.set(
+				App.DefaultRightHandPosition[0],
+				App.DefaultRightHandPosition[1],
+				App.DefaultRightHandPosition[2]
+			)
 		}
-		const rightOrientation = this._actionManager.queryInputPath('/input/gamepad/right/orientation')[0]
-		if (rightOrientation) {
-			this._rightHand.quaternion.set(...rightOrientation)
-			this._rightPointer.visible =
-				this._actionManager.queryInputPath('/input/gamepad/right/button/0/touched')[0] || false
+		this._actionManager.queryInputPath('/input/gamepad/right/orientation', _workingQueryArray)
+		if (_workingQueryArray[0]) {
+			this._rightHand.quaternion.set(
+				_workingQueryArray[1][0],
+				_workingQueryArray[1][1],
+				_workingQueryArray[1][2],
+				_workingQueryArray[1][3]
+			)
+			this._actionManager.queryInputPath('/input/gamepad/right/button/0/touched', _workingQueryArray)
+			this._rightPointer.visible = _workingQueryArray[0]
 			this._rightHand.visible = true
 		} else {
 			// If it's not at least a 3dof controller, we don't show it
@@ -648,7 +692,6 @@ const App = class extends EventHandler {
 		} else {
 			this._pickingInputSource.right = null
 		}
-		this._virtualKeyboardInputSource.handlePick(this._pickingInputSource.left, this._pickingInputSource.right)
 		this._actionManager.poll()
 	}
 
@@ -694,6 +737,7 @@ const _zeroVector3 = new THREE.Vector3(0, 0, 0)
 const _workingVector3_1 = new THREE.Vector3()
 const _workingVector3_2 = new THREE.Vector3()
 const _workingMatrix4_1 = new THREE.Matrix4()
+const _workingQueryArray = new Array(2)
 
 /**
 @param {number[]} inputTranslation [x, y, z]
