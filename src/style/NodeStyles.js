@@ -129,8 +129,8 @@ class NodeStyles {
 			if (child.shadowSOM === true) continue
 			if (child.styles.computedStyles.getString('position') === 'absolute') continue
 			_workingBox3_1.set(child.styles.marginBounds.min, child.styles.marginBounds.max)
-			_workingBox3_1.translate(child.position)
 			_workingBox3_1.scale(child.scale)
+			_workingBox3_1.translate(child.position)
 			this.contentBounds.expandByPoint(_workingBox3_1.min)
 			this.contentBounds.expandByPoint(_workingBox3_1.max)
 		}

@@ -70,15 +70,14 @@ body					{ z-index: 2; }
 /* App styles */
 
 .som-root {
-	padding: 4cm;
+	padding: 3cm;
 
 	border-width: var(--som-border-width);
 	border-radius: var(--som-border-radius);
 	border-emissive: var(--som-border-color);
 
 	background-z: -4cm;
-	background-opacity: 1;
-	background-emissive: rgb(240, 240, 240);
+	background-emissive: rgb(220, 220, 220);
 }
 
 .som-input-group {

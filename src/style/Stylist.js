@@ -86,7 +86,7 @@ const Stylist = class extends EventHandler {
 
 		this._layout(scene)
 
-		//if(this._updateCount > 0) console.log('updateCount', this._updateCount)
+		if (this._updateCount > 0) console.log('updateCount', this._updateCount)
 	}
 
 	/**

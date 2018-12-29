@@ -39,11 +39,13 @@ Applicators.set('display', (node, styleInfo) => {
 				node.styles.layout = new GridLayout(node)
 			}
 			// The other grid declarations like 'grid-template' are handled in GridLayout
+			node.visible = true
 			return
 		case 'box':
 			if (!node.styles.layout || node.styles.layout.isBoxLayout !== true) {
 				node.styles.layout = new BoxLayout(node)
 			}
+			node.visible = true
 			return
 		case 'none':
 			node.visible = false

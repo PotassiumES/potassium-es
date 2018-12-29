@@ -35,8 +35,10 @@ class BoxLayout extends Layout {
 		}
 		// Start at the horizontal or vertical edge of the geometry bounds since it is always the first node to lay out
 		this.node.styles.geometryBounds.getSize(_workingVector3_1)
+		let child = null
 		let position = BoxLayout.VERTICAL ? _workingVector3_1.y : _workingVector3_1.x
-		for (const child of childrenToPosition) {
+		for (let i = 0; i < childrenToPosition.length; i++) {
+			child = childrenToPosition[i]
 			_workingBox3_1.set(child.styles.marginBounds.min, child.styles.marginBounds.max)
 			_workingBox3_1.scale(child.scale)
 			_workingBox3_1.getSize(_workingVector3_1)
