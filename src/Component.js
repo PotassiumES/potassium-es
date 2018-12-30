@@ -312,7 +312,6 @@ const Component = class extends EventHandler {
 	focus() {
 		if (this._acceptsTextInputFocus === false) return false
 		Component.TextInputFocus = this
-		this._updateClasses()
 		return this
 	}
 
@@ -320,7 +319,6 @@ const Component = class extends EventHandler {
 	blur() {
 		if (Component.TextInputFocus !== this) return
 		Component.TextInputFocus = null
-		this._updateClasses()
 		return this
 	}
 
@@ -502,9 +500,11 @@ const Component = class extends EventHandler {
 		const blurredComponent = Component._TextInputFocus
 		Component._TextInputFocus = component
 		if (blurredComponent) {
+			blurredComponent._updateClasses()
 			blurredComponent.trigger(Component.BlurEvent, blurredComponent)
 		}
 		if (component) {
+			component._updateClasses()
 			component.trigger(Component.FocusEvent, component)
 		}
 	}
