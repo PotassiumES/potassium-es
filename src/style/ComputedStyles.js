@@ -36,16 +36,20 @@ class ComputedStyles {
 	*/
 	computeStyles(assignedStyles, localStyles, parentalComputedStyles = null) {
 		// Swap the previous and current maps
-		const holdingVariable = this._previousStyles
+		_holdingVariable = this._previousStyles
 		this._previousStyles = this._currentStyles
-		this._currentStyles = holdingVariable
+		this._currentStyles = _holdingVariable
 		this._currentStyles.clear()
-		// Empty the change list
+
+		// Empty the working list
 		this._changes.splice(0, this._changes.length)
+		_currentPropertiesArray.splice(0, _currentPropertiesArray.length)
+		_changedVariablesArray.splice(0, _changedVariablesArray.length)
 
 		// Assign the assigned styles
 		for (const styleInfo of assignedStyles) {
 			this._currentStyles.set(styleInfo.property, styleInfo)
+			_currentPropertiesArray.push(styleInfo.property)
 		}
 
 		// Assign the local styles
@@ -53,6 +57,7 @@ class ComputedStyles {
 			// Don't overwrite assigned styles
 			if (assignedStyles.has(styleInfo.property)) continue
 			this._currentStyles.set(styleInfo.property, styleInfo)
+			_currentPropertiesArray.push(styleInfo.property)
 		}
 
 		// If there are parental styles then add the inheritable ones for which there is not a local style
@@ -65,20 +70,35 @@ class ComputedStyles {
 				if (this._currentStyles.has(styleInfo.property)) continue
 				// Ok, this is a cascaded style!
 				this._currentStyles.set(styleInfo.property, styleInfo)
+				_currentPropertiesArray.push(styleInfo.property)
 			}
 		}
 
 		//Recalculate the changes list
-		for (const property of this._currentStyles.keys()) {
+		for (const property of _currentPropertiesArray) {
 			const hasStyle = this._previousStyles.has(property)
 			if (hasStyle === false) {
 				this._changes.push(property)
+				if (property.startsWith('--')) _changedVariablesArray.push(property)
 			} else if (hasStyle && this._previousStyles.get(property).value !== this._currentStyles.get(property).value) {
 				this._changes.push(property)
+				if (property.startsWith('--')) _changedVariablesArray.push(property)
 			}
 		}
 		for (const property of this._previousStyles.keys()) {
 			if (this._currentStyles.has(property) === false) this._changes.push(property)
+			if (property.startsWith('--')) _changedVariablesArray.push(property)
+		}
+
+		// Mark changed any declarations whose value is one of the changed variables
+		for (const property of this._currentStyles.keys()) {
+			if (this._changes.includes(property)) continue // Already marked as a change
+			_workingVal = this._currentStyles.get(property).value
+			if (_workingVal.startsWith('var(--') === false) continue
+			_workingVal = _workingVal.substring(4, _workingVal.length - 1)
+			if (_changedVariablesArray.includes(_workingVal)) {
+				this._changes.push(property)
+			}
 		}
 	}
 
@@ -163,6 +183,11 @@ class ComputedStyles {
 		}
 	}
 }
+
+let _workingVal = null
+let _holdingVariable = null
+const _changedVariablesArray = new Array()
+const _currentPropertiesArray = new Array()
 
 /**
 The name of properties that are inherited during the cascade.
