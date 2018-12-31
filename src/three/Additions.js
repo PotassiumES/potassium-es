@@ -122,21 +122,25 @@ THREE.Object3D.prototype.addClass = function(...classNames) {
 		this.styles.setSubgraphStylesDirty()
 		return this
 	}
+	let shouldSetDirty = false
 	for (let i = 0; i < classNames.length; i++) {
 		if (this.userData.classes.includes(classNames[i])) continue
 		this.userData.classes.push(classNames[i])
-		this.styles.setSubgraphStylesDirty()
+		shouldSetDirty = true
 	}
+	if (shouldSetDirty) this.styles.setSubgraphStylesDirty()
 	return this
 }
 THREE.Object3D.prototype.removeClass = function(...classNames) {
 	if (this.userData.classes === undefined || this.userData.classes.length === 0) return this
+	let shouldSetDirty = false
 	for (let i = 0; i < classNames.length; i++) {
 		const index = this.userData.classes.indexOf(classNames[i])
 		if (index === -1) continue
 		this.userData.classes.splice(index, 1)
-		this.styles.setSubgraphStylesDirty()
+		shouldSetDirty = true
 	}
+	if (shouldSetDirty) this.styles.setSubgraphStylesDirty()
 	return this
 }
 THREE.Object3D.prototype.hasClass = function(className) {

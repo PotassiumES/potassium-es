@@ -94,7 +94,6 @@ const Stylist = class extends EventHandler {
 	*/
 	_updateLocalStyles(scene) {
 		scene.traverse(node => {
-			if (node.visible === false) return
 			if (node.shadowSOM === true) return
 			if (node.styles.needsStyleRefresh === false) return
 			this._updateCount += 1
@@ -114,7 +113,6 @@ const Stylist = class extends EventHandler {
 	*/
 	_updateComputedStyles(scene) {
 		scene.traverse(node => {
-			if (node.visible === false) return
 			if (node.shadowSOM === true) return
 			if (node.styles.needsStyleRefresh === false) return
 			this._updateCount += 1
@@ -131,7 +129,6 @@ const Stylist = class extends EventHandler {
 	*/
 	_applyStyles(scene, renderer) {
 		scene.traverse(node => {
-			if (node.visible === false) return
 			if (node.shadowSOM === true) return
 			if (node.styles.needsStyleRefresh === false) return
 			this._updateCount += 1
@@ -159,7 +156,6 @@ const Stylist = class extends EventHandler {
 	*/
 	_layout(scene) {
 		scene.traverseDepthFirst(node => {
-			if (node.visible === false) return
 			if (node.shadowSOM === true) return
 			if (node.styles.isInAnyWayDirty === false) return
 			this._updateCount += 1

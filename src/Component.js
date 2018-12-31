@@ -405,14 +405,7 @@ const Component = class extends EventHandler {
 	hides the flatDOM, portalDOM, portalSOM, and immersiveSOM if their `uses*` option was true
 	*/
 	hide() {
-		this.flatDOM.addClass('hidden')
-		this.portalDOM.addClass('hidden')
-		if (this.options.usesPortalSpatial) {
-			this.portalSOM.visible = false
-		}
-		if (this.options.usesImmersive) {
-			this.immersiveSOM.visible = false
-		}
+		this.addClass('hidden')
 		return this
 	}
 
@@ -420,14 +413,7 @@ const Component = class extends EventHandler {
 	shows the flatDOM, portalDOM, portalSOM, and immersiveSOM if their `uses*` option was true
 	*/
 	show() {
-		if (this.options.usesFlat) this.flatDOM.removeClass('hidden')
-		if (this.options.usesPortalOverlay) this.portalDOM.removeClass('hidden')
-		if (this.options.usesPortalSpatial) {
-			this.portalSOM.visible = true
-		}
-		if (this.options.usesImmersive) {
-			this.immersiveSOM.visible = true
-		}
+		this.removeClass('hidden')
 		return this
 	}
 

@@ -47,11 +47,18 @@ som.fonts = new Map() // url => THREE.Font
 
 const _shapeCurveSegments = 4
 
-function loadText(resultGroup, text, material, fontURL, options) {
+function loadText(resultGroup, text, fontURL, options) {
 	text = String(text)
-	if (!text || text.trim().length === 0) return
+	if (!text || text.trim().length === 0) {
+		if (resultGroup.geometry) {
+			resultGroup.geometry.dispose()
+			resultGroup.geometry = new THREE.ShapeGeometry([], 1)
+		}
+		return
+	}
 	if (som.fonts.has(fontURL)) {
 		const shapes = som.fonts.get(fontURL).generateShapes(text, options.size)
+		if (resultGroup.geometry) resultGroup.geometry.dispose()
 		resultGroup.geometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
 		resultGroup.styles.geometryIsDirty = true
 		resultGroup.styles.setAncestorsLayoutDirty()
@@ -67,6 +74,7 @@ function loadText(resultGroup, text, material, fontURL, options) {
 				loadedFont => {
 					som.fonts.set(fontURL, loadedFont)
 					const shapes = loadedFont.generateShapes(text, options.size)
+					if (resultGroup.geometry) resultGroup.geometry.dispose()
 					resultGroup.geometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
 					resultGroup.styles.geometryIsDirty = true
 					resultGroup.styles.setAncestorsLayoutDirty()
@@ -127,7 +135,7 @@ som.text = (text = '', options = {}) => {
 		newText = newText || ''
 		if (force === false && newText === currentText) return
 		currentText = newText
-		loadText(resultGroup, currentText, options.material, options.fontURL, fontOptions)
+		loadText(resultGroup, currentText, options.fontURL, fontOptions)
 	}
 
 	resultGroup.setText(currentText)
