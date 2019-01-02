@@ -21,6 +21,7 @@ class BoxLayout extends Layout {
 				node.styles.computedStyles.get('centroid') !== null ||
 				node.styles.computedStyles.get('centroid-x') !== null ||
 				node.styles.computedStyles.get('centroid-y') !== null
+				// Allow Z to be set separately
 			) {
 				return false
 			}

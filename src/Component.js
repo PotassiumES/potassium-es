@@ -406,6 +406,12 @@ const Component = class extends EventHandler {
 	*/
 	hide() {
 		this.addClass('hidden')
+		if (this.usesPortalSpatial) {
+			this.portalSOM.styles.assignedStyles.set('display', 'none')
+		}
+		if (this.usesImmersive) {
+			this.immersiveSOM.styles.assignedStyles.set('display', 'none')
+		}
 		return this
 	}
 
@@ -414,6 +420,12 @@ const Component = class extends EventHandler {
 	*/
 	show() {
 		this.removeClass('hidden')
+		if (this.usesPortalSpatial) {
+			this.portalSOM.styles.assignedStyles.delete('display')
+		}
+		if (this.usesImmersive) {
+			this.immersiveSOM.styles.assignedStyles.delete('display')
+		}
 		return this
 	}
 

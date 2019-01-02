@@ -137,6 +137,8 @@ const Stylist = class extends EventHandler {
 				// Variables are used but not applied
 				if (changedProperty.startsWith('--')) continue
 
+				if (!node.styles.computedStyles.get(changedProperty)) continue
+
 				const applicatorFunction = Applicators.get(changedProperty) || null
 				if (applicatorFunction === null) continue
 

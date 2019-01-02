@@ -1,6 +1,6 @@
 import StyleInfo from './StyleInfo.js'
 import Declaration from './Declaration.js'
-
+import { LayoutEffectingProperties } from './ComputedStyles.js'
 /**
 AssignedStyles tracks programmatically (not via KSS) assigned styles for a node
 Assigned styles are never overwritten by local (KSS defined) or inherited styles
@@ -34,6 +34,9 @@ class AssignedStyles {
 	*/
 	delete(property) {
 		this._node.styles.stylesAreDirty = true
+		if (LayoutEffectingProperties.includes(property)) {
+			this._node.styles.setAncestorsLayoutDirty()
+		}
 		return this._map.delete(property)
 	}
 
@@ -50,6 +53,9 @@ class AssignedStyles {
 		})
 		this._map.set(property, new StyleInfo(declaration))
 		this._node.styles.stylesAreDirty = true
+		if (LayoutEffectingProperties.includes(property)) {
+			this._node.styles.setAncestorsLayoutDirty()
+		}
 	}
 
 	get infos() {
