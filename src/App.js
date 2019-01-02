@@ -393,6 +393,7 @@ const App = class extends EventHandler {
 				this._immersiveEngine.stop()
 				this._updateClasses()
 				this.trigger(App.DisplayModeChangedEvent, App.FLAT)
+				this._displayModeTracker.currentDisplayMode = App.FLAT
 				window.requestAnimationFrame(this._handleWindowAnimationFrame)
 				resolve(App.FLAT)
 			})
@@ -406,6 +407,7 @@ const App = class extends EventHandler {
 						this._displayMode = App.PORTAL
 						this._updateClasses()
 						this.trigger(App.DisplayModeChangedEvent, App.PORTAL)
+						this._displayModeTracker.currentDisplayMode = App.PORTAL
 						resolve(App.PORTAL)
 					})
 					.catch(err => {
@@ -423,6 +425,7 @@ const App = class extends EventHandler {
 						this._displayMode = App.IMMERSIVE
 						this._updateClasses()
 						this.trigger(App.DisplayModeChangedEvent, App.IMMERSIVE)
+						this._displayModeTracker.currentDisplayMode = App.IMMERSIVE
 						resolve(App.IMMERSIVE)
 					})
 					.catch(err => {
