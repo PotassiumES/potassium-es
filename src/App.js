@@ -5,11 +5,13 @@ import som from './SOM.js'
 import Router from './Router.js'
 import Component from './Component.js'
 import Localizer from './Localizer.js'
+import Engine from './display/Engine.js'
 import AssetLoader from './AssetLoader.js'
 import EventHandler from './EventHandler.js'
-import { Engine, FlatDisplay } from './Engine.js'
+import FlatDisplay from './display/FlatDisplay.js'
 import { throttledConsoleLog } from './throttle.js'
 import DisplayModeTracker from './DisplayModeTracker.js'
+import * as displayConstants from './display/Constants.js'
 
 import Stylist from './style/Stylist.js'
 
@@ -212,7 +214,7 @@ const App = class extends EventHandler {
 		this._portalScene = som.scene()
 		this._portalScene.addClass('portal-scene', 'app', 'spatial-app')
 		this._portalScene.name = 'PortalScene'
-		this._portalEngine = new Engine(this._portalScene, Engine.PORTAL, this._handlePortalTick)
+		this._portalEngine = new Engine(this._portalScene, displayConstants.PORTAL, this._handlePortalTick)
 		this._portalEngine.addListener((eventName, engine) => {
 			if (this._displayMode === App.PORTAL) {
 				this.setDisplayMode(App.FLAT)
@@ -228,7 +230,7 @@ const App = class extends EventHandler {
 		this._immersiveScene = som.scene()
 		this._immersiveScene.addClass('immersive-scene', 'app', 'spatial-app')
 		this._immersiveScene.name = 'ImmersiveScene'
-		this._immersiveEngine = new Engine(this._immersiveScene, Engine.IMMERSIVE, this._handleImmersiveTick)
+		this._immersiveEngine = new Engine(this._immersiveScene, displayConstants.IMMERSIVE, this._handleImmersiveTick)
 		this._immersiveEngine.addListener((eventName, engine) => {
 			if (this._displayMode === App.IMMERSIVE) {
 				this.setDisplayMode(App.FLAT)
@@ -264,6 +266,7 @@ const App = class extends EventHandler {
 		this._leftHand = som.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
 		this._leftHand.addClass('left-hand')
 		this._leftHand.name = 'LeftHand'
+		this._leftHand.visible = false
 		this._leftPointer = this._makePointer(0x99ff99)
 		this._leftPointer.addClass('left-pointer')
 		this._leftPointer.name = 'LeftPointer'
@@ -272,6 +275,7 @@ const App = class extends EventHandler {
 		this._rightHand = som.group(this._makeHand(0xff9999)).appendTo(this._immersiveScene)
 		this._rightHand.addClass('right-hand')
 		this._rightHand.name = 'RightHand'
+		this._rightHand.visible = false
 		this._rightPointer = this._makePointer(0x99ff99)
 		this._rightPointer.addClass('right-pointer')
 		this._rightPointer.name = 'RightPointer'
