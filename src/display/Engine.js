@@ -86,16 +86,13 @@ const Engine = class extends EventHandler {
 	}
 
 	pickScreen(normalizedMouseX, normalizedMouseY) {
-		this._raycaster.setFromCamera(
-			{
-				x: normalizedMouseX,
-				y: normalizedMouseY
-			},
-			this._camera
-		)
-		const intersects = this._raycaster.intersectObjects(this._scene.children, true)
-		if (intersects.length === 0) return null
-		return intersects[0]
+		_workingVector2_1.x = normalizedMouseX
+		_workingVector2_1.y = normalizedMouseY
+		this._raycaster.setFromCamera(_workingVector2_1, this._camera)
+		_workingPickResults.splice(0, _workingPickResults.length)
+		this._raycaster.intersectObjects(this._scene.children, true, _workingPickResults)
+		if (_workingPickResults.length === 0) return null
+		return _workingPickResults[0]
 	}
 
 	pickPose(pointObject3D) {
@@ -103,9 +100,10 @@ const Engine = class extends EventHandler {
 		pointObject3D.getWorldQuaternion(this._workingQuat)
 		this._raycaster.ray.direction.set(0, 0, -1).applyQuaternion(this._workingQuat)
 		this._raycaster.ray.direction.normalize()
-		const intersects = this._raycaster.intersectObjects(this._scene.children, true)
-		if (intersects.length === 0) return null
-		return intersects[0]
+		_workingPickResults.splice(0, _workingPickResults.length)
+		this._raycaster.intersectObjects(this._scene.children, true, _workingPickResults)
+		if (_workingPickResults.length === 0) return null
+		return _workingPickResults[0]
 	}
 
 	/**
@@ -203,6 +201,9 @@ const Engine = class extends EventHandler {
 		}
 	}
 }
+
+let _workingVector2_1 = new THREE.Vector2()
+let _workingPickResults = new Array()
 
 Engine.STARTED = 'engine-started'
 Engine.STOPPED = 'engine-stopped'

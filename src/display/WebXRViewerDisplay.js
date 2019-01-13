@@ -49,6 +49,7 @@ class WebXRViewerDisplay extends SceneDisplay {
 		})
 		this._renderer.autoClear = false
 		this._renderer.setPixelRatio(window.devicePixelRatio)
+		this._renderer.setSize(document.documentElement.offsetWidth, document.documentElement.offsetHeight, true)
 	}
 
 	get blendMode() {
@@ -130,8 +131,8 @@ class WebXRViewerDisplay extends SceneDisplay {
 			_workingViewport = this._xrSession.baseLayer.getViewport(_workingView)
 
 			this._camera.matrix.fromArray(_workingPose.getViewMatrix(_workingView))
-			this._camera.updateMatrixWorld()
 			this._camera.projectionMatrix.fromArray(_workingView.projectionMatrix)
+			this._camera.updateMatrixWorld()
 
 			this._renderer.setViewport(
 				_workingViewport.x,
