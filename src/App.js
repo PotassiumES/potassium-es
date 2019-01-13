@@ -617,13 +617,19 @@ const App = class extends EventHandler {
 	_handlePortalTick() {
 		// Update picking
 		this._pickingInputSource.clearIntersectObjects()
-		this._actionManager.queryInputPath('/input/touch/normalized-position', _workingQueryArray)
+		this._actionManager.queryInputPath('/input/touch/normalized-position/0', _workingQueryArray)
 		if (_workingQueryArray[0]) {
 			this._pickingInputSource.touch = this._portalEngine.pickScreen(
-				_workingQueryArray[1][0][0],
-				_workingQueryArray[1][0][1],
-				_workingQueryArray[1][0][2]
+				_workingQueryArray[1][0],
+				_workingQueryArray[1][1]
 			)
+			console.log('touched',
+				_workingQueryArray[1][0],
+				_workingQueryArray[1][1]
+			)
+			if(this._pickingInputSource.touch){
+				console.log('Hit', this._pickingInputSource.touch)
+			}
 		}
 
 		// Update actions
