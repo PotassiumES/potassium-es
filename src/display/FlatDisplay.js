@@ -77,7 +77,7 @@ const FlatDisplay = class extends SceneDisplay {
 	_updateSize() {
 		this._width = this.dom.clientWidth
 		this._height = this.dom.clientHeight
-		this._renderer.setPixelRatio(window.devicePixelRatio)
+		this._renderer.setPixelRatio(1)
 		this._camera.aspect = this._width / this._height
 		this._camera.updateProjectionMatrix()
 		this._renderer.setSize(this._width, this._height, false)
