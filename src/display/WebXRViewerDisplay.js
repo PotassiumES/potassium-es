@@ -14,8 +14,6 @@ class WebXRViewerDisplay extends SceneDisplay {
 		this._eyeLevelFrameOfReference = null
 
 		this._outputCanvas = document.createElement('canvas')
-		this._outputCanvas.width = document.documentElement.offsetWidth
-		this._outputCanvas.height = document.documentElement.offsetHeight
 		this._outputCanvas.setAttribute('class', 'xr-canvas')
 		this._outputContext = this._outputCanvas.getContext('xrpresent')
 		if (!this._outputContext) {
@@ -23,8 +21,6 @@ class WebXRViewerDisplay extends SceneDisplay {
 		}
 
 		this._glCanvas = document.createElement('canvas')
-		this._glCanvas.width = document.documentElement.offsetWidth
-		this._glCanvas.height = document.documentElement.offsetHeight
 		this._glCanvas.setAttribute('class', 'xr-canvas')
 		this._glContext = this._glCanvas.getContext('webgl', {
 			compatibleXRDevice: this._xrDevice
@@ -48,8 +44,8 @@ class WebXRViewerDisplay extends SceneDisplay {
 			alpha: false
 		})
 		this._renderer.autoClear = false
-		this._renderer.setPixelRatio(window.devicePixelRatio)
-		this._renderer.setSize(document.documentElement.offsetWidth, document.documentElement.offsetHeight, true)
+		this._renderer.setPixelRatio(1)
+		this._resize()
 	}
 
 	get blendMode() {
@@ -72,6 +68,11 @@ class WebXRViewerDisplay extends SceneDisplay {
 			document.body.style['background-color'] = 'rgba(0, 0, 0, 0)'
 
 			this._dom.appendChild(this._outputCanvas)
+
+			this._outputCanvas.width = document.documentElement.offsetWidth
+			this._outputCanvas.height = document.documentElement.offsetHeight
+			this._glCanvas.width = document.documentElement.offsetWidth
+			this._glCanvas.height = document.documentElement.offsetHeight
 
 			this._xrDevice
 				.requestSession({ outputContext: this._outputContext })
@@ -112,12 +113,29 @@ class WebXRViewerDisplay extends SceneDisplay {
 		return Promise.resolve()
 	}
 
+	_resize() {
+		const w = document.body.clientWidth
+		const h = document.body.clientHeight
+		this._renderer.setSize(w, h, true)
+		this._outputCanvas.width = w
+		this._outputCanvas.height = h
+		this._glCanvas.width = w
+		this._glCanvas.height = h
+	}
+
 	_render(t, frame) {
 		if (this._isStarted === false || this._xrSession === null || this._xrSession.ended) return
 		this._xrSession.requestAnimationFrame(this._render)
 
 		if (this._tickCallback) {
 			this._tickCallback()
+		}
+
+		if (
+			document.documentElement.offsetHeight != this._glCanvas.height ||
+			document.documentElement.offsetWidth != this._glCanvas.width
+		) {
+			this._resize()
 		}
 
 		this._renderer.clear()
