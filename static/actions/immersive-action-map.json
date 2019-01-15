@@ -2,12 +2,41 @@
   "comment": "Immersive",
   "filters": [
     {
+      "comment": "Accept button 0 since that is the touchpad on most controllers",
       "filter": "/filter/active-pick",
       "filterParameters": {
         "pickPath": "/input/picking/left"
       },
       "actionParameters": { "pointer": "left" },
       "source": "/input/gamepad/left/button/0/pressed",
+      "destination": "/action/activate"
+    },
+    {
+      "comment": "Accept button 4 since that is the touchpad on WinXR Controllers",
+      "filter": "/filter/active-pick",
+      "filterParameters": {
+        "pickPath": "/input/picking/left"
+      },
+      "actionParameters": { "pointer": "left" },
+      "source": "/input/gamepad/left/button/4/pressed",
+      "destination": "/action/activate"
+    },
+    {
+      "filter": "/filter/active-pick",
+      "filterParameters": {
+        "pickPath": "/input/picking/right"
+      },
+      "actionParameters": { "pointer": "right" },
+      "source": "/input/gamepad/right/button/0/pressed",
+      "destination": "/action/activate"
+    },
+    {
+      "filter": "/filter/active-pick",
+      "filterParameters": {
+        "pickPath": "/input/picking/right"
+      },
+      "actionParameters": { "pointer": "right" },
+      "source": "/input/gamepad/right/button/4/pressed",
       "destination": "/action/activate"
     }
   ],

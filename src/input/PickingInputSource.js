@@ -1,7 +1,7 @@
 import InputSource from 'action-input/src/input/InputSource'
 
 /**
- *  PickingInputSource is used by App to track 3D objects that are:
+ *  PickingInputSource is used by {@link App} to track 3D objects that are:
  *  - pointed at by hands
  *  - looked at by gaze
  *  - hovered over by a mouse

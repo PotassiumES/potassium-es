@@ -617,9 +617,9 @@ const App = class extends EventHandler {
 	_handlePortalTick() {
 		// Update picking
 		this._pickingInputSource.clearIntersectObjects()
-		this._actionManager.queryInputPath('/input/touch/normalized-position/0', _workingQueryArray)
-		if (_workingQueryArray[0]) {
-			this._pickingInputSource.touch = this._portalEngine.pickScreen(_workingQueryArray[1][0], _workingQueryArray[1][1])
+		this._actionManager.queryInputPath('/input/touch/normalized-position/0', _workingQueryArray_1)
+		if (_workingQueryArray_1[0]) {
+			this._pickingInputSource.touch = this._portalEngine.pickScreen(_workingQueryArray_1[1][0], _workingQueryArray_1[1][1])
 		}
 
 		// Update actions
@@ -628,9 +628,9 @@ const App = class extends EventHandler {
 
 	_handleImmersiveTick() {
 		// Update hand poses, visibility, and pointers
-		this._actionManager.queryInputPath('/input/gamepad/left/position', _workingQueryArray)
-		if (_workingQueryArray[0]) {
-			this._leftHand.position.set(_workingQueryArray[1][0], _workingQueryArray[1][1], _workingQueryArray[1][2])
+		this._actionManager.queryInputPath('/input/gamepad/left/position', _workingQueryArray_1)
+		if (_workingQueryArray_1[0]) {
+			this._leftHand.position.set(_workingQueryArray_1[1][0], _workingQueryArray_1[1][1], _workingQueryArray_1[1][2])
 		} else {
 			this._leftHand.position.set(
 				App.DefaultLeftHandPosition[0],
@@ -638,24 +638,25 @@ const App = class extends EventHandler {
 				App.DefaultLeftHandPosition[2]
 			)
 		}
-		this._actionManager.queryInputPath('/input/gamepad/left/orientation', _workingQueryArray)
-		if (_workingQueryArray[0]) {
+		this._actionManager.queryInputPath('/input/gamepad/left/orientation', _workingQueryArray_1)
+		if (_workingQueryArray_1[0]) {
 			this._leftHand.quaternion.set(
-				_workingQueryArray[1][0],
-				_workingQueryArray[1][1],
-				_workingQueryArray[1][2],
-				_workingQueryArray[1][3]
+				_workingQueryArray_1[1][0],
+				_workingQueryArray_1[1][1],
+				_workingQueryArray_1[1][2],
+				_workingQueryArray_1[1][3]
 			)
-			this._actionManager.queryInputPath('/input/gamepad/left/button/0/touched', _workingQueryArray)
-			this._leftPointer.visible = _workingQueryArray[0]
+			this._actionManager.queryInputPath('/input/gamepad/left/button/0/touched', _workingQueryArray_1)
+			this._actionManager.queryInputPath('/input/gamepad/left/button/4/touched', _workingQueryArray_2)
+			this._leftPointer.visible = _workingQueryArray_1[0] || _workingQueryArray_2[0]
 			this._leftHand.visible = true
 		} else {
 			// If it's not at least a 3dof controller, we don't show it
 			this._leftHand.visible = false
 		}
-		this._actionManager.queryInputPath('/input/gamepad/right/position', _workingQueryArray)
-		if (_workingQueryArray[0]) {
-			this._rightHand.position.set(_workingQueryArray[1][0], _workingQueryArray[1][1], _workingQueryArray[1][2])
+		this._actionManager.queryInputPath('/input/gamepad/right/position', _workingQueryArray_1)
+		if (_workingQueryArray_1[0]) {
+			this._rightHand.position.set(_workingQueryArray_1[1][0], _workingQueryArray_1[1][1], _workingQueryArray_1[1][2])
 		} else {
 			this._rightHand.position.set(
 				App.DefaultRightHandPosition[0],
@@ -663,16 +664,17 @@ const App = class extends EventHandler {
 				App.DefaultRightHandPosition[2]
 			)
 		}
-		this._actionManager.queryInputPath('/input/gamepad/right/orientation', _workingQueryArray)
-		if (_workingQueryArray[0]) {
+		this._actionManager.queryInputPath('/input/gamepad/right/orientation', _workingQueryArray_1)
+		if (_workingQueryArray_1[0]) {
 			this._rightHand.quaternion.set(
-				_workingQueryArray[1][0],
-				_workingQueryArray[1][1],
-				_workingQueryArray[1][2],
-				_workingQueryArray[1][3]
+				_workingQueryArray_1[1][0],
+				_workingQueryArray_1[1][1],
+				_workingQueryArray_1[1][2],
+				_workingQueryArray_1[1][3]
 			)
-			this._actionManager.queryInputPath('/input/gamepad/right/button/0/touched', _workingQueryArray)
-			this._rightPointer.visible = _workingQueryArray[0]
+			this._actionManager.queryInputPath('/input/gamepad/right/button/0/touched', _workingQueryArray_1)
+			this._actionManager.queryInputPath('/input/gamepad/right/button/4/touched', _workingQueryArray_2)
+			this._rightPointer.visible = _workingQueryArray_1[0] || _workingQueryArray_2[0]
 			this._rightHand.visible = true
 		} else {
 			// If it's not at least a 3dof controller, we don't show it
@@ -682,6 +684,7 @@ const App = class extends EventHandler {
 		// Update picking
 		this._pickingInputSource.clearIntersectObjects()
 		if (this._leftHand.visible && this._leftPointer.visible) {
+			// Turn off the hand during picking
 			this._leftHand.visible = false
 			this._pickingInputSource.left = this._immersiveEngine.pickPose(this._leftPointer)
 			this._leftHand.visible = true
@@ -689,6 +692,7 @@ const App = class extends EventHandler {
 			this._pickingInputSource.left = null
 		}
 		if (this._rightHand.visible && this._rightPointer.visible) {
+			// Turn off the hand during picking
 			this._rightHand.visible = false
 			this._pickingInputSource.right = this._immersiveEngine.pickPose(this._rightPointer)
 			this._rightHand.visible = true
@@ -740,7 +744,8 @@ const _zeroVector3 = new THREE.Vector3(0, 0, 0)
 const _workingVector3_1 = new THREE.Vector3()
 const _workingVector3_2 = new THREE.Vector3()
 const _workingMatrix4_1 = new THREE.Matrix4()
-const _workingQueryArray = new Array(2)
+const _workingQueryArray_1 = new Array(2)
+const _workingQueryArray_2 = new Array(2)
 
 /**
 @param {number[]} inputTranslation [x, y, z]
