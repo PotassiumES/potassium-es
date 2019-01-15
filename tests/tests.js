@@ -3,16 +3,15 @@ import Runner from '/node_modules/potassium-test/src/Runner.js'
 import SynchronousFetchMap from '/node_modules/potassium-test/src/SynchronousFetchMap.js'
 import TestResultsRenderer from '/node_modules/potassium-test/src/TestResultsRenderer.js'
 
-import * as ta from '/src/three/Additions.js'
-
-import dom from '/src/DOM.js'
-import Router from '/src/Router.js'
-import Component from '/src/Component.js'
-import DataModel from '/src/DataModel.js'
-import DataObject from '/src/DataObject.js'
-import DataCollection from '/src/DataCollection.js'
-
-import { RegexTemplates } from '/src/style/Evaluators.js'
+import {
+	dom,
+	Router,
+	Component,
+	DataModel,
+	DataObject,
+	DataCollection,
+	RegexTemplates
+} from '/dist/potassium-es.js'
 
 const tests = []
 
@@ -66,8 +65,6 @@ tests.push(
 		test.assertRegExpMatchCount(RegexTemplates.percentageFloatRegex, 'bogo', 0)
 		test.assertRegExpMatchCount(RegexTemplates.percentageFloatRegex, '', 0)
 
-		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23fr', ['23fr'])
-		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23%', ['23%'])
 		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, 'auto', ['auto'])
 		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23m', ['23m'])
 		test.assertRegExpMatches(RegexTemplates.anyDistanceRegex, '23cm', ['23cm'])
@@ -75,30 +72,23 @@ tests.push(
 		test.assertRegExpMatchCount(RegexTemplates.anyDistanceRegex, 'bogo', 0)
 		test.assertRegExpMatchCount(RegexTemplates.anyDistanceRegex, '', 0)
 
-		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '23%', ['23%'], 'g')
 		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '4mm', ['4mm'], 'g')
-		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, '4fr', ['4fr'], 'g')
 		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, 'auto', ['auto'], 'g')
-		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, 'auto 23mm 4fr', ['auto', '23mm', '4fr'], 'g')
+		test.assertRegExpMatches(RegexTemplates.anyDistanceArrayRegex, 'auto 23mm', ['auto', '23mm'], 'g')
 		test.assertRegExpMatches(
 			RegexTemplates.anyDistanceArrayRegex,
-			'23mm 4fr auto 6mm 9fr auto',
-			['23mm', '4fr', 'auto', '6mm', '9fr', 'auto'],
+			'23mm auto 6mm auto',
+			['23mm', 'auto', '6mm', 'auto'],
 			'g'
 		)
 		test.assertRegExpMatchCount(RegexTemplates.anyDistanceArrayRegex, 'bogo', 0, 'g')
 		test.assertRegExpMatchCount(RegexTemplates.anyDistanceArrayRegex, '', 0, 'g')
 
-		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto / 4fr', ['auto / 4fr', 'auto', '4fr'])
-		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 1fr / 4fr 20%', [
-			'auto 1fr / 4fr 20%',
-			'auto 1fr',
-			'4fr 20%'
-		])
-		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 1fr / 4fr 20% auto', [
-			'auto 1fr / 4fr 20% auto',
-			'auto 1fr',
-			'4fr 20% auto'
+		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto / auto', ['auto / auto', 'auto', 'auto'])
+		test.assertRegExpMatches(RegexTemplates.gridTemplateRegex, 'auto 23cm / 24cm 25cm', [
+			'auto 23cm / 24cm 25cm',
+			'auto 23cm',
+			'24cm 25cm'
 		])
 		test.assertRegExpMatchCount(RegexTemplates.gridTemplateRegex, 'bogo', 0)
 		test.assertRegExpMatchCount(RegexTemplates.gridTemplateRegex, '', 0)
