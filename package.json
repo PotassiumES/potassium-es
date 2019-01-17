@@ -1,6 +1,6 @@
 {
   "name": "potassium-es",
-  "version": "0.1.0-alpha1",
+  "version": "1.0.0",
   "description": "A browser-side framework for wider web applications",
   "main": "src/App.js",
   "scripts": {
@@ -73,7 +73,7 @@
     "relative": true
   },
   "dependencies": {
-    "action-input": "git+https@github.com:PotassiumES/action-input.git#development"
+    "action-input": "git+https@github.com:PotassiumES/action-input.git"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
@@ -85,7 +85,7 @@
     "http-server": "^0.11.1",
     "husky": "^1.2.0",
     "lint-staged": "^8.1.0",
-    "potassium-test": "git+https@github.com:PotassiumES/potassium-test.git#development",
+    "potassium-test": "git+https@github.com:PotassiumES/potassium-test.git",
     "prettier": "^1.13.7",
     "rollup": "^0.62.0",
     "rollup-plugin-cleanup": "^3.0.0",
