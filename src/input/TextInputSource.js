@@ -27,6 +27,8 @@ export default class TextInputSource extends InputSource {
 
 	/**
 	@param {string} partialPath the relative semantic path for an input
+	@param {Array} [result=null]
+	
 	@return [active, value]
 	*/
 	queryInputPath(partialPath, result = null) {

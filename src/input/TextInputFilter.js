@@ -14,13 +14,14 @@ export default class TextInputFilter extends Filter {
 	}
 
 	/**
-	 * @param {string} inputPath
-	 * @param {boolean} inputActive
-	 * @param inputValue
-	 * @param {string} filterPath
-	 * @param {Object} filterParameters parameters for use while filtering
-	 *
-	 * @return {Array} [active, value]
+	@param {string} inputPath
+	@param {boolean} inputActive
+	@param {object} inputValue
+	@param {string} filterPath
+	@param {Object} filterParameters parameters for use while filtering
+	@param {Array} [results=null]
+	 
+	 @return {Array} [active, value]
 	 */
 	filter(inputPath, inputActive, inputValue, filterPath, filterParameters, results = null) {
 		if (results === null) results = new Array(2)

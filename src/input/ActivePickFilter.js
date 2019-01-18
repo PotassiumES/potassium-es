@@ -26,6 +26,7 @@ export default class ActivePickFilter extends Filter {
 	 * @param inputValue
 	 * @param {string} filterPath
 	 * @param {Object} filterParameters parameters for use while filtering
+	 * @param {Array} results
 	 *
 	 * @return {Array} [active, value]
 	 */

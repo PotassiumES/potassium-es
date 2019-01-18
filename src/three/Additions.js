@@ -289,7 +289,10 @@ THREE.Object3D.prototype.getAncestry = function(node = this) {
 
 /**
 Logs the ancestry of `node` starting with the root and ending with the `node`
-@param {Object3D} node
+@param {Object3D} [node=this]
+@param {boolean} [showVars=false]
+@param {boolean} [localsOnly=false]
+
 */
 THREE.Object3D.prototype.logAncestry = function(node = this, showVars = false, localsOnly = false) {
 	node.getAncestry().forEach(obj => {
@@ -325,8 +328,10 @@ THREE.Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, show
 @param {THREE.Object3D} node
 @param {string[]} [results=[]] an accumulator array
 @param {int} [tabDepth=0]
-@param {bool} [showVars=false] if true, log the CSS variables of the form `--name`
-@param {bool} [localsOnly=false] if true, show the local instead of the computed styles
+@param {boolean} [showVars=false] if true, log the CSS variables of the form `--name`
+@param {boolean} [localsOnly=false] if true, show the local instead of the computed styles
+@param {boolean} [traverseChildren=true]
+
 @return {string} a string describing the computed styles for a node and its descendents
 */
 THREE.Object3D.prototype._getStyleTreeLines = function(
