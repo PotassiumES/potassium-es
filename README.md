@@ -1,8 +1,6 @@
 # PotassiumES
 
-**NOTE** We're just breaking ground on this project and there's a lot to do. Go look at the [Issues](https://github.com/PotassiumES/potassium-es/issues) to see what's happening and how you can help!
-
-## Project goals
+This repository holds the source code for PotassiumES's front-end application framework. The project page is at [PotassiumES.org](https://potassiumes.org/).
 
 **Goal 1:** Enable the wider web
 
@@ -26,21 +24,25 @@ PotassiumES is for teams who create wider web applications:
 - Writers
 - Coders
 
-This project is indirectly for people who use the wider web, but they'll probably never know we are here any more than they know about which web server software hosts their favorite web sites.
-
 ## Products
 
-A delightful technical framework for building wider web applications.
-- [API Documentation](https://doc.esdoc.org/github.com/PotassiumES/potassium-es/)
+A delightful technical framework for wider web applications:
+- [Quickstart skeleton project](https://github.com/PotassiumES/potassium-skeleton/)
+- [Samples](https://github.com/potassiumes/potassium-samples/)
+- [API Documentation](https://potassiumes.org/docs/es/)
 
-A library of beautiful user interface controls that work nicely on major web browsers and on accessibility-oriented browsers like screen readers.
-- [potassium-components repo](https://github.com/PotassiumES/potassium-components)
+A library of beautiful user interface controls.
+- [Component Library](https://github.com/PotassiumES/potassium-components) (accessibility core features are in-progress)
 
-Educational resources for teams who want to co-create the wider web.
+Educational resources for wider-web creation teams.
+- In progress
 
 A solid social framework for organizing and realizing progressive projects.
+- In progress
 
 ## Contributors
+
+Making the wider web is a lot of work! Go look at the [Issues](https://github.com/PotassiumES/potassium-es/issues) to see what's happening and how you can help!
 
 This project has a somewhat unique [Code of Conduct](https://github.com/PotassiumES/potassium-es/blob/master/CODE%20OF%20CONDUCT.md) that holds contributors to a higher standard than most other collective action.
 
