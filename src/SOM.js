@@ -2,6 +2,7 @@
 Functions that generate Spatial Object Model (SOM) elements like som.group(...)
 Underlying the SOM is the Three.js scene som 
 */
+import * as paths from './Paths.js'
 import AssetLoader from './AssetLoader.js'
 
 import Attributes from './style/Attributes.js'
@@ -102,7 +103,7 @@ som.text = (text = '', options = {}) => {
 			bevelEnabled: false,
 			material: null,
 			color: 0x444444,
-			fontURL: '/static/potassium-es/fonts/helvetiker_regular.typeface.json'
+			fontURL: paths.Static + '/potassium-es/fonts/helvetiker_regular.typeface.json'
 		},
 		options
 	)

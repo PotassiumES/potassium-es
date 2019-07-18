@@ -3,6 +3,7 @@ import * as ta from './three/Additions.js'
 import dom from './DOM.js'
 import som from './SOM.js'
 import Router from './Router.js'
+import * as paths from './Paths.js'
 import Component from './Component.js'
 import Localizer from './Localizer.js'
 import Engine from './display/Engine.js'
@@ -102,20 +103,20 @@ const App = class extends EventHandler {
 		/** @todo figure out how action map files should be bundled */
 		this._actionManager.addActionMap(
 			'flat',
-			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/flat-action-map.json')
+			new ActionMap([...this._actionManager.filters], paths.Static + '/potassium-es/actions/flat-action-map.json')
 		)
 		this._actionManager.addActionMap(
 			'portal',
-			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/portal-action-map.json')
+			new ActionMap([...this._actionManager.filters], paths.Static + '/potassium-es/actions/portal-action-map.json')
 		)
 		this._actionManager.addActionMap(
 			'immersive',
-			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/immersive-action-map.json')
+			new ActionMap([...this._actionManager.filters], paths.Static + '/potassium-es/actions/immersive-action-map.json')
 		)
 		/** the 'flat-dev' action map is used during dev when App.toggleFlatDisplay is used */
 		this._actionManager.addActionMap(
 			'flat-dev',
-			new ActionMap([...this._actionManager.filters], '/static/potassium-es/actions/flat-dev-action-map.json')
+			new ActionMap([...this._actionManager.filters], paths.Static + '/potassium-es/actions/flat-dev-action-map.json')
 		)
 		this._actionManager.switchToActionMaps('flat')
 
@@ -263,7 +264,8 @@ const App = class extends EventHandler {
 		this._flatTransformation = null
 
 		/* Set up hands and pointers */
-		this._leftHand = som.group(this._makeHand(0x9999ff)).appendTo(this._immersiveScene)
+		this._madeHands = false // Hands are lazily loaded
+		this._leftHand = som.group().appendTo(this._immersiveScene)
 		this._leftHand.addClass('left-hand')
 		this._leftHand.name = 'LeftHand'
 		this._leftHand.visible = false
@@ -272,7 +274,7 @@ const App = class extends EventHandler {
 		this._leftPointer.name = 'LeftPointer'
 		this._leftPointer.visible = false
 		this._leftHand.add(this._leftPointer)
-		this._rightHand = som.group(this._makeHand(0xff9999)).appendTo(this._immersiveScene)
+		this._rightHand = som.group().appendTo(this._immersiveScene)
 		this._rightHand.addClass('right-hand')
 		this._rightHand.name = 'RightHand'
 		this._rightHand.visible = false
@@ -300,6 +302,12 @@ const App = class extends EventHandler {
 			/* style once right at the start to avoid seeing unstyled scenes */
 			switch (mode) {
 				case App.IMMERSIVE:
+					// Lazily load hands if necessary
+					if (this._madeHands === false) {
+						this._leftHand.add(this._makeHand(0xff9999))
+						this._rightHand.add(this._makeHand(0xff9999))
+						this._madeHands = true
+					}
 					this._stylist.style(this._immersiveScene, this._immersiveEngine.renderer)
 					break
 				case App.PORTAL:
@@ -590,7 +598,7 @@ const App = class extends EventHandler {
 	_makeHand(color) {
 		/** @todo make this a portable resource, perhaps by embedding it in an ES module */
 		return som.obj(
-			'/static/potassium-es/models/Controller.obj',
+			paths.Static + '/potassium-es/models/Controller.obj',
 			(group, obj) => {
 				const body = group.getObjectByName('Body_Cylinder') // Magic string for temp OBJ
 				if (!body) {
@@ -619,7 +627,10 @@ const App = class extends EventHandler {
 		this._pickingInputSource.clearIntersectObjects()
 		this._actionManager.queryInputPath('/input/touch/normalized-position/0', _workingQueryArray_1)
 		if (_workingQueryArray_1[0]) {
-			this._pickingInputSource.touch = this._portalEngine.pickScreen(_workingQueryArray_1[1][0], _workingQueryArray_1[1][1])
+			this._pickingInputSource.touch = this._portalEngine.pickScreen(
+				_workingQueryArray_1[1][0],
+				_workingQueryArray_1[1][1]
+			)
 		}
 
 		// Update actions
