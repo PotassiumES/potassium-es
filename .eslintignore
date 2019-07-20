@@ -1,0 +1,3 @@
+src/three/GLTFLoader.js
+src/three/MTLLoader.js
+src/three/OBJLoader.js

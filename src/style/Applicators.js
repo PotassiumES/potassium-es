@@ -1,3 +1,5 @@
+import { Vector3 } from 'three/src/Three.js'
+
 import Evaluators from './Evaluators.js'
 import GridLayout from './GridLayout.js'
 import BoxLayout from './BoxLayout.js'
@@ -9,7 +11,7 @@ Applicators holds functions that apply a declared style property (color, font-si
 */
 const Applicators = new Map()
 
-const _workingVector3_1 = new THREE.Vector3()
+const _workingVector3_1 = new Vector3()
 
 /** set Object3D.scale */
 Applicators.set('scale', (node, styleInfo) => {

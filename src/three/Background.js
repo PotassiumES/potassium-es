@@ -1,3 +1,5 @@
+import { Mesh, MeshStandardMaterial, BufferGeometry, BufferAttribute, DoubleSide } from 'three/src/Three.js'
+
 import RoundRectCurve from './RoundRectCurve.js'
 
 /**
@@ -5,11 +7,11 @@ Background extends THREE.Mesh (an Object3D) and is used to render a background p
 Unlike the DOM's background, this Background is designed to float a few centimeters behind the node's BorderLine.
 */
 function Background(width = 0, height = 0, radius = [0, 0, 0, 0]) {
-	THREE.Mesh.call(
+	Mesh.call(
 		this,
 		new BackgroundGeometry(width, height, radius),
-		new THREE.MeshStandardMaterial({
-			side: THREE.DoubleSide
+		new MeshStandardMaterial({
+			side: DoubleSide
 		}),
 		undefined
 	)
@@ -17,14 +19,14 @@ function Background(width = 0, height = 0, radius = [0, 0, 0, 0]) {
 	// Shadow SOM nodes are ignored during some layout calculations
 	this.shadowSOM = true
 }
-Background.prototype = Object.create(THREE.Mesh.prototype)
+Background.prototype = Object.create(Mesh.prototype)
 Background.prototype.constructor = Background
 
 function BackgroundGeometry(width = 0, height = 0, radius = [0, 0, 0, 0]) {
-	THREE.BufferGeometry.call(this)
+	BufferGeometry.call(this)
 	this.setParams(width, height, radius)
 }
-BackgroundGeometry.prototype = Object.create(THREE.BufferGeometry.prototype)
+BackgroundGeometry.prototype = Object.create(BufferGeometry.prototype)
 BackgroundGeometry.prototype.constructor = BackgroundGeometry
 
 BackgroundGeometry.CurveDivisions = 15
@@ -94,7 +96,7 @@ BackgroundGeometry.prototype._updatePoints = function() {
 		positions.set([0, 0, 0], positionsIndex + 3)
 		push(i, positionsIndex + 6)
 	}
-	this.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+	this.addAttribute('position', new BufferAttribute(positions, 3))
 }
 
 export default Background

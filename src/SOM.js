@@ -2,6 +2,44 @@
 Functions that generate Spatial Object Model (SOM) elements like som.group(...)
 Underlying the SOM is the Three.js scene som 
 */
+
+import {
+	Scene,
+	Group,
+	Object3D,
+	AmbientLight,
+	HemisphereLight,
+	DirectionalLight,
+	PerspectiveCamera,
+	FontLoader,
+	TextureLoader,
+	VideoTexture,
+	Geometry,
+	SphereBufferGeometry,
+	BoxBufferGeometry,
+	ShapeGeometry,
+	Box3,
+	Line,
+	Mesh,
+	MeshBasicMaterial,
+	LineBasicMaterial,
+	MeshLambertMaterial,
+	MeshStandardMaterial,
+	DoubleSide,
+	NearestFilter,
+	LinearFilter,
+	RGBFormat,
+	Euler,
+	Matrix4,
+	Vector3
+} from 'three/src/Three.js'
+
+import { MTLLoader } from './three/MTLLoader.js'
+import { OBJLoader } from './three/OBJLoader.js'
+import { GLTFLoader } from './three/GLTFLoader.js'
+
+import { generateCubeGeometry } from './three/GeometryGenerators.js'
+
 import * as paths from './Paths.js'
 import AssetLoader from './AssetLoader.js'
 
@@ -11,12 +49,17 @@ import { SelectorFragmentList } from './style/Selector.js'
 const som = {}
 export default som
 
-const assetLoader = AssetLoader.Singleton
-const fontLoader = new THREE.FontLoader()
-const mtlLoader = new THREE.MTLLoader()
-const objLoader = new THREE.OBJLoader()
+som.DoubleSide = DoubleSide
+som.NearestFilter = NearestFilter
+som.LinearFilter = LinearFilter
+som.RGBFormat = RGBFormat
 
-const _textureLoader = new THREE.TextureLoader()
+const assetLoader = AssetLoader.Singleton
+const fontLoader = new FontLoader()
+const mtlLoader = new MTLLoader()
+const objLoader = new OBJLoader()
+
+const _textureLoader = new TextureLoader()
 
 som.textureLoader = function() {
 	return _textureLoader
@@ -31,9 +74,9 @@ som.nodeFunction = function(clazz, ...params) {
 	let consumedFirstParam = false
 	if (Array.isArray(params[0])) {
 		consumedFirstParam = true
-		instance = new THREE[clazz](...params[0])
+		instance = new clazz(...params[0])
 	} else {
-		instance = new THREE[clazz]()
+		instance = new clazz()
 	}
 
 	// Append the children parameters
@@ -53,14 +96,14 @@ function loadText(resultGroup, text, fontURL, options) {
 	if (!text || text.trim().length === 0) {
 		if (resultGroup.geometry) {
 			resultGroup.geometry.dispose()
-			resultGroup.geometry = new THREE.ShapeGeometry([], 1)
+			resultGroup.geometry = new ShapeGeometry([], 1)
 		}
 		return
 	}
 	if (som.fonts.has(fontURL)) {
 		const shapes = som.fonts.get(fontURL).generateShapes(text, options.size)
 		if (resultGroup.geometry) resultGroup.geometry.dispose()
-		resultGroup.geometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
+		resultGroup.geometry = new ShapeGeometry(shapes, _shapeCurveSegments)
 		resultGroup.styles.geometryIsDirty = true
 		resultGroup.styles.setAncestorsLayoutDirty()
 	} else {
@@ -76,7 +119,7 @@ function loadText(resultGroup, text, fontURL, options) {
 					som.fonts.set(fontURL, loadedFont)
 					const shapes = loadedFont.generateShapes(text, options.size)
 					if (resultGroup.geometry) resultGroup.geometry.dispose()
-					resultGroup.geometry = new THREE.ShapeGeometry(shapes, _shapeCurveSegments)
+					resultGroup.geometry = new ShapeGeometry(shapes, _shapeCurveSegments)
 					resultGroup.styles.geometryIsDirty = true
 					resultGroup.styles.setAncestorsLayoutDirty()
 					URL.revokeObjectURL(blobURL)
@@ -103,14 +146,14 @@ som.text = (text = '', options = {}) => {
 			bevelEnabled: false,
 			material: null,
 			color: 0x444444,
-			fontURL: paths.Static + '/potassium-es/fonts/helvetiker_regular.typeface.json'
+			fontURL: paths.Static + '/potassium-es/spatial-fonts/public-sans/public-sans-regular.json'
 		},
 		options
 	)
 	if (options.material === null) {
-		options.material = new THREE.MeshStandardMaterial({
+		options.material = new MeshStandardMaterial({
 			color: options.color,
-			side: THREE.DoubleSide
+			side: DoubleSide
 		})
 	}
 	const fontOptions = {
@@ -157,9 +200,9 @@ som.cube = (size = 1, options = {}) => {
 	if (options.material) {
 		material = options.material
 	} else {
-		material = new THREE.MeshStandardMaterial({ color: options.color })
+		material = new MeshStandardMaterial({ color: options.color })
 	}
-	const result = new THREE.Mesh(THREE.MakeCubeGeometry(size), material)
+	const result = new Mesh(generateCubeGeometry(size), material)
 	// set up for kss element selection, like `cube {}` or `node[name=Cube] {}`
 	result.name = 'Cube'
 	result.isCube = true
@@ -184,26 +227,46 @@ som.obj = (objPath, successCallback = null, failureCallback = null) => {
 }
 
 /**
+Load a glTF file
+@return {THREE.Group}
+*/
+som.gltf = (gltfPath, successCallback = null, failureCallback = null) => {
+	const group = som.group()
+	group.name = 'GLTF Wrapper'
+	loadGLTF(gltfPath)
+		.then(gltf => {
+			group.add(gltf.scene)
+			if (successCallback !== null) successCallback(group, gltf)
+		})
+		.catch((...params) => {
+			if (failureCallback !== null) failureCallback(group, ...params)
+		})
+	return group
+}
+
+/**
 The methods created from these info just pass through any params to the class constructor.
 For example, creating a MeshBasicMaterial will be som.meshBasicMaterial(...params).
 */
 som.SUPPORT_CLASSES = [
-	{ class: 'Box3', name: 'box3' },
-	{ class: 'Line', name: 'line' },
-	{ class: 'Euler', name: 'euler' },
-	{ class: 'Matrix4', name: 'matrix4' },
-	{ class: 'Vector3', name: 'vector3' },
-	{ class: 'Geometry', name: 'geometry' },
-	{ class: 'SphereBufferGeometry', name: 'sphereBufferGeometry' },
-	{ class: 'MeshBasicMaterial', name: 'meshBasicMaterial' },
-	{ class: 'LineBasicMaterial', name: 'lineBasicMaterial' },
-	{ class: 'MeshLambertMaterial', name: 'meshLambertMaterial' },
-	{ class: 'MeshStandardMaterial', name: 'meshStandardMaterial' }
+	{ class: Box3, name: 'box3' },
+	{ class: Line, name: 'line' },
+	{ class: Euler, name: 'euler' },
+	{ class: Matrix4, name: 'matrix4' },
+	{ class: Vector3, name: 'vector3' },
+	{ class: Geometry, name: 'geometry' },
+	{ class: VideoTexture, name: 'videoTexture' },
+	{ class: BoxBufferGeometry, name: 'boxBufferGeometry' },
+	{ class: SphereBufferGeometry, name: 'sphereBufferGeometry' },
+	{ class: MeshBasicMaterial, name: 'meshBasicMaterial' },
+	{ class: LineBasicMaterial, name: 'lineBasicMaterial' },
+	{ class: MeshLambertMaterial, name: 'meshLambertMaterial' },
+	{ class: MeshStandardMaterial, name: 'meshStandardMaterial' }
 ]
 for (const classInfo of som.SUPPORT_CLASSES) {
 	const innerClazz = classInfo.class
 	som[classInfo.name] = function(...params) {
-		return new THREE[innerClazz](...params)
+		return new innerClazz(...params)
 	}
 }
 
@@ -211,13 +274,13 @@ for (const classInfo of som.SUPPORT_CLASSES) {
 The methods created from these classes use the som.nodeFuction (see below)
 */
 som.GRAPH_CLASSES = [
-	{ class: 'Mesh', name: 'mesh' },
-	{ class: 'Scene', name: 'scene' },
-	{ class: 'Group', name: 'group' },
-	{ class: 'AmbientLight', name: 'ambientLight' },
-	{ class: 'HemisphereLight', name: 'hemisphereLight' },
-	{ class: 'DirectionalLight', name: 'directionalLight' },
-	{ class: 'PerspectiveCamera', name: 'perspectiveCamera' }
+	{ class: Mesh, name: 'mesh' },
+	{ class: Scene, name: 'scene' },
+	{ class: Group, name: 'group' },
+	{ class: AmbientLight, name: 'ambientLight' },
+	{ class: HemisphereLight, name: 'hemisphereLight' },
+	{ class: DirectionalLight, name: 'directionalLight' },
+	{ class: PerspectiveCamera, name: 'perspectiveCamera' }
 ]
 
 // This loop generates the element generating functions like som.group(...)
@@ -226,6 +289,27 @@ for (const somClassInfo of som.GRAPH_CLASSES) {
 	som[somClassInfo.name] = function(...params) {
 		return som.nodeFunction(innerClazz, ...params)
 	}
+}
+
+function loadGLTF(gltfPath) {
+	const fileName = gltfPath.split('/')[gltfPath.split('/').length - 1]
+	const baseURL = gltfPath.substring(0, gltfPath.length - fileName.length)
+
+	return new Promise((resolve, reject) => {
+		const loader = new GLTFLoader().setPath(baseURL)
+		loader.load(
+			fileName,
+			gltf => {
+				gltf.scene.name = 'GLTF'
+				resolve(gltf)
+			},
+			() => {},
+			(...params) => {
+				console.error('Failed to load gltf', ...params)
+				reject(...params)
+			}
+		)
+	})
 }
 
 function loadObj(objPath) {

@@ -1,3 +1,5 @@
+import { Vector3 } from 'three/src/Three.js'
+
 import Layout from './Layout.js'
 import Evaluators from './Evaluators.js'
 
@@ -239,7 +241,7 @@ class Grid {
 Grid.Row = Symbol('grid-row')
 Grid.Column = Symbol('grid-column')
 
-const _workingVector3_1 = new THREE.Vector3()
+const _workingVector3_1 = new Vector3()
 
 const _parseGridTemplate = function(rawValue, node) {
 	const evaledTemplate = Evaluators.parse(rawValue, node)

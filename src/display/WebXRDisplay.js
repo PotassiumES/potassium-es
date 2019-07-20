@@ -1,3 +1,4 @@
+import { WebGLRenderer } from 'three/src/Three.js'
 import SceneDisplay from './SceneDisplay.js'
 import * as displayConstants from './Constants.js'
 
@@ -66,7 +67,7 @@ const WebXRDisplay = class extends SceneDisplay {
 			})
 			if (!this._glContext) throw new Error('Could not create a webgl context')
 
-			this._renderer = new THREE.WebGLRenderer({
+			this._renderer = new WebGLRenderer({
 				canvas: this._glCanvas,
 				context: this._glContext,
 				antialias: false,

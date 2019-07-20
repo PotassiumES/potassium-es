@@ -1,14 +1,15 @@
 import RoundRectCurve from './RoundRectCurve.js'
+import { Mesh, MeshStandardMaterial, BufferGeometry, DoubleSide, Vector3, BufferAttribute } from 'three/src/Three.js'
 
 /**
 BorderLine extends THREE.Mesh (an Object3D) and is used to render the box border set by KSS
 */
 function BorderLine(lineWidth = [0.01, 0.01, 0.01, 0.01], width = 0, height = 0, radius = [0, 0, 0, 0]) {
-	THREE.Mesh.call(
+	Mesh.call(
 		this,
 		new BorderGeometry(lineWidth, width, height, radius),
-		new THREE.MeshStandardMaterial({
-			side: THREE.DoubleSide
+		new MeshStandardMaterial({
+			side: DoubleSide
 		}),
 		undefined
 	)
@@ -16,18 +17,18 @@ function BorderLine(lineWidth = [0.01, 0.01, 0.01, 0.01], width = 0, height = 0,
 	// Shadow SOM nodes are ignored during some layout calculations
 	this.shadowSOM = true
 }
-BorderLine.prototype = Object.create(THREE.Mesh.prototype)
+BorderLine.prototype = Object.create(Mesh.prototype)
 BorderLine.prototype.constructor = BorderLine
 
 function BorderGeometry(lineWidth = [0.01, 0.01, 0.01, 0.01], width = 0, height = 0, radius = [0, 0, 0, 0]) {
-	THREE.BufferGeometry.call(this)
+	BufferGeometry.call(this)
 	this._lineWidth = null
 	this._width = null
 	this._height = null
 	this._radius = null
 	this.setParams(lineWidth, width, height, radius)
 }
-BorderGeometry.prototype = Object.create(THREE.BufferGeometry.prototype)
+BorderGeometry.prototype = Object.create(BufferGeometry.prototype)
 BorderGeometry.prototype.constructor = BorderGeometry
 
 BorderGeometry.CurveDivisions = 15
@@ -118,7 +119,7 @@ BorderGeometry.prototype._updatePoints = function() {
 		height + totalWidthY,
 		this._radius[0] // TODO handle different radius per corner
 	).getPoints(BorderGeometry.CurveDivisions)
-	const outerOffset = new THREE.Vector3(this._lineWidth[1] - totalWidthX / 2, this._lineWidth[0] - totalWidthY / 2, 0)
+	const outerOffset = new Vector3(this._lineWidth[1] - totalWidthX / 2, this._lineWidth[0] - totalWidthY / 2, 0)
 	for (const point of outerCurvePoints) {
 		point.add(outerOffset)
 	}
@@ -145,7 +146,7 @@ BorderGeometry.prototype._updatePoints = function() {
 		push(i + curvePointCount, positionsIndex + 12)
 		push((i + 1) % curvePointCount, positionsIndex + 15)
 	}
-	this.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+	this.addAttribute('position', new BufferAttribute(positions, 3))
 }
 
 export default BorderLine
