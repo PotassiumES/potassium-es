@@ -1,18 +1,20 @@
+import { Object3D, Scene, Vector3, Box3, LineBasicMaterial, LineSegments } from 'three/src/Three.js'
 import Attributes from '../style/Attributes.js'
 import NodeStyles from '../style/NodeStyles.js'
 
+import { generateCubeGeometry } from './GeometryGenerators.js'
 import { SelectorFragmentList } from '../style/Selector.js'
 
 /**
 importing this extends THREE.Object3D with many methods and attributes useful for creating and manipulating the SOM
 */
 
-const _workingVector3_1 = new THREE.Vector3()
-const _workingVector3_2 = new THREE.Vector3()
+const _workingVector3_1 = new Vector3()
+const _workingVector3_2 = new Vector3()
 
 // Used by KSS tag selectors
-THREE.Object3D.prototype.isNode = true
-THREE.Scene.prototype.isScene = true
+Object3D.prototype.isNode = true
+Scene.prototype.isScene = true
 
 /**
 Expands or contracts along the XR plane by:
@@ -21,26 +23,26 @@ Expands or contracts along the XR plane by:
 - subbtracting bottom from this.min.y
 - subbtracting left from this.min.x
 */
-THREE.Box3.prototype.changeXYPlane = function(top, right, bottom, left) {
+Box3.prototype.changeXYPlane = function(top, right, bottom, left) {
 	this.max.y += top
 	this.max.x += right
 	this.min.y -= bottom
 	this.min.x -= left
 }
 
-THREE.Box3.prototype.makeZero = function() {
+Box3.prototype.makeZero = function() {
 	this.min.set(0, 0, 0)
 	this.max.set(0, 0, 0)
 	return this
 }
 
-THREE.Box3.prototype.centerAtOrigin = function() {
+Box3.prototype.centerAtOrigin = function() {
 	this.getCenter(_workingVector3_1)
 	_workingVector3_1.negate()
 	this.translate(_workingVector3_1)
 }
 
-THREE.Box3.prototype.scale = function(vec3) {
+Box3.prototype.scale = function(vec3) {
 	this.min.x *= vec3.x
 	this.min.y *= vec3.y
 	this.min.z *= vec3.z
@@ -49,7 +51,7 @@ THREE.Box3.prototype.scale = function(vec3) {
 	this.max.z *= vec3.z
 }
 
-Object.defineProperty(THREE.Object3D.prototype, 'styles', {
+Object.defineProperty(Object3D.prototype, 'styles', {
 	/**
 	Object3D.styles holds the KSS and layout information for an Object3D
 	@type {NodeStyles}
@@ -65,8 +67,8 @@ Object.defineProperty(THREE.Object3D.prototype, 'styles', {
 /**
 Set the styles.hierarchyIsDirty when adding or removing a child
 */
-const _oldAdd = THREE.Object3D.prototype.add
-THREE.Object3D.prototype.add = function(...objects) {
+const _oldAdd = Object3D.prototype.add
+Object3D.prototype.add = function(...objects) {
 	let shouldSetDirty = false
 	for (let i = 0; i < objects.length; i++) {
 		_oldAdd.call(this, objects[i])
@@ -79,8 +81,8 @@ THREE.Object3D.prototype.add = function(...objects) {
 	}
 	return this
 }
-const _oldRemove = THREE.Object3D.prototype.remove
-THREE.Object3D.prototype.remove = function(...objects) {
+const _oldRemove = Object3D.prototype.remove
+Object3D.prototype.remove = function(...objects) {
 	for (let i = 0; i < objects.length; i++) {
 		_oldRemove.call(this, objects[i])
 	}
@@ -91,7 +93,7 @@ THREE.Object3D.prototype.remove = function(...objects) {
 /**
 Override the Object3D.visible property in order to update styles when it changes
 */
-Object.defineProperty(THREE.Object3D.prototype, 'visible', {
+Object.defineProperty(Object3D.prototype, 'visible', {
 	get: function() {
 		return this._visible !== false
 	},
@@ -105,7 +107,7 @@ Object.defineProperty(THREE.Object3D.prototype, 'visible', {
 	}
 })
 
-THREE.Object3D.prototype.toggleClass = function(on, ...classNames) {
+Object3D.prototype.toggleClass = function(on, ...classNames) {
 	if (on) {
 		return this.addClass(...classNames)
 	} else {
@@ -116,7 +118,7 @@ THREE.Object3D.prototype.toggleClass = function(on, ...classNames) {
 /**
 Helper functions to handling classes used by the Stylist
 */
-THREE.Object3D.prototype.addClass = function(...classNames) {
+Object3D.prototype.addClass = function(...classNames) {
 	if (this.userData.classes === undefined) {
 		this.userData.classes = [...classNames]
 		this.styles.setSubgraphStylesDirty()
@@ -131,7 +133,7 @@ THREE.Object3D.prototype.addClass = function(...classNames) {
 	if (shouldSetDirty) this.styles.setSubgraphStylesDirty()
 	return this
 }
-THREE.Object3D.prototype.removeClass = function(...classNames) {
+Object3D.prototype.removeClass = function(...classNames) {
 	if (this.userData.classes === undefined || this.userData.classes.length === 0) return this
 	let shouldSetDirty = false
 	for (let i = 0; i < classNames.length; i++) {
@@ -143,11 +145,11 @@ THREE.Object3D.prototype.removeClass = function(...classNames) {
 	if (shouldSetDirty) this.styles.setSubgraphStylesDirty()
 	return this
 }
-THREE.Object3D.prototype.hasClass = function(className) {
+Object3D.prototype.hasClass = function(className) {
 	if (this.userData.classes === undefined) return false
 	return this.userData.classes.includes(className)
 }
-THREE.Object3D.prototype.getClasses = function() {
+Object3D.prototype.getClasses = function() {
 	if (this.userData.classes === undefined) return []
 	return this.userData.classes
 }
@@ -155,7 +157,7 @@ THREE.Object3D.prototype.getClasses = function() {
 /**
 Calls showEdges or hideEdges to toggle the debugging edge boxes
 */
-THREE.Object3D.prototype.toggleEdges = function(includingChildren = false) {
+Object3D.prototype.toggleEdges = function(includingChildren = false) {
 	if (this._marginBox) {
 		this.hideEdges(includingChildren)
 	} else {
@@ -167,18 +169,18 @@ THREE.Object3D.prototype.toggleEdges = function(includingChildren = false) {
 /**
 If the Object3D has a geometry then show a debugging box around it
 */
-THREE.Object3D.prototype.showEdges = function(includingChildren = false) {
+Object3D.prototype.showEdges = function(includingChildren = false) {
 	if (this._marginBox === undefined) {
 		if (_edgeBoxMaterial === null) {
-			_edgeBoxMaterial = new THREE.LineBasicMaterial({
+			_edgeBoxMaterial = new LineBasicMaterial({
 				color: 0x660000,
 				linewidth: 200
 			})
 		}
 		if (_edgeBoxGeometry === null) {
-			_edgeBoxGeometry = THREE.MakeCubeGeometry(1)
+			_edgeBoxGeometry = generateCubeGeometry(1)
 		}
-		this._marginBox = new THREE.LineSegments(_edgeBoxGeometry, _edgeBoxMaterial)
+		this._marginBox = new LineSegments(_edgeBoxGeometry, _edgeBoxMaterial)
 		this._marginBox.addClass('margin-box')
 		this._marginBox.styles.assignedStyles.set('position', 'absolute')
 		this._marginBox.shadowSOM = true
@@ -209,7 +211,7 @@ THREE.Object3D.prototype.showEdges = function(includingChildren = false) {
 /**
 Remove boxes shown by `Object3D.showEdges`
 */
-THREE.Object3D.prototype.hideEdges = function(includingChildren = false) {
+Object3D.prototype.hideEdges = function(includingChildren = false) {
 	if (this._marginBox !== undefined) {
 		this.remove(this._marginBox)
 		this._marginBox = undefined
@@ -224,7 +226,7 @@ THREE.Object3D.prototype.hideEdges = function(includingChildren = false) {
 	return this
 }
 
-THREE.Object3D.prototype.findRoot = function(node = this) {
+Object3D.prototype.findRoot = function(node = this) {
 	if (node.parent === null) return node
 	return node.findRoot(node.parent)
 }
@@ -233,7 +235,7 @@ THREE.Object3D.prototype.findRoot = function(node = this) {
 A handy function for depth first traversal of all children and this node
 @param {function} func a function of the signature function(Object3D)
 */
-THREE.Object3D.prototype.traverseDepthFirst = function(func) {
+Object3D.prototype.traverseDepthFirst = function(func) {
 	_traverseDepthFirst(this, func)
 }
 
@@ -249,7 +251,7 @@ const _traverseDepthFirst = function(node, func) {
 @param {boolean} atMostOne - true if only one result is desired
 @return {Object3D[]} nodes that match the selector
 */
-THREE.Object3D.prototype.getObjectsBySelector = function(selector, atMostOne = false) {
+Object3D.prototype.getObjectsBySelector = function(selector, atMostOne = false) {
 	const selectorFragmentList = SelectorFragmentList.Parse(selector)
 	const results = []
 	this.traverse(node => {
@@ -266,7 +268,7 @@ THREE.Object3D.prototype.getObjectsBySelector = function(selector, atMostOne = f
 @param {string} selector - like 'node[name=ModeSwitcherComponent] .button-component > text'
 @return {Object3D?} the first node to match the selector or null if none were found
 */
-THREE.Object3D.prototype.querySelector = function(selector) {
+Object3D.prototype.querySelector = function(selector) {
 	const results = this.getObjectsBySelector(selector, true)
 	if (results.length > 0) return results[0]
 	return null
@@ -276,7 +278,7 @@ THREE.Object3D.prototype.querySelector = function(selector) {
 @param {Object3D} node
 @return {Object3D[]} returns an array of the ancesters of `node`, starting at the root and ending with the `node`
 */
-THREE.Object3D.prototype.getAncestry = function(node = this) {
+Object3D.prototype.getAncestry = function(node = this) {
 	const lineage = []
 	let workingNode = node
 	while (workingNode) {
@@ -294,7 +296,7 @@ Logs the ancestry of `node` starting with the root and ending with the `node`
 @param {boolean} [localsOnly=false]
 
 */
-THREE.Object3D.prototype.logAncestry = function(node = this, showVars = false, localsOnly = false) {
+Object3D.prototype.logAncestry = function(node = this, showVars = false, localsOnly = false) {
 	node.getAncestry().forEach(obj => {
 		obj
 			._getStyleTreeLines(undefined, undefined, undefined, showVars, localsOnly, false)
@@ -309,7 +311,7 @@ logs to the console the computed styles for a node and its descendents
 @param {bool} [showVars=false] if true, log the CSS variables of the form `--name`
 @param {bool} [localsOnly=false] if true, show the local instead of the computed styles
 */
-THREE.Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
+Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
 	this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).forEach(line => console.log(line))
 }
 
@@ -320,7 +322,7 @@ THREE.Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVar
 @param {bool} [localsOnly=false] if true, show the local instead of the computed styles
 @return {string} a string describing the computed styles for a node and its descendents
 */
-THREE.Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
+Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
 	return this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).join('\n')
 }
 
@@ -334,7 +336,7 @@ THREE.Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, show
 
 @return {string} a string describing the computed styles for a node and its descendents
 */
-THREE.Object3D.prototype._getStyleTreeLines = function(
+Object3D.prototype._getStyleTreeLines = function(
 	node = this,
 	results = [],
 	tabDepth = 0,
@@ -385,7 +387,7 @@ const _generateTabs = function(depth) {
 /**
 Object3D.attributes is a helper API for accessing attributes on the node or in node.userData
 */
-Object.defineProperty(THREE.Object3D.prototype, 'attributes', {
+Object.defineProperty(Object3D.prototype, 'attributes', {
 	/**
 	@type {Attributes}
 	*/
@@ -398,7 +400,7 @@ Object.defineProperty(THREE.Object3D.prototype, 'attributes', {
 /**
 Logs to the console info about this node
 */
-THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
+Object3D.prototype.prettyPrint = function(depth = 0) {
 	let tabs = ''
 	for (let i = 0; i < depth; i++) {
 		tabs += '  '
@@ -417,7 +419,7 @@ THREE.Object3D.prototype.prettyPrint = function(depth = 0) {
 Looks in this node and up the ancestors until it finds a {Component} attribute
 @return {Component|null}
 */
-THREE.Object3D.prototype.getComponent = function() {
+Object3D.prototype.getComponent = function() {
 	let obj = this
 	while (true) {
 		if (obj.component) return obj.component
@@ -427,13 +429,13 @@ THREE.Object3D.prototype.getComponent = function() {
 }
 
 /** A convenience function to allow chaining like `let group = som.group().appendTo(scene)` */
-THREE.Object3D.prototype.appendTo = function(parent) {
+Object3D.prototype.appendTo = function(parent) {
 	parent.add(this)
 	return this
 }
 
 /** A convenience function to allow appending dictionaries of attributes, arrays of subchildren, or children */
-THREE.Object3D.prototype.append = function(child = null) {
+Object3D.prototype.append = function(child = null) {
 	if (child === null) {
 		return
 	}
@@ -447,99 +449,6 @@ THREE.Object3D.prototype.append = function(child = null) {
 		this.add(child)
 	}
 	return this
-}
-
-THREE.MakeCubeGeometry = function(size) {
-	const h = size * 0.5
-	const geometry = new THREE.BufferGeometry()
-	const position = []
-	position.push(
-		-h,
-		-h,
-		-h,
-		-h,
-		h,
-		-h,
-
-		-h,
-		h,
-		-h,
-		h,
-		h,
-		-h,
-
-		h,
-		h,
-		-h,
-		h,
-		-h,
-		-h,
-
-		h,
-		-h,
-		-h,
-		-h,
-		-h,
-		-h,
-
-		-h,
-		-h,
-		h,
-		-h,
-		h,
-		h,
-
-		-h,
-		h,
-		h,
-		h,
-		h,
-		h,
-
-		h,
-		h,
-		h,
-		h,
-		-h,
-		h,
-
-		h,
-		-h,
-		h,
-		-h,
-		-h,
-		h,
-
-		-h,
-		-h,
-		-h,
-		-h,
-		-h,
-		h,
-
-		-h,
-		h,
-		-h,
-		-h,
-		h,
-		h,
-
-		h,
-		h,
-		-h,
-		h,
-		h,
-		h,
-
-		h,
-		-h,
-		-h,
-		h,
-		-h,
-		h
-	)
-	geometry.addAttribute('position', new THREE.Float32BufferAttribute(position, 3))
-	return geometry
 }
 
 let _edgeBoxMaterial = null

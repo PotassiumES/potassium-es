@@ -1,5 +1,7 @@
 import * as ta from './three/Additions.js'
 
+import { Quaternion, Euler, Vector3, Matrix4, Clock } from 'three/src/Three.js'
+
 import dom from './DOM.js'
 import som from './SOM.js'
 import Router from './Router.js'
@@ -179,9 +181,7 @@ const App = class extends EventHandler {
 					)
 				}
 				if (actionParameters.rotation) {
-					this._flatTransformation.rotation = new THREE.Quaternion().setFromEuler(
-						new THREE.Euler(...actionParameters.rotation)
-					)
+					this._flatTransformation.rotation = new Quaternion().setFromEuler(new Euler(...actionParameters.rotation))
 				}
 			}
 		)
@@ -258,8 +258,8 @@ const App = class extends EventHandler {
 		*/
 		this._flatDisplay = null
 		this._debugScene = null // either _portalScene or _immersiveScene
-		this._flatCamera = null // a THREE.Camera
-		this._flatClock = null // a THREE.Clock
+		this._flatCamera = null // a Camera
+		this._flatClock = null // a Clock
 		/* _flatTransformation is used to transform the camera during dev based on input triggered actions */
 		this._flatTransformation = null
 
@@ -491,7 +491,7 @@ const App = class extends EventHandler {
 				.addClass(immersive ? 'immersive-mode' : 'portal-mode')
 			this._debugScene = immersive ? this._immersiveScene : this._portalScene
 			this._flatCamera = som.perspectiveCamera([45, 1, 0.05, 10000])
-			this._flatClock = new THREE.Clock(false)
+			this._flatClock = new Clock(false)
 			this._flatCamera.name = 'flat-camera'
 			this._flatCamera.matrixAutoUpdate = true
 			this._flatDisplay = new FlatDisplay(this._flatCamera, this._debugScene, this._handleFlatDisplayTick)
@@ -575,7 +575,7 @@ const App = class extends EventHandler {
 				this._debugScene.position.set(0, 0, 0)
 			}
 			if (this._flatTransformation.rotation) {
-				this._debugScene.quaternion.setFromEuler(new THREE.Euler(...this._flatTransformation.rotation))
+				this._debugScene.quaternion.setFromEuler(new Euler(...this._flatTransformation.rotation))
 			} else {
 				this._debugScene.quaternion.set(0, 0, 0, 1)
 			}
@@ -750,11 +750,11 @@ App.DisplayModeFailedEvent = 'display-mode-failed'
 
 export default App
 
-const _yAxis = new THREE.Vector3(0, 1, 0)
-const _zeroVector3 = new THREE.Vector3(0, 0, 0)
-const _workingVector3_1 = new THREE.Vector3()
-const _workingVector3_2 = new THREE.Vector3()
-const _workingMatrix4_1 = new THREE.Matrix4()
+const _yAxis = new Vector3(0, 1, 0)
+const _zeroVector3 = new Vector3(0, 0, 0)
+const _workingVector3_1 = new Vector3()
+const _workingVector3_2 = new Vector3()
+const _workingMatrix4_1 = new Matrix4()
 const _workingQueryArray_1 = new Array(2)
 const _workingQueryArray_2 = new Array(2)
 

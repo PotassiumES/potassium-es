@@ -95,6 +95,9 @@ const Stylist = class extends EventHandler {
 	_updateLocalStyles(scene) {
 		scene.traverse(node => {
 			if (node.shadowSOM === true) return
+			if (typeof node.styles === 'undefined') {
+				console.log('undefined styles', node)
+			}
 			if (node.styles.needsStyleRefresh === false) return
 			this._updateCount += 1
 

@@ -1,3 +1,5 @@
+import { Vector2, Vector3, Raycaster, Quaternion } from 'three/src/Three.js'
+
 import dom from '../DOM.js'
 import som from '../SOM.js'
 import EventHandler from '../EventHandler.js'
@@ -36,8 +38,8 @@ const Engine = class extends EventHandler {
 		this._camera.name = mode + '-camera'
 		this._camera.matrixAutoUpdate = false
 
-		this._raycaster = new THREE.Raycaster()
-		this._workingQuat = new THREE.Quaternion()
+		this._raycaster = new Raycaster()
+		this._workingQuat = new Quaternion()
 
 		this._sceneDisplay = null
 	}
@@ -202,8 +204,8 @@ const Engine = class extends EventHandler {
 	}
 }
 
-let _workingVector2_1 = new THREE.Vector2()
-let _workingPickResults = new Array()
+const _workingVector2_1 = new Vector2()
+const _workingPickResults = new Array()
 
 Engine.STARTED = 'engine-started'
 Engine.STOPPED = 'engine-stopped'

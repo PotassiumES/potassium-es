@@ -1,3 +1,4 @@
+import { WebGLRenderer } from 'three/src/Three.js'
 import SceneDisplay from './SceneDisplay.js'
 import * as displayConstants from './Constants.js'
 
@@ -37,7 +38,7 @@ class WebXRViewerDisplay extends SceneDisplay {
 		this._camera.updateProjectionMatrix()
 		this._scene.add(this._camera)
 
-		this._renderer = new THREE.WebGLRenderer({
+		this._renderer = new WebGLRenderer({
 			canvas: this._glCanvas,
 			context: this._glContext,
 			antialias: false,

@@ -1,3 +1,4 @@
+import { Clock, WebGLRenderer, PCFShadowMap } from 'three/src/Three.js'
 import SceneDisplay from './SceneDisplay.js'
 import * as displayConstants from './Constants.js'
 
@@ -17,17 +18,17 @@ const FlatDisplay = class extends SceneDisplay {
 
 		this._isStarted = false
 
-		this._clock = new THREE.Clock()
+		this._clock = new Clock()
 		this._delta = this._clock.getDelta()
 
-		this._renderer = new THREE.WebGLRenderer({
+		this._renderer = new WebGLRenderer({
 			antialias: true
 		})
 		this._renderer.domElement.setAttribute('class', 'flat-display')
 		this._renderer.setClearColor(displayConstants.defaultBackgroundColor)
 		this._renderer.autoClear = false
 		this._renderer.shadowMap.enabled = true
-		this._renderer.shadowMap.type = THREE.PCFShadowMap
+		this._renderer.shadowMap.type = PCFShadowMap
 	}
 
 	get dom() {

@@ -1,3 +1,4 @@
+import { Vector3, Box3 } from 'three/src/Three.js'
 import Layout from './Layout.js'
 import Evaluators from './Evaluators.js'
 
@@ -58,9 +59,9 @@ class BoxLayout extends Layout {
 
 BoxLayout.prototype.isBoxLayout = true
 
-const _workingVector3_1 = new THREE.Vector3()
-const _workingVector3_2 = new THREE.Vector3()
-const _workingBox3_1 = new THREE.Box3()
+const _workingVector3_1 = new Vector3()
+const _workingVector3_2 = new Vector3()
+const _workingBox3_1 = new Box3()
 
 BoxLayout.HORIZONTAL = Symbol('horizontal')
 BoxLayout.VERTICAL = Symbol('vertical')
