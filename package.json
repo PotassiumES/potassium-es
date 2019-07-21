@@ -73,8 +73,8 @@
     "relative": true
   },
   "dependencies": {
-    "action-input": "git+https@github.com:PotassiumES/action-input.git",
-    "potassium-test": "git+https@github.com:PotassiumES/potassium-test.git",
+    "action-input": "PotassiumES/action-input.git",
+    "potassium-test": "PotassiumES/potassium-test.git",
     "postcss": "^7.0.4",
     "postcss-cli": "^6.0.0",
     "postcss-import": "^12.0.0",
