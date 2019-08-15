@@ -146,7 +146,7 @@ som.text = (text = '', options = {}) => {
 			bevelEnabled: false,
 			material: null,
 			color: 0x444444,
-			fontURL: paths.Static + '/potassium-es/spatial-fonts/public-sans/public-sans-regular.json'
+			fontURL: paths.Static + '/potassium-es/som-fonts/public-sans/public-sans-regular.json'
 		},
 		options
 	)
