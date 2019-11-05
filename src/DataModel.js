@@ -38,6 +38,16 @@ export default class extends DataObject {
 		return this.data[dataField]
 	}
 	/**
+	Return the first value for a data key in the dataFields parameter
+	@return may be native types or, if mapped by options.fieldDataObjects, another DataObject, or null if the dataField does not exist
+	*/
+	getFirst(...dataFields) {
+		for (const dataField of dataFields) {
+			if (typeof this.data[dataField] !== 'undefined') return this.data[dataField]
+		}
+		return null
+	}
+	/**
 	Set a key/value pair
 	*/
 	set(dataField, value) {
