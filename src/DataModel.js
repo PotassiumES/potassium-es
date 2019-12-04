@@ -24,6 +24,9 @@ export default class extends DataObject {
 		super.cleanup()
 		this.data = null
 	}
+	get id() {
+		this.get('id')
+	}
 	has(dataField) {
 		return typeof this.data[dataField] !== 'undefined'
 	}
