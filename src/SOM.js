@@ -34,6 +34,8 @@ import {
 	Vector3
 } from 'three/src/Three.js'
 
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+
 import { MTLLoader } from './three/MTLLoader.js'
 import { OBJLoader } from './three/OBJLoader.js'
 import { GLTFLoader } from './three/GLTFLoader.js'
@@ -256,6 +258,7 @@ som.SUPPORT_CLASSES = [
 	{ class: Vector3, name: 'vector3' },
 	{ class: Geometry, name: 'geometry' },
 	{ class: VideoTexture, name: 'videoTexture' },
+	{ class: OrbitControls, name: 'orbitControls' },
 	{ class: BoxBufferGeometry, name: 'boxBufferGeometry' },
 	{ class: SphereBufferGeometry, name: 'sphereBufferGeometry' },
 	{ class: MeshBasicMaterial, name: 'meshBasicMaterial' },
