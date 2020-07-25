@@ -3,15 +3,7 @@ import Runner from '/node_modules/potassium-test/src/Runner.js'
 import SynchronousFetchMap from '/node_modules/potassium-test/src/SynchronousFetchMap.js'
 import TestResultsRenderer from '/node_modules/potassium-test/src/TestResultsRenderer.js'
 
-import {
-	dom,
-	Router,
-	Component,
-	DataModel,
-	DataObject,
-	DataCollection,
-	RegexTemplates
-} from '/dist/potassium-es.js'
+import { dom, Router, Component, DataModel, DataObject, DataCollection, RegexTemplates } from '/dist/potassium-es.js'
 
 const tests = []
 
@@ -267,7 +259,12 @@ tests.push(
 
 tests.push(
 	new Test('DataCollection sorting', test => {
-		let col1 = new DataCollection([{ id: 4, foo: 'a' }, { id: 1, foo: 'b' }, { id: 2, foo: 'c' }, { id: 3, foo: 'd' }])
+		let col1 = new DataCollection([
+			{ id: 4, foo: 'a' },
+			{ id: 1, foo: 'b' },
+			{ id: 2, foo: 'c' },
+			{ id: 3, foo: 'd' }
+		])
 		col1.sort() // Sorts by id
 		test.assertEqual(col1.at(0).get('id'), 1)
 		test.assertEqual(col1.at(1).get('id'), 2)
@@ -289,7 +286,12 @@ tests.push(
 		test.assertEqual(col1.at(1).get('foo'), 'c')
 		test.assertEqual(col1.at(2).get('foo'), 'd')
 		test.assertEqual(col1.at(3).get('foo'), 'z')
-		col1.reset([{ id: 1, foo: 'b' }, { id: 2, foo: 'c' }, { id: 3, foo: 'd' }, { id: 4, foo: 'a' }])
+		col1.reset([
+			{ id: 1, foo: 'b' },
+			{ id: 2, foo: 'c' },
+			{ id: 3, foo: 'd' },
+			{ id: 4, foo: 'a' }
+		])
 		test.assertEqual(col1.at(0).get('foo'), 'a')
 		test.assertEqual(col1.at(1).get('foo'), 'b')
 		test.assertEqual(col1.at(2).get('foo'), 'c')

@@ -73,13 +73,13 @@
     "relative": true
   },
   "dependencies": {
-    "action-input": "PotassiumES/action-input.git",
-    "potassium-test": "PotassiumES/potassium-test.git",
-    "postcss": "^7.0.4",
-    "postcss-cli": "^6.0.0",
-    "postcss-import": "^12.0.0",
+    "action-input": "github:PotassiumES/action-input",
+    "postcss": "^7.0.32",
+    "postcss-cli": "^7.1.1",
+    "postcss-import": "^12.0.1",
     "postcss-potassium": "1.0.0",
-    "three": "^0.106.2"
+    "potassium-test": "github:PotassiumES/potassium-test",
+    "three": "^0.118.3"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
@@ -88,7 +88,7 @@
     "eslint": "^5.0.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.2",
-    "http-server": "^0.11.1",
+    "http-server": "^0.12.3",
     "husky": "^1.2.0",
     "lint-staged": "^8.1.0",
     "prettier": "^1.13.7",
