@@ -33,7 +33,7 @@ const WebVRDisplay = class extends SceneDisplay {
 		this._renderer.shadowMap.type = PCFShadowMap
 		this._updateSize()
 
-		window.addEventListener('vrdisplaypresentchange', ev => {
+		window.addEventListener('vrdisplaypresentchange', (ev) => {
 			if (this._vrDisplay === null) return
 			this.trigger('vr-display-change', this._vrDisplay.isPresenting)
 			if (this._vrDisplay.isPresenting === false) {
@@ -70,7 +70,7 @@ const WebVRDisplay = class extends SceneDisplay {
 					this._vrDisplay.requestAnimationFrame(this._render)
 					resolve()
 				})
-				.catch(err => {
+				.catch((err) => {
 					this._isStarted = false
 					document.body.removeChild(this._renderer.domElement)
 					console.error('Error starting WebVR', err)

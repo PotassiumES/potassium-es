@@ -250,7 +250,7 @@ const App = class extends EventHandler {
 			.then(() => {
 				this._displayModeTracker.setModes(true, this._portalEngine.hasDisplay, this._immersiveEngine.hasDisplay)
 			})
-			.catch(err => {
+			.catch((err) => {
 				console.error('Error setting engine displays', err)
 			})
 
@@ -424,7 +424,7 @@ const App = class extends EventHandler {
 						this._displayModeTracker.currentDisplayMode = App.PORTAL
 						resolve(App.PORTAL)
 					})
-					.catch(err => {
+					.catch((err) => {
 						this.trigger(App.DisplayModeFailedEvent, App.PORTAL)
 						reject(err)
 					})
@@ -442,7 +442,7 @@ const App = class extends EventHandler {
 						this._displayModeTracker.currentDisplayMode = App.IMMERSIVE
 						resolve(App.IMMERSIVE)
 					})
-					.catch(err => {
+					.catch((err) => {
 						this.trigger(App.DisplayModeFailedEvent, App.IMMERSIVE)
 						reject(err)
 					})
@@ -765,7 +765,7 @@ const _workingQueryArray_2 = new Array(2)
 @param {THREE.Quaternion} orientation
 @return {number[]?} the orientated output translation
 */
-const _calculateTranslation = function(inputTranslation, orientation) {
+const _calculateTranslation = function (inputTranslation, orientation) {
 	// set up the input vector
 	_workingVector3_1.set(...inputTranslation)
 	_workingVector3_1.x *= -1

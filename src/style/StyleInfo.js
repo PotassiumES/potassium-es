@@ -36,7 +36,7 @@ class StyleInfo {
 /**
 A sort comparator that sorts {StyleInfo}s from most to least important/specific/load-order
 */
-const styleInfoComparator = function(info1, info2) {
+const styleInfoComparator = function (info1, info2) {
 	// Important truth is lesser for the sort
 	if (info1.important !== info2.important) {
 		return info1.important === true ? -1 : 1

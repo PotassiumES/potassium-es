@@ -23,26 +23,26 @@ Expands or contracts along the XR plane by:
 - subbtracting bottom from this.min.y
 - subbtracting left from this.min.x
 */
-Box3.prototype.changeXYPlane = function(top, right, bottom, left) {
+Box3.prototype.changeXYPlane = function (top, right, bottom, left) {
 	this.max.y += top
 	this.max.x += right
 	this.min.y -= bottom
 	this.min.x -= left
 }
 
-Box3.prototype.makeZero = function() {
+Box3.prototype.makeZero = function () {
 	this.min.set(0, 0, 0)
 	this.max.set(0, 0, 0)
 	return this
 }
 
-Box3.prototype.centerAtOrigin = function() {
+Box3.prototype.centerAtOrigin = function () {
 	this.getCenter(_workingVector3_1)
 	_workingVector3_1.negate()
 	this.translate(_workingVector3_1)
 }
 
-Box3.prototype.scale = function(vec3) {
+Box3.prototype.scale = function (vec3) {
 	this.min.x *= vec3.x
 	this.min.y *= vec3.y
 	this.min.z *= vec3.z
@@ -56,7 +56,7 @@ Object.defineProperty(Object3D.prototype, 'styles', {
 	Object3D.styles holds the KSS and layout information for an Object3D
 	@type {NodeStyles}
 	*/
-	get: function() {
+	get: function () {
 		if (this._styles === undefined) {
 			this._styles = new NodeStyles(this)
 		}
@@ -68,7 +68,7 @@ Object.defineProperty(Object3D.prototype, 'styles', {
 Set the styles.hierarchyIsDirty when adding or removing a child
 */
 const _oldAdd = Object3D.prototype.add
-Object3D.prototype.add = function(...objects) {
+Object3D.prototype.add = function (...objects) {
 	let shouldSetDirty = false
 	for (let i = 0; i < objects.length; i++) {
 		_oldAdd.call(this, objects[i])
@@ -82,7 +82,7 @@ Object3D.prototype.add = function(...objects) {
 	return this
 }
 const _oldRemove = Object3D.prototype.remove
-Object3D.prototype.remove = function(...objects) {
+Object3D.prototype.remove = function (...objects) {
 	for (let i = 0; i < objects.length; i++) {
 		_oldRemove.call(this, objects[i])
 	}
@@ -94,10 +94,10 @@ Object3D.prototype.remove = function(...objects) {
 Override the Object3D.visible property in order to update styles when it changes
 */
 Object.defineProperty(Object3D.prototype, 'visible', {
-	get: function() {
+	get: function () {
 		return this._visible !== false
 	},
-	set: function(val) {
+	set: function (val) {
 		if (this._visible === val) return
 		this._visible = val
 		if (this.shadowSOM !== true) {
@@ -107,7 +107,7 @@ Object.defineProperty(Object3D.prototype, 'visible', {
 	}
 })
 
-Object3D.prototype.toggleClass = function(on, ...classNames) {
+Object3D.prototype.toggleClass = function (on, ...classNames) {
 	if (on) {
 		return this.addClass(...classNames)
 	} else {
@@ -118,7 +118,7 @@ Object3D.prototype.toggleClass = function(on, ...classNames) {
 /**
 Helper functions to handling classes used by the Stylist
 */
-Object3D.prototype.addClass = function(...classNames) {
+Object3D.prototype.addClass = function (...classNames) {
 	if (this.userData.classes === undefined) {
 		this.userData.classes = [...classNames]
 		this.styles.setSubgraphStylesDirty()
@@ -133,7 +133,7 @@ Object3D.prototype.addClass = function(...classNames) {
 	if (shouldSetDirty) this.styles.setSubgraphStylesDirty()
 	return this
 }
-Object3D.prototype.removeClass = function(...classNames) {
+Object3D.prototype.removeClass = function (...classNames) {
 	if (this.userData.classes === undefined || this.userData.classes.length === 0) return this
 	let shouldSetDirty = false
 	for (let i = 0; i < classNames.length; i++) {
@@ -145,11 +145,11 @@ Object3D.prototype.removeClass = function(...classNames) {
 	if (shouldSetDirty) this.styles.setSubgraphStylesDirty()
 	return this
 }
-Object3D.prototype.hasClass = function(className) {
+Object3D.prototype.hasClass = function (className) {
 	if (this.userData.classes === undefined) return false
 	return this.userData.classes.includes(className)
 }
-Object3D.prototype.getClasses = function() {
+Object3D.prototype.getClasses = function () {
 	if (this.userData.classes === undefined) return []
 	return this.userData.classes
 }
@@ -157,7 +157,7 @@ Object3D.prototype.getClasses = function() {
 /**
 Calls showEdges or hideEdges to toggle the debugging edge boxes
 */
-Object3D.prototype.toggleEdges = function(includingChildren = false) {
+Object3D.prototype.toggleEdges = function (includingChildren = false) {
 	if (this._marginBox) {
 		this.hideEdges(includingChildren)
 	} else {
@@ -169,7 +169,7 @@ Object3D.prototype.toggleEdges = function(includingChildren = false) {
 /**
 If the Object3D has a geometry then show a debugging box around it
 */
-Object3D.prototype.showEdges = function(includingChildren = false) {
+Object3D.prototype.showEdges = function (includingChildren = false) {
 	if (this._marginBox === undefined) {
 		if (_edgeBoxMaterial === null) {
 			_edgeBoxMaterial = new LineBasicMaterial({
@@ -211,7 +211,7 @@ Object3D.prototype.showEdges = function(includingChildren = false) {
 /**
 Remove boxes shown by `Object3D.showEdges`
 */
-Object3D.prototype.hideEdges = function(includingChildren = false) {
+Object3D.prototype.hideEdges = function (includingChildren = false) {
 	if (this._marginBox !== undefined) {
 		this.remove(this._marginBox)
 		this._marginBox = undefined
@@ -226,7 +226,7 @@ Object3D.prototype.hideEdges = function(includingChildren = false) {
 	return this
 }
 
-Object3D.prototype.findRoot = function(node = this) {
+Object3D.prototype.findRoot = function (node = this) {
 	if (node.parent === null) return node
 	return node.findRoot(node.parent)
 }
@@ -235,11 +235,11 @@ Object3D.prototype.findRoot = function(node = this) {
 A handy function for depth first traversal of all children and this node
 @param {function} func a function of the signature function(Object3D)
 */
-Object3D.prototype.traverseDepthFirst = function(func) {
+Object3D.prototype.traverseDepthFirst = function (func) {
 	_traverseDepthFirst(this, func)
 }
 
-const _traverseDepthFirst = function(node, func) {
+const _traverseDepthFirst = function (node, func) {
 	for (let i = 0; i < node.children.length; i++) {
 		_traverseDepthFirst(node.children[i], func)
 	}
@@ -251,10 +251,10 @@ const _traverseDepthFirst = function(node, func) {
 @param {boolean} atMostOne - true if only one result is desired
 @return {Object3D[]} nodes that match the selector
 */
-Object3D.prototype.getObjectsBySelector = function(selector, atMostOne = false) {
+Object3D.prototype.getObjectsBySelector = function (selector, atMostOne = false) {
 	const selectorFragmentList = SelectorFragmentList.Parse(selector)
 	const results = []
-	this.traverse(node => {
+	this.traverse((node) => {
 		if (node === this) return
 		if (node.shadowSOM !== true && selectorFragmentList.matches(node)) {
 			results.push(node)
@@ -268,7 +268,7 @@ Object3D.prototype.getObjectsBySelector = function(selector, atMostOne = false) 
 @param {string} selector - like 'node[name=ModeSwitcherComponent] .button-component > text'
 @return {Object3D?} the first node to match the selector or null if none were found
 */
-Object3D.prototype.querySelector = function(selector) {
+Object3D.prototype.querySelector = function (selector) {
 	const results = this.getObjectsBySelector(selector, true)
 	if (results.length > 0) return results[0]
 	return null
@@ -278,7 +278,7 @@ Object3D.prototype.querySelector = function(selector) {
 @param {Object3D} node
 @return {Object3D[]} returns an array of the ancesters of `node`, starting at the root and ending with the `node`
 */
-Object3D.prototype.getAncestry = function(node = this) {
+Object3D.prototype.getAncestry = function (node = this) {
 	const lineage = []
 	let workingNode = node
 	while (workingNode) {
@@ -296,11 +296,11 @@ Logs the ancestry of `node` starting with the root and ending with the `node`
 @param {boolean} [localsOnly=false]
 
 */
-Object3D.prototype.logAncestry = function(node = this, showVars = false, localsOnly = false) {
-	node.getAncestry().forEach(obj => {
+Object3D.prototype.logAncestry = function (node = this, showVars = false, localsOnly = false) {
+	node.getAncestry().forEach((obj) => {
 		obj
 			._getStyleTreeLines(undefined, undefined, undefined, showVars, localsOnly, false)
-			.forEach(line => console.log(line))
+			.forEach((line) => console.log(line))
 	})
 }
 
@@ -311,8 +311,8 @@ logs to the console the computed styles for a node and its descendents
 @param {bool} [showVars=false] if true, log the CSS variables of the form `--name`
 @param {bool} [localsOnly=false] if true, show the local instead of the computed styles
 */
-Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
-	this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).forEach(line => console.log(line))
+Object3D.prototype.logStyles = function (node = this, tabDepth = 0, showVars = false, localsOnly = false) {
+	this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).forEach((line) => console.log(line))
 }
 
 /**
@@ -322,7 +322,7 @@ Object3D.prototype.logStyles = function(node = this, tabDepth = 0, showVars = fa
 @param {bool} [localsOnly=false] if true, show the local instead of the computed styles
 @return {string} a string describing the computed styles for a node and its descendents
 */
-Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, showVars = false, localsOnly = false) {
+Object3D.prototype.getStyleTree = function (node = this, tabDepth = 0, showVars = false, localsOnly = false) {
 	return this._getStyleTreeLines(node, [], tabDepth, showVars, localsOnly).join('\n')
 }
 
@@ -336,7 +336,7 @@ Object3D.prototype.getStyleTree = function(node = this, tabDepth = 0, showVars =
 
 @return {string} a string describing the computed styles for a node and its descendents
 */
-Object3D.prototype._getStyleTreeLines = function(
+Object3D.prototype._getStyleTreeLines = function (
 	node = this,
 	results = [],
 	tabDepth = 0,
@@ -352,7 +352,7 @@ Object3D.prototype._getStyleTreeLines = function(
 			(node.type ? `[type=${node.type}] ` : ': ') +
 			node
 				.getClasses()
-				.map(clazz => `.${clazz}`)
+				.map((clazz) => `.${clazz}`)
 				.join('') +
 			(node.hierarchyIsDirty ? '\tdirty' : '')
 	)
@@ -377,7 +377,7 @@ Object3D.prototype._getStyleTreeLines = function(
 	return results
 }
 
-const _generateTabs = function(depth) {
+const _generateTabs = function (depth) {
 	if (depth === 0) return ''
 	const result = []
 	result[depth - 1] = null
@@ -391,7 +391,7 @@ Object.defineProperty(Object3D.prototype, 'attributes', {
 	/**
 	@type {Attributes}
 	*/
-	get: function() {
+	get: function () {
 		if (typeof this._attributes === 'undefined') this._attributes = new Attributes(this)
 		return this._attributes
 	}
@@ -400,7 +400,7 @@ Object.defineProperty(Object3D.prototype, 'attributes', {
 /**
 Logs to the console info about this node
 */
-Object3D.prototype.prettyPrint = function(depth = 0) {
+Object3D.prototype.prettyPrint = function (depth = 0) {
 	let tabs = ''
 	for (let i = 0; i < depth; i++) {
 		tabs += '  '
@@ -419,7 +419,7 @@ Object3D.prototype.prettyPrint = function(depth = 0) {
 Looks in this node and up the ancestors until it finds a {Component} attribute
 @return {Component|null}
 */
-Object3D.prototype.getComponent = function() {
+Object3D.prototype.getComponent = function () {
 	let obj = this
 	while (true) {
 		if (obj.component) return obj.component
@@ -429,13 +429,13 @@ Object3D.prototype.getComponent = function() {
 }
 
 /** A convenience function to allow chaining like `let group = som.group().appendTo(scene)` */
-Object3D.prototype.appendTo = function(parent) {
+Object3D.prototype.appendTo = function (parent) {
 	parent.add(this)
 	return this
 }
 
 /** A convenience function to allow appending dictionaries of attributes, arrays of subchildren, or children */
-Object3D.prototype.append = function(child = null) {
+Object3D.prototype.append = function (child = null) {
 	if (child === null) {
 		return
 	}

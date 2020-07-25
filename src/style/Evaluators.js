@@ -124,7 +124,7 @@ Singleton.add(
 	new Evaluator('rgb color', /rgb\((?:([\.0-9])+,[\s]?){2}(([\.0-9]+){1})\)/gi, (value, node) => {
 		const result = _parseNumberArray(value.substring(4, value.length - 1))
 		if (typeof result === 'undefined') return undefined
-		return result.map(val => val / 255.0)
+		return result.map((val) => val / 255.0)
 	})
 )
 
@@ -143,8 +143,8 @@ Singleton.add(
 			_parseHexNumber(value.substring(3, 5)),
 			_parseHexNumber(value.substring(5, 7))
 		]
-		if (result.some(num => Number.isNaN(num))) return undefined
-		return result.map(val => val / 255.0)
+		if (result.some((num) => Number.isNaN(num))) return undefined
+		return result.map((val) => val / 255.0)
 	})
 )
 
@@ -155,8 +155,8 @@ Singleton.add(
 			_parseHexNumber(value.substring(2, 3)),
 			_parseHexNumber(value.substring(3, 4))
 		]
-		if (result.some(num => Number.isNaN(num))) return undefined
-		return result.map(val => val / 255.0)
+		if (result.some((num) => Number.isNaN(num))) return undefined
+		return result.map((val) => val / 255.0)
 	})
 )
 
@@ -164,7 +164,7 @@ const DistanceVectorRegex = /(\+?\-?[\d\.]+(?:cm|m)?)/gi
 Singleton.add(
 	new Evaluator('explicit distance vector', DistanceVectorRegex, (value, node) => {
 		const splitValues = value.match(DistanceVectorRegex)
-		const parsedValues = splitValues.map(val => {
+		const parsedValues = splitValues.map((val) => {
 			let multiplier = 1
 			if (val.endsWith('cm')) {
 				multiplier = 0.01
@@ -173,7 +173,7 @@ Singleton.add(
 			}
 			return _parseDistance(val, multiplier)
 		})
-		if (parsedValues.some(pv => Number.isNaN(pv))) return undefined
+		if (parsedValues.some((pv) => Number.isNaN(pv))) return undefined
 		return parsedValues
 	})
 )
@@ -181,11 +181,11 @@ Singleton.add(
 export default Singleton
 export { Evaluators, Evaluator, Singleton, RegexTemplates }
 
-const _parseHexNumber = function(strVal) {
+const _parseHexNumber = function (strVal) {
 	return parseInt(strVal, 16)
 }
 
-const _parseDistance = function(value, multiplier = 1) {
+const _parseDistance = function (value, multiplier = 1) {
 	const numberVal = Number.parseFloat(value)
 	if (Number.isNaN(numberVal)) return undefined
 	return numberVal * multiplier
@@ -194,13 +194,13 @@ const _parseDistance = function(value, multiplier = 1) {
 /**
 parses string like '1, 3, 4.5'
 */
-const _parseNumberArray = function(value) {
+const _parseNumberArray = function (value) {
 	const parsedVal = value
 		.split(',')
-		.filter(token => token.trim().length > 0)
-		.map(token => {
+		.filter((token) => token.trim().length > 0)
+		.map((token) => {
 			return Number.parseFloat(token.trim())
 		})
-	if (parsedVal.some(val => Number.isNaN(val))) return undefined
+	if (parsedVal.some((val) => Number.isNaN(val))) return undefined
 	return parsedVal
 }

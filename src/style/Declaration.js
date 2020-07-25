@@ -7,7 +7,7 @@ class DeclarationList {
 	}
 }
 
-DeclarationList.prototype[Symbol.iterator] = function*() {
+DeclarationList.prototype[Symbol.iterator] = function* () {
 	for (const declaration of this._declarations) yield declaration
 }
 

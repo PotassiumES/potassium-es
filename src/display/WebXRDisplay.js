@@ -79,7 +79,7 @@ const WebXRDisplay = class extends SceneDisplay {
 
 			this._xrDevice
 				.requestSession(sessionInitParamers)
-				.then(session => {
+				.then((session) => {
 					this._session = session
 					// Set the session's base layer into which the app will render
 					this._session.baseLayer = new XRWebGLLayer(this._session, this._glContext)
@@ -90,19 +90,19 @@ const WebXRDisplay = class extends SceneDisplay {
 
 					this._session
 						.requestFrameOfReference('eye-level')
-						.then(frameOfReference => {
+						.then((frameOfReference) => {
 							this._eyeLevelFrameOfReference = frameOfReference
 							this._session.requestAnimationFrame(this._render)
 							this._bodyBackgroundColor = document.body.style['background-color']
 							document.body.style['background-color'] = 'inherit'
 							resolve(this._displayMode)
 						})
-						.catch(err => {
+						.catch((err) => {
 							document.body.style['background-color'] = this._bodyBackgroundColor
 							reject(err)
 						})
 				})
-				.catch(err => {
+				.catch((err) => {
 					reject(err)
 				})
 		})

@@ -37,8 +37,8 @@ class SelectorFragmentList {
 
 	get raw() {
 		return Array.from(this)
-			.filter(frag => frag.type !== Combinator.DESCENDANT)
-			.map(frag => frag.raw)
+			.filter((frag) => frag.type !== Combinator.DESCENDANT)
+			.map((frag) => frag.raw)
 			.join(' ')
 	}
 
@@ -106,7 +106,7 @@ class SelectorFragmentList {
 					if (previouslyMatchedNode.parent === null) return false
 					// Refuse if there are no siblings
 					if (previouslyMatchedNode.parent.children.length === 1) return false
-					const siblings = previouslyMatchedNode.parent.children.filter(child => child !== node)
+					const siblings = previouslyMatchedNode.parent.children.filter((child) => child !== node)
 					for (let i = 0; i < siblings.length; i++) {
 						if (this.matches(siblings[i], fragmentIndex + 1)) {
 							return true
@@ -138,7 +138,7 @@ class SelectorFragmentList {
 	@return {SelectorFragmentList}
 	*/
 	static Parse(rawSelector) {
-		const rawFragments = _splitSelectors(rawSelector).filter(rf => rf.trim().length > 0)
+		const rawFragments = _splitSelectors(rawSelector).filter((rf) => rf.trim().length > 0)
 		const results = []
 		let previousWasElement = false
 		for (const rf of rawFragments) {
@@ -172,17 +172,17 @@ class SelectorFragmentList {
 		for (const fragment of this._reverseFragments) {
 			if (fragment instanceof Combinator) continue
 			// IDs
-			hundredCount += fragment._elements.filter(element => element.type === SelectorElement.ID_ELEMENT).length
+			hundredCount += fragment._elements.filter((element) => element.type === SelectorElement.ID_ELEMENT).length
 			// Classes
-			tenCount += fragment._elements.filter(element => element.type === SelectorElement.CLASS_ELEMENT).length
+			tenCount += fragment._elements.filter((element) => element.type === SelectorElement.CLASS_ELEMENT).length
 			// Attributes
 			tenCount += fragment._attributes.length
 			// Pseudo-classes
-			tenCount += fragment._pseudos.filter(pseudo => pseudo.type === SelectorElement.PSEUDO_CLASS).length
+			tenCount += fragment._pseudos.filter((pseudo) => pseudo.type === SelectorElement.PSEUDO_CLASS).length
 			// Elements
-			oneCount += fragment._elements.filter(element => element.type === SelectorElement.TAG_ELEMENT).length
+			oneCount += fragment._elements.filter((element) => element.type === SelectorElement.TAG_ELEMENT).length
 			// Pseudo-elements
-			oneCount += fragment._pseudos.filter(pseudo => pseudo.type === SelectorElement.PSEUDO_ELEMENT).length
+			oneCount += fragment._pseudos.filter((pseudo) => pseudo.type === SelectorElement.PSEUDO_ELEMENT).length
 		}
 		return 100 * hundredCount + 10 * tenCount + oneCount
 	}
@@ -232,7 +232,7 @@ class SelectorElement extends SelectorFragment {
 	matches(node) {
 		// Refuse if any element does not match
 		if (
-			this._elements.some(element => {
+			this._elements.some((element) => {
 				return this._elementMatches(element, node) === false
 			})
 		)
@@ -240,7 +240,7 @@ class SelectorElement extends SelectorFragment {
 
 		// Refuse if any attribute does not match
 		if (
-			this._attributes.some(attribute => {
+			this._attributes.some((attribute) => {
 				return this._attributeMatches(attribute, node) === false
 			})
 		)
@@ -248,7 +248,7 @@ class SelectorElement extends SelectorFragment {
 
 		// Refuse if any pseudo does not match
 		if (
-			this._pseudos.some(pseudo => {
+			this._pseudos.some((pseudo) => {
 				return this._pseudoMatches(pseudo, node) === false
 			})
 		)
@@ -329,8 +329,8 @@ class SelectorElement extends SelectorFragment {
 		if (!rawElements) return []
 		return rawElements
 			.match(/(\.|#)?([\w-]*|\*)/g)
-			.filter(element => element.trim().length > 0)
-			.map(element => {
+			.filter((element) => element.trim().length > 0)
+			.map((element) => {
 				if (element.startsWith('.')) {
 					return {
 						type: SelectorElement.CLASS_ELEMENT,
@@ -357,7 +357,7 @@ class SelectorElement extends SelectorFragment {
 
 	_parseAttributes(rawAttributes) {
 		if (!rawAttributes) return []
-		return rawAttributes.match(/\[[^\]]+\]/g).map(ra => {
+		return rawAttributes.match(/\[[^\]]+\]/g).map((ra) => {
 			ra = ra.slice(1, ra.length - 1) // remove brackets
 			const key = ra.match(/[^=~+|*$\^]*/)[0] || ''
 			const operator = ra.match(/[=~+|*$\^]+/)[0] || ''
@@ -387,7 +387,7 @@ class SelectorElement extends SelectorFragment {
 	*/
 	_parsePseudos(rawPseudos) {
 		if (!rawPseudos) return []
-		return rawPseudos.match(/:{1,2}[^:]+/g).map(pseudo => {
+		return rawPseudos.match(/:{1,2}[^:]+/g).map((pseudo) => {
 			if (pseudo.startsWith('::')) {
 				return {
 					type: SelectorElement.PSEUDO_ELEMENT,
@@ -486,7 +486,7 @@ function _intercaseTag(tag) {
 
 function _createCheckFunction(tag) {
 	const attribute = `is${_intercaseTag(tag)}`
-	return function(node) {
+	return function (node) {
 		return node[attribute] === true
 	}
 }
@@ -526,7 +526,7 @@ for (const tag of SpatialTags) {
 }
 
 SelectorElement.PSEUDO_CHECK_FUNCTIONS = new Map()
-SelectorElement.PSEUDO_CHECK_FUNCTIONS.set('root', node => {
+SelectorElement.PSEUDO_CHECK_FUNCTIONS.set('root', (node) => {
 	return node.parent === null
 })
 
@@ -539,7 +539,7 @@ class Combinator extends SelectorFragment {
 	constructor(rawFragment) {
 		super()
 		this._raw = rawFragment
-		this._type = Combinator.TYPES.find(t => this._raw === t) || Combinator.DESCENDANT
+		this._type = Combinator.TYPES.find((t) => this._raw === t) || Combinator.DESCENDANT
 	}
 
 	get raw() {
@@ -561,7 +561,7 @@ Combinator.TYPES = [Combinator.DESCENDANT, Combinator.CHILD, Combinator.ADJACENT
 @param {string} rawSelector like 'div.class:first > p[name~=flowers][selected] + text'
 @return {Array<string>} an array of separate fragments like ['div.class:first', '>', 'p[name~=flowers i][selected]', '+', 'text']
 */
-const _splitSelectors = function(rawSelector) {
+const _splitSelectors = function (rawSelector) {
 	const results = []
 	let current = []
 	let startQuote = null

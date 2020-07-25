@@ -61,7 +61,7 @@ const objLoader = new OBJLoader()
 
 const _textureLoader = new TextureLoader()
 
-som.textureLoader = function() {
+som.textureLoader = function () {
 	return _textureLoader
 }
 
@@ -69,7 +69,7 @@ som.textureLoader = function() {
 The behind the scene function that generates an enhanced Object3D when you call som.foo(...)
 if the first elements in `params` is an array, the values of the array will be passed as separate parameters into the constructor of the instance
 */
-som.nodeFunction = function(clazz, ...params) {
+som.nodeFunction = function (clazz, ...params) {
 	let instance = null
 	let consumedFirstParam = false
 	if (Array.isArray(params[0])) {
@@ -107,7 +107,7 @@ function loadText(resultGroup, text, fontURL, options) {
 		resultGroup.styles.geometryIsDirty = true
 		resultGroup.styles.setAncestorsLayoutDirty()
 	} else {
-		assetLoader.get(fontURL).then(blob => {
+		assetLoader.get(fontURL).then((blob) => {
 			if (!blob) {
 				console.error('Failed to fetch the font', fontURL)
 				return
@@ -115,7 +115,7 @@ function loadText(resultGroup, text, fontURL, options) {
 			const blobURL = URL.createObjectURL(blob)
 			fontLoader.load(
 				blobURL,
-				loadedFont => {
+				(loadedFont) => {
 					som.fonts.set(fontURL, loadedFont)
 					const shapes = loadedFont.generateShapes(text, options.size)
 					if (resultGroup.geometry) resultGroup.geometry.dispose()
@@ -125,7 +125,7 @@ function loadText(resultGroup, text, fontURL, options) {
 					URL.revokeObjectURL(blobURL)
 				},
 				() => {},
-				err => {
+				(err) => {
 					console.error('Could not load font', fontURL, err)
 					URL.revokeObjectURL(blobURL)
 				}
@@ -170,7 +170,7 @@ som.text = (text = '', options = {}) => {
 	resultGroup.addClass('text')
 	resultGroup.isText = true
 
-	resultGroup.setFontOptions = newOptions => {
+	resultGroup.setFontOptions = (newOptions) => {
 		Object.assign(fontOptions, newOptions)
 		resultGroup.setText(currentText, true)
 	}
@@ -216,7 +216,7 @@ Load an OBJ file
 som.obj = (objPath, successCallback = null, failureCallback = null) => {
 	const group = som.group()
 	loadObj(objPath)
-		.then(obj => {
+		.then((obj) => {
 			group.add(obj)
 			if (successCallback !== null) successCallback(group, obj)
 		})
@@ -234,7 +234,7 @@ som.gltf = (gltfPath, successCallback = null, failureCallback = null) => {
 	const group = som.group()
 	group.name = 'GLTF Wrapper'
 	loadGLTF(gltfPath)
-		.then(gltf => {
+		.then((gltf) => {
 			group.add(gltf.scene)
 			if (successCallback !== null) successCallback(group, gltf)
 		})
@@ -265,7 +265,7 @@ som.SUPPORT_CLASSES = [
 ]
 for (const classInfo of som.SUPPORT_CLASSES) {
 	const innerClazz = classInfo.class
-	som[classInfo.name] = function(...params) {
+	som[classInfo.name] = function (...params) {
 		return new innerClazz(...params)
 	}
 }
@@ -286,7 +286,7 @@ som.GRAPH_CLASSES = [
 // This loop generates the element generating functions like som.group(...)
 for (const somClassInfo of som.GRAPH_CLASSES) {
 	const innerClazz = somClassInfo.class
-	som[somClassInfo.name] = function(...params) {
+	som[somClassInfo.name] = function (...params) {
 		return som.nodeFunction(innerClazz, ...params)
 	}
 }
@@ -299,7 +299,7 @@ function loadGLTF(gltfPath) {
 		const loader = new GLTFLoader().setPath(baseURL)
 		loader.load(
 			fileName,
-			gltf => {
+			(gltf) => {
 				gltf.scene.name = 'GLTF'
 				resolve(gltf)
 			},
@@ -319,13 +319,13 @@ function loadObj(objPath) {
 	const mtlPath = baseURL + mtlName
 
 	return new Promise((resolve, reject) => {
-		assetLoader.get(mtlPath).then(mtlBlob => {
+		assetLoader.get(mtlPath).then((mtlBlob) => {
 			if (mtlBlob === null) {
 				reject(`Could not load ${mtlPath}`)
 				return
 			}
 
-			assetLoader.get(objPath).then(objBlob => {
+			assetLoader.get(objPath).then((objBlob) => {
 				if (objBlob === null) {
 					reject(`Could not load ${objPath}`)
 					return
@@ -337,12 +337,12 @@ function loadObj(objPath) {
 				mtlLoader.setTexturePath(baseURL)
 				mtlLoader.load(
 					mtlURL,
-					materials => {
+					(materials) => {
 						materials.preload()
 						objLoader.setMaterials(materials)
 						objLoader.load(
 							objURL,
-							obj => {
+							(obj) => {
 								URL.revokeObjectURL(objURL)
 								obj.name = 'OBJ'
 								resolve(obj)

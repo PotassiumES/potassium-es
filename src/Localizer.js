@@ -124,8 +124,8 @@ const Localizer = class extends EventHandler {
 					month: 'numeric',
 					day: 'numeric'
 				})
-				.filter(part => part.type !== 'literal')
-				.map(part => part.type)
+				.filter((part) => part.type !== 'literal')
+				.map((part) => part.type)
 			return DateFieldOrder
 		}
 
@@ -137,7 +137,7 @@ const Localizer = class extends EventHandler {
 				year: 'numeric'
 			})
 			.split(/[\/ \.]/)
-			.filter(token => token.trim().length > 0)
+			.filter((token) => token.trim().length > 0)
 		let monthIndex = 0
 		let yearIndex = 0
 		for (let i = 1; i < 3; i++) {

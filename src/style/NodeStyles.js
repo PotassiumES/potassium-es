@@ -117,7 +117,7 @@ class NodeStyles {
 	}
 
 	setSubgraphStylesDirty() {
-		this.node.traverse(node => {
+		this.node.traverse((node) => {
 			node.styles.stylesAreDirty = true
 		})
 	}
@@ -169,7 +169,7 @@ class NodeStyles {
 		this.borderBounds.getSize(_workingVector3_2)
 
 		// Update the border
-		if (borderWidth !== null && borderWidth.some(w => w > 0)) {
+		if (borderWidth !== null && borderWidth.some((w) => w > 0)) {
 			if (this.borderLine === null) {
 				this.borderLine = new BorderLine(borderWidth, _workingVector3_1.x, _workingVector3_1.y, borderRadius)
 				this.node.add(this.borderLine)

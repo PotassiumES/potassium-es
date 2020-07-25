@@ -123,7 +123,7 @@ class Grid {
 	}
 
 	updateTemplate(directions) {
-		if (directions.length === 0 || directions.some(direction => direction.length === 0)) {
+		if (directions.length === 0 || directions.some((direction) => direction.length === 0)) {
 			console.error('Could not use grid-template', directions)
 			return
 		}
@@ -141,7 +141,7 @@ class Grid {
 	Sets the positions for this._node.children using assigned cell sizes and then autoflow sizes
 	*/
 	apply() {
-		const childrenToLayout = this._node.children.filter(child => {
+		const childrenToLayout = this._node.children.filter((child) => {
 			return (
 				child.shadowSOM !== true && child.visible && child.styles.computedStyles.getString('position') !== 'absolute'
 			)
@@ -243,7 +243,7 @@ Grid.Column = Symbol('grid-column')
 
 const _workingVector3_1 = new Vector3()
 
-const _parseGridTemplate = function(rawValue, node) {
+const _parseGridTemplate = function (rawValue, node) {
 	const evaledTemplate = Evaluators.parse(rawValue, node)
 	if (evaledTemplate === null || evaledTemplate.length !== 2) {
 		console.error('Error parsing grid template', rawValue, evaledTemplate)

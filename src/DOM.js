@@ -8,18 +8,18 @@ export default dom
 domElementFunction is the behind the scenes logic for the functions like dom.div(...)
 Below you will find the loop that uses domElementFunction
 */
-dom.domElementFunction = function(tagName, ...params) {
+dom.domElementFunction = function (tagName, ...params) {
 	// Create a boring DOM element
 	const element = document.createElement(tagName)
 
 	// A convenience function to allow chaining like `let fooDiv = dom.div().appendTo(document.body)`
-	element.appendTo = function(parent) {
+	element.appendTo = function (parent) {
 		parent.appendChild(this)
 		return this
 	}
 
 	// if element.parentElement exists, call removeChild(element) on it
-	element.remove = function() {
+	element.remove = function () {
 		if (this.parentElement) {
 			this.parentElement.removeChild(this)
 		}
@@ -27,7 +27,7 @@ dom.domElementFunction = function(tagName, ...params) {
 	}
 
 	// A convenience function to allow appending strings, dictionaries of attributes, arrays of subchildren, or children
-	element.append = function(child = null) {
+	element.append = function (child = null) {
 		if (child === null) {
 			return
 		}
@@ -51,7 +51,7 @@ dom.domElementFunction = function(tagName, ...params) {
 		return this
 	}
 
-	element.documentPosition = function() {
+	element.documentPosition = function () {
 		return dom.documentOffset(this)
 	}
 
@@ -59,7 +59,7 @@ dom.domElementFunction = function(tagName, ...params) {
 	Sort element.children *in place* using the comparator function
 	See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort for an explanation of the comparator function
 	*/
-	element.sort = function(comparator = dom.defaultComparator) {
+	element.sort = function (comparator = dom.defaultComparator) {
 		// Populate the holding array while removing children from the DOM
 		const holdingArray = []
 		while (this.children.length > 0) {
@@ -73,7 +73,7 @@ dom.domElementFunction = function(tagName, ...params) {
 	}
 
 	// Sort element.children *in place* using child[attributeName] and the comparator function
-	element.sortByAttribute = function(attributeName, comparator = dom.defaultComparator) {
+	element.sortByAttribute = function (attributeName, comparator = dom.defaultComparator) {
 		this.sort((el1, el2) => {
 			return comparator(el1.getAttribute(attributeName), el2.getAttribute(attributeName))
 		})
@@ -81,7 +81,7 @@ dom.domElementFunction = function(tagName, ...params) {
 	}
 
 	// Convenience functions to add and remove classes from this element without duplication
-	element.addClass = function(...classNames) {
+	element.addClass = function (...classNames) {
 		const classAttribute = this.getAttribute('class') || ''
 		const classes = classAttribute === '' ? [] : classAttribute.split(/\s+/)
 		for (const className of classNames) {
@@ -92,7 +92,7 @@ dom.domElementFunction = function(tagName, ...params) {
 		this.setAttribute('class', classes.join(' '))
 		return this
 	}
-	element.removeClass = function(...classNames) {
+	element.removeClass = function (...classNames) {
 		const classAttribute = this.getAttribute('class') || ''
 		const classes = classAttribute === '' ? [] : classAttribute.split(/\s+/)
 		for (const className of classNames) {
@@ -117,7 +117,7 @@ dom.domElementFunction = function(tagName, ...params) {
 }
 
 // This comparator stringifies the passed values and returns the comparison of those values
-dom.defaultComparator = function(el1, el2) {
+dom.defaultComparator = function (el1, el2) {
 	if (el1 === el2) return 0
 	const str1 = '' + el1
 	const str2 = '' + el2
@@ -127,10 +127,10 @@ dom.defaultComparator = function(el1, el2) {
 }
 
 // Traverse the document tree to calculate the offset in the entire document of this element
-dom.documentOffset = function(element) {
+dom.documentOffset = function (element) {
 	let left = 0
 	let top = 0
-	const findPos = function(obj) {
+	const findPos = function (obj) {
 		left += obj.offsetLeft
 		top += obj.offsetTop
 		if (obj.offsetParent) {
@@ -258,24 +258,24 @@ dom.TAGS = [
 // This loop generates the element generating functions like dom.div(...)
 for (const tag of dom.TAGS) {
 	const innerTag = tag
-	dom[innerTag] = function(...params) {
+	dom[innerTag] = function (...params) {
 		return dom.domElementFunction(innerTag, ...params)
 	}
 }
 
 const CookieValueRegularExpressionParts = ['(?:(?:^|.*;\\s*)', '\\s*\\=\\s*([^;]*).*$)|^.*$']
 
-dom.getCookie = function(cookieName) {
+dom.getCookie = function (cookieName) {
 	const cookieRegExp = new RegExp(
 		`${CookieValueRegularExpressionParts[0]}${encodeURIComponent(cookieName)}${CookieValueRegularExpressionParts[1]}`
 	)
 	return document.cookie.replace(cookieRegExp, '$1')
 }
 
-dom.setCookie = function(cookieName, value) {
+dom.setCookie = function (cookieName, value) {
 	document.cookie = `${encodeURIComponent(cookieName)}=${encodeURIComponent(value)}`
 }
 
-dom.removeCookie = function(cookieName) {
+dom.removeCookie = function (cookieName) {
 	document.cookie = `${encodeURIComponent(cookieName)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT`
 }

@@ -47,18 +47,18 @@ const DataCollection = class extends DataObject {
 	create(data, options = {}) {
 		// Creates an child instance and POSTs it to the collection
 		return new Promise(
-			function(resolve, reject) {
+			function (resolve, reject) {
 				const fetchOptions = Object.assign(options, this.fetchOptions)
 				fetchOptions.method = 'post'
 				fetchOptions.body = JSON.stringify(data)
 				this._innerFetch(this.url, fetchOptions)
-					.then(response => {
+					.then((response) => {
 						if (response.status != 200) {
 							throw 'Create failed with status ' + response.status
 						}
 						return response.json()
 					})
-					.then(data => {
+					.then((data) => {
 						const dataObject = this.generateDataObject(data)
 						this.add(dataObject)
 						resolve(dataObject)
@@ -189,7 +189,7 @@ const DataCollection = class extends DataObject {
 	}
 }
 
-DataCollection.defaultComparator = function(dataObject1, dataObject2) {
+DataCollection.defaultComparator = function (dataObject1, dataObject2) {
 	if (dataObject1 === dataObject2) return 0
 	if (typeof dataObject1.equals === 'function' && dataObject1.equals(dataObject2)) return 0
 	if (typeof dataObject1.get === 'function' && typeof dataObject2.get === 'function') {

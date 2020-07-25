@@ -187,7 +187,7 @@ const Engine = class extends EventHandler {
 		if (immersiveEngine.hasDisplay === false && typeof navigator.getVRDisplays === 'function') {
 			let displays = await navigator.getVRDisplays()
 			// If there is a WebVR device
-			displays = displays.filter(display => display.capabilities.canPresent)
+			displays = displays.filter((display) => display.capabilities.canPresent)
 			if (displays.length > 0) {
 				// set immersive engine display to use WebVR
 				immersiveEngine.sceneDisplay = new WebVRDisplay(

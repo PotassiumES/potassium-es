@@ -34,44 +34,44 @@ BorderGeometry.prototype.constructor = BorderGeometry
 BorderGeometry.CurveDivisions = 15
 
 Object.defineProperty(BorderGeometry.prototype, 'lineWidth', {
-	get: function() {
+	get: function () {
 		return this._lineWidth
 	},
-	set: function(val) {
+	set: function (val) {
 		this.setParams(val, this._width, this._height, this._radius)
 	}
 })
 
 Object.defineProperty(BorderGeometry.prototype, 'width', {
-	get: function() {
+	get: function () {
 		return this._width
 	},
-	set: function(val) {
+	set: function (val) {
 		if (val < 0) return
 		this.setParams(this._lineWidth, val, this._height, this._radius)
 	}
 })
 
 Object.defineProperty(BorderGeometry.prototype, 'height', {
-	get: function() {
+	get: function () {
 		return this._height
 	},
-	set: function(val) {
+	set: function (val) {
 		if (val < 0) return
 		this.setParams(this._lineWidth, this._width, val, this._radius)
 	}
 })
 
 Object.defineProperty(BorderGeometry.prototype, 'radius', {
-	get: function() {
+	get: function () {
 		return this._radius
 	},
-	set: function(val) {
+	set: function (val) {
 		this.setParams(this._lineWidth, this._width, this._height, val)
 	}
 })
 
-BorderGeometry.prototype.setContentSize = function(width, height) {
+BorderGeometry.prototype.setContentSize = function (width, height) {
 	this.setParams(this._lineWidth, width, height, this._radius)
 }
 
@@ -84,7 +84,7 @@ function numArrayEqual(a1, a2) {
 	return true
 }
 
-BorderGeometry.prototype.setParams = function(lineWidth, width, height, radius) {
+BorderGeometry.prototype.setParams = function (lineWidth, width, height, radius) {
 	if (
 		numArrayEqual(this._lineWidth, lineWidth) === true &&
 		this._width === width &&
@@ -92,17 +92,17 @@ BorderGeometry.prototype.setParams = function(lineWidth, width, height, radius) 
 		numArrayEqual(this._radius, radius)
 	)
 		return
-	this._lineWidth = lineWidth.map(w => Math.max(0, w))
+	this._lineWidth = lineWidth.map((w) => Math.max(0, w))
 	this._width = Math.max(0, width)
 	this._height = Math.max(0, height)
-	this._radius = radius.map(r => Math.max(0, r))
+	this._radius = radius.map((r) => Math.max(0, r))
 	this._updatePoints()
 }
 
-BorderGeometry.prototype._updatePoints = function() {
+BorderGeometry.prototype._updatePoints = function () {
 	this.clearGroups()
 	this.removeAttribute('position')
-	if (this._lineWidth.some(w => w > 0) === false) return
+	if (this._lineWidth.some((w) => w > 0) === false) return
 
 	const width = Math.max(this._width, 0.0001)
 	const height = Math.max(this._height, 0.0001)

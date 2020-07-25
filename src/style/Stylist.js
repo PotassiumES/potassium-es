@@ -93,7 +93,7 @@ const Stylist = class extends EventHandler {
 	Traverse the graph and update each Object3D.styles.localStyles using the KSS stylesheets
 	*/
 	_updateLocalStyles(scene) {
-		scene.traverse(node => {
+		scene.traverse((node) => {
 			if (node.shadowSOM === true) return
 			if (typeof node.styles === 'undefined') {
 				console.log('undefined styles', node)
@@ -115,7 +115,7 @@ const Stylist = class extends EventHandler {
 	Uses assigned, local, and cascade-inherited declarations set during _updateLocalStyles
 	*/
 	_updateComputedStyles(scene) {
-		scene.traverse(node => {
+		scene.traverse((node) => {
 			if (node.shadowSOM === true) return
 			if (node.styles.needsStyleRefresh === false) return
 			this._updateCount += 1
@@ -131,7 +131,7 @@ const Stylist = class extends EventHandler {
 	Traverse the graph and apply each node's computed styles
 	*/
 	_applyStyles(scene, renderer) {
-		scene.traverse(node => {
+		scene.traverse((node) => {
 			if (node.shadowSOM === true) return
 			if (node.styles.needsStyleRefresh === false) return
 			this._updateCount += 1
@@ -160,7 +160,7 @@ const Stylist = class extends EventHandler {
 	Lay out the graph
 	*/
 	_layout(scene) {
-		scene.traverseDepthFirst(node => {
+		scene.traverseDepthFirst((node) => {
 			if (node.shadowSOM === true) return
 			if (node.styles.isInAnyWayDirty === false) return
 			this._updateCount += 1

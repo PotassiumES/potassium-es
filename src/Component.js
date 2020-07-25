@@ -612,7 +612,7 @@ const Binder = class {
 	*/
 	bindText(dataField, target, formatter = null, dataModel = this._component.dataObject) {
 		if (formatter === null) {
-			formatter = value => {
+			formatter = (value) => {
 				if (value === null) return ''
 				if (typeof value === 'string') return value
 				return '' + value
@@ -646,7 +646,7 @@ const Binder = class {
 	*/
 	bindAttribute(dataField, target, attributeName, formatter = null, dataModel = this._component.dataObject) {
 		if (formatter === null) {
-			formatter = value => {
+			formatter = (value) => {
 				if (value === null) return ''
 				if (typeof value === 'string') return value
 				return '' + value

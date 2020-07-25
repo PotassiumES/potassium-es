@@ -77,25 +77,25 @@ class WebXRViewerDisplay extends SceneDisplay {
 
 			this._xrDevice
 				.requestSession({ outputContext: this._outputContext })
-				.then(session => {
+				.then((session) => {
 					this._xrSession = session
 					this._xrSession.baseLayer = new XRWebGLLayer(this._xrSession, this._glContext)
 
 					this._xrSession
 						.requestFrameOfReference('eye-level')
-						.then(frameOfReference => {
+						.then((frameOfReference) => {
 							this._eyeLevelFrameOfReference = frameOfReference
 							// Kick off rendering
 							this._xrSession.requestAnimationFrame(this._render)
 							resolve()
 						})
-						.catch(err => {
+						.catch((err) => {
 							document.body.style['background-color'] = this._bgColor
 							this._isStarted = false
 							reject(err)
 						})
 				})
-				.catch(err => {
+				.catch((err) => {
 					this._dom.removeChild(this._outputCanvas)
 					document.body.style['background-color'] = this._bgColor
 					this._isStarted = false

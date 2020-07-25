@@ -52,7 +52,7 @@ class Stylesheet {
 	updateLocalStyles(node) {
 		// Now test each rule
 		for (const rule of this._data.rules) {
-			const matchingSelector = rule.selectors.find(sfList => sfList.matches(node))
+			const matchingSelector = rule.selectors.find((sfList) => sfList.matches(node))
 			if (!matchingSelector) continue
 			node.styles.matchingRules.push({
 				rule: rule,
@@ -71,7 +71,7 @@ class Stylesheet {
 	@return {Array<SelectorFragmentList>}
 	*/
 	_parseSelectors(rawSelectors) {
-		return rawSelectors.map(rawSelector => {
+		return rawSelectors.map((rawSelector) => {
 			return SelectorFragmentList.Parse(rawSelector)
 		})
 	}
@@ -81,7 +81,7 @@ class Stylesheet {
 	@return {Array<DeclarationList>}
 	*/
 	_parseDeclarations(rawDeclarations) {
-		const declarations = rawDeclarations.map(rawDeclaration => new Declaration(rawDeclaration))
+		const declarations = rawDeclarations.map((rawDeclaration) => new Declaration(rawDeclaration))
 		return new DeclarationList(declarations)
 	}
 }

@@ -138,7 +138,7 @@ const AssetLoader = class extends EventHandler {
 		this._currentFetchingAsset
 			.fetch()
 			.then(this._handleAssetFetched)
-			.catch(err => {
+			.catch((err) => {
 				console.error('Error checking loading queue', err)
 			})
 	}

@@ -32,40 +32,40 @@ BackgroundGeometry.prototype.constructor = BackgroundGeometry
 BackgroundGeometry.CurveDivisions = 15
 
 Object.defineProperty(BackgroundGeometry.prototype, 'width', {
-	get: function() {
+	get: function () {
 		return this._width
 	},
-	set: function(val) {
+	set: function (val) {
 		if (val < 0) return
 		this.setParams(val, this._height, this._radius)
 	}
 })
 
 Object.defineProperty(BackgroundGeometry.prototype, 'height', {
-	get: function() {
+	get: function () {
 		return this._height
 	},
-	set: function(val) {
+	set: function (val) {
 		if (val < 0) return
 		this.setParams(this._width, val, this._radius)
 	}
 })
 
 Object.defineProperty(BackgroundGeometry.prototype, 'radius', {
-	get: function() {
+	get: function () {
 		return this._radius
 	},
-	set: function(val) {
+	set: function (val) {
 		if (val < 0) return
 		this.setParams(this._width, this._height, val)
 	}
 })
 
-BackgroundGeometry.prototype.setContentSize = function(width, height) {
+BackgroundGeometry.prototype.setContentSize = function (width, height) {
 	this.setParams(width, height, this._radius)
 }
 
-BackgroundGeometry.prototype.setParams = function(width, height, radius) {
+BackgroundGeometry.prototype.setParams = function (width, height, radius) {
 	if (this._width === width && this._height === height && this._radius === radius) return
 	this._width = Math.max(0, width)
 	this._height = Math.max(0, height)
@@ -73,7 +73,7 @@ BackgroundGeometry.prototype.setParams = function(width, height, radius) {
 	this._updatePoints()
 }
 
-BackgroundGeometry.prototype._updatePoints = function() {
+BackgroundGeometry.prototype._updatePoints = function () {
 	this.clearGroups()
 	this.removeAttribute('position')
 

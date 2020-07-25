@@ -63,23 +63,23 @@ const DataObject = class extends EventHandler {
 	fetch() {
 		// Ask the server for data for this model or collection
 		return new Promise(
-			function(resolve, reject) {
+			function (resolve, reject) {
 				this.trigger('fetching', this)
 				this._innerFetch(this.url, this.fetchOptions)
-					.then(response => {
+					.then((response) => {
 						if (response.status != 200) {
 							throw 'Fetch failed with status ' + response.status
 						}
 						return response.json()
 					})
-					.then(data => {
+					.then((data) => {
 						data = this.parse(data)
 						this._new = false
 						this.reset(data)
 						this.trigger('fetched', this, data, null)
 						resolve(this)
 					})
-					.catch(err => {
+					.catch((err) => {
 						this._new = false
 						this.trigger('fetched', this, null, err)
 						reject(err)
@@ -117,7 +117,7 @@ const DataObject = class extends EventHandler {
 					.then(() => {
 						if (allAreFetched()) resolve(...dataObjects)
 					})
-					.catch(err => {
+					.catch((err) => {
 						if (allAreFetched()) resolve(...dataObjects)
 					})
 			}
@@ -126,7 +126,7 @@ const DataObject = class extends EventHandler {
 	save() {
 		// Tell the server to create (POST) or update (PUT) this model or collection
 		return new Promise(
-			function(resolve, reject) {
+			function (resolve, reject) {
 				this.trigger('saving', this)
 				const options = Object.assign({}, this.fetchOptions)
 				if (this.isNew) {
@@ -136,20 +136,20 @@ const DataObject = class extends EventHandler {
 				}
 				options.body = JSON.stringify(this.data)
 				this._innerFetch(this.url, options)
-					.then(response => {
+					.then((response) => {
 						if (response.status != 200) {
 							throw 'Save failed with status ' + response.status
 						}
 						return response.json()
 					})
-					.then(data => {
+					.then((data) => {
 						data = this.parse(data)
 						this.reset(data)
 						this._new = false
 						this.trigger('saved', this, data, null)
 						resolve(this)
 					})
-					.catch(err => {
+					.catch((err) => {
 						this.trigger('saved', this, null, err)
 						reject(err)
 					})
@@ -158,19 +158,19 @@ const DataObject = class extends EventHandler {
 	}
 	delete() {
 		return new Promise(
-			function(resolve, reject) {
+			function (resolve, reject) {
 				this.trigger('deleting', this)
 				const options = Object.assign({}, this.fetchOptions)
 				options.method = 'delete'
 				this._innerFetch(this.url, options)
-					.then(response => {
+					.then((response) => {
 						if (response.status != 200) {
 							throw 'Delete failed with status ' + response.status
 						}
 						this.trigger('deleted', this, null)
 						resolve()
 					})
-					.catch(err => {
+					.catch((err) => {
 						this.trigger('deleted', this, err)
 						reject(err)
 					})

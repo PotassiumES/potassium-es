@@ -5,18 +5,18 @@ If trailing is true, once the wait time has passed the function is called.
 
 This code is cribbed from https://github.com/jashkenas/underscore
 */
-const throttle = function(func, wait, leading = true, trailing = true) {
+const throttle = function (func, wait, leading = true, trailing = true) {
 	let timeout, context, args, result
 	let previous = 0
 
-	const later = function() {
+	const later = function () {
 		previous = leading === false ? 0 : Date.now()
 		timeout = null
 		result = func.apply(context, args)
 		if (!timeout) context = args = null
 	}
 
-	const throttled = function() {
+	const throttled = function () {
 		const now = Date.now()
 		if (!previous && leading === false) previous = now
 		const remaining = wait - (now - previous)
@@ -36,7 +36,7 @@ const throttle = function(func, wait, leading = true, trailing = true) {
 		return result
 	}
 
-	throttled.cancel = function() {
+	throttled.cancel = function () {
 		clearTimeout(timeout)
 		previous = 0
 		timeout = context = args = null
@@ -45,7 +45,7 @@ const throttle = function(func, wait, leading = true, trailing = true) {
 	return throttled
 }
 
-const throttledConsoleLog = throttle(function(...params) {
+const throttledConsoleLog = throttle(function (...params) {
 	console.log(...params)
 }, 1000)
 

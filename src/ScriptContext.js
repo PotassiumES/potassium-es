@@ -115,7 +115,7 @@ function getScriptContext(err) {
 		if (search.substr(0, 1) === '?') search = search.substr(1)
 		search.replace(/\?/g, '&')
 		pairs = search.split('&')
-		pairs.forEach(function(pair) {
+		pairs.forEach(function (pair) {
 			pair = pair.split('=')
 			if (pair[1].indexOf(',') > -1) context.data[pair[0]] = pair[1].split(',')
 			else context.data[pair[0]] = pair[1]
