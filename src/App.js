@@ -202,6 +202,7 @@ const App = class extends EventHandler {
 			})
 			.appendTo(this._dom)
 		this._flatDOM.setAttribute('data-name', 'FlatRoot')
+		this._flatDOM.app = this
 
 		/** Portal display mode overlay DOM */
 		this._portalDOM = dom
@@ -210,6 +211,7 @@ const App = class extends EventHandler {
 			})
 			.appendTo(this._dom)
 		this._portalDOM.setAttribute('data-name', 'PortalRoot')
+		this._portalDOM.app = this
 
 		/** Portal display mode 3D scene */
 		this._portalScene = som.scene()

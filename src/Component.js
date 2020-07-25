@@ -178,6 +178,16 @@ const Component = class extends EventHandler {
 		return this
 	}
 
+	/* Traverses the flatDOM's parent chain until it finds either the App or no more parents */
+
+	get app() {
+		let el = this._flatDOM
+		while (!el.app && el.parentElement) {
+			el = el.parentElement
+		}
+		return el.app || null
+	}
+
 	/**
 	inherited options that should be passed into children Components like so:
 
