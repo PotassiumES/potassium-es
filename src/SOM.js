@@ -337,7 +337,6 @@ function loadObj(objPath) {
 				const objURL = URL.createObjectURL(objBlob)
 				const mtlURL = URL.createObjectURL(mtlBlob)
 
-				mtlLoader.setTexturePath(baseURL)
 				mtlLoader.load(
 					mtlURL,
 					(materials) => {

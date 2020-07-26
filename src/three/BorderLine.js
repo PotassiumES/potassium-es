@@ -101,7 +101,7 @@ BorderGeometry.prototype.setParams = function (lineWidth, width, height, radius)
 
 BorderGeometry.prototype._updatePoints = function () {
 	this.clearGroups()
-	this.removeAttribute('position')
+	this.deleteAttribute('position')
 	if (this._lineWidth.some((w) => w > 0) === false) return
 
 	const width = Math.max(this._width, 0.0001)
@@ -146,7 +146,7 @@ BorderGeometry.prototype._updatePoints = function () {
 		push(i + curvePointCount, positionsIndex + 12)
 		push((i + 1) % curvePointCount, positionsIndex + 15)
 	}
-	this.addAttribute('position', new BufferAttribute(positions, 3))
+	this.setAttribute('position', new BufferAttribute(positions, 3))
 }
 
 export default BorderLine

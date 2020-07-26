@@ -93,7 +93,7 @@ function generateCubeGeometry(size) {
 		-h,
 		h
 	)
-	geometry.addAttribute('position', new Float32BufferAttribute(position, 3))
+	geometry.setAttribute('position', new Float32BufferAttribute(position, 3))
 	return geometry
 }
 

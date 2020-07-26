@@ -75,7 +75,7 @@ BackgroundGeometry.prototype.setParams = function (width, height, radius) {
 
 BackgroundGeometry.prototype._updatePoints = function () {
 	this.clearGroups()
-	this.removeAttribute('position')
+	this.deleteAttribute('position')
 
 	if (this._width <= 0 || this._height <= 0) return
 
@@ -96,7 +96,7 @@ BackgroundGeometry.prototype._updatePoints = function () {
 		positions.set([0, 0, 0], positionsIndex + 3)
 		push(i, positionsIndex + 6)
 	}
-	this.addAttribute('position', new BufferAttribute(positions, 3))
+	this.setAttribute('position', new BufferAttribute(positions, 3))
 }
 
 export default Background
