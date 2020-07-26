@@ -37,8 +37,8 @@ import {
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import { MTLLoader } from './three/MTLLoader.js'
-import { OBJLoader } from 'three/OBJLoader.js'
-import { GLTFLoader } from 'three/GLTFLoader.js'
+import { OBJLoader } from './three/OBJLoader.js'
+import { GLTFLoader } from './three/GLTFLoader.js'
 
 import { generateCubeGeometry } from './three/GeometryGenerators.js'
 
