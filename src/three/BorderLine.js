@@ -1,5 +1,13 @@
 import RoundRectCurve from './RoundRectCurve.js'
-import { Mesh, MeshStandardMaterial, BufferGeometry, DoubleSide, Vector3, BufferAttribute } from 'three/src/Three.js'
+import {
+	Mesh,
+	MeshStandardMaterial,
+	BufferGeometry,
+	DoubleSide,
+	Vector3,
+	Float32BufferAttribute,
+	BufferAttribute
+} from 'three/src/Three.js'
 
 /**
 BorderLine extends THREE.Mesh (an Object3D) and is used to render the box border set by KSS
@@ -9,6 +17,7 @@ function BorderLine(lineWidth = [0.01, 0.01, 0.01, 0.01], width = 0, height = 0,
 		this,
 		new BorderGeometry(lineWidth, width, height, radius),
 		new MeshStandardMaterial({
+			color: 0x000000,
 			side: DoubleSide
 		}),
 		undefined
@@ -102,6 +111,7 @@ BorderGeometry.prototype.setParams = function (lineWidth, width, height, radius)
 BorderGeometry.prototype._updatePoints = function () {
 	this.clearGroups()
 	this.deleteAttribute('position')
+	this.deleteAttribute('normal')
 	if (this._lineWidth.some((w) => w > 0) === false) return
 
 	const width = Math.max(this._width, 0.0001)
@@ -147,6 +157,12 @@ BorderGeometry.prototype._updatePoints = function () {
 		push((i + 1) % curvePointCount, positionsIndex + 15)
 	}
 	this.setAttribute('position', new BufferAttribute(positions, 3))
+
+	const normals = []
+	for (let i = 0; i < triangleCount * 3; i++) {
+		normals.push(0, 0, 1)
+	}
+	this.setAttribute('normal', new Float32BufferAttribute(normals, 3))
 }
 
 export default BorderLine

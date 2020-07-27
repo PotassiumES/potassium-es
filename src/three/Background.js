@@ -1,4 +1,11 @@
-import { Mesh, MeshStandardMaterial, BufferGeometry, BufferAttribute, DoubleSide } from 'three/src/Three.js'
+import {
+	Mesh,
+	MeshStandardMaterial,
+	BufferGeometry,
+	BufferAttribute,
+	Float32BufferAttribute,
+	DoubleSide
+} from 'three/src/Three.js'
 
 import RoundRectCurve from './RoundRectCurve.js'
 
@@ -11,6 +18,7 @@ function Background(width = 0, height = 0, radius = [0, 0, 0, 0]) {
 		this,
 		new BackgroundGeometry(width, height, radius),
 		new MeshStandardMaterial({
+			color: 0x000000,
 			side: DoubleSide
 		}),
 		undefined
@@ -76,6 +84,7 @@ BackgroundGeometry.prototype.setParams = function (width, height, radius) {
 BackgroundGeometry.prototype._updatePoints = function () {
 	this.clearGroups()
 	this.deleteAttribute('position')
+	this.deleteAttribute('normal')
 
 	if (this._width <= 0 || this._height <= 0) return
 
@@ -97,6 +106,12 @@ BackgroundGeometry.prototype._updatePoints = function () {
 		push(i, positionsIndex + 6)
 	}
 	this.setAttribute('position', new BufferAttribute(positions, 3))
+
+	const normals = []
+	for (let i = 0; i < pointsCount * 3; i++) {
+		normals.push(0, 0, 1)
+	}
+	this.setAttribute('normal', new Float32BufferAttribute(normals, 3))
 }
 
 export default Background
